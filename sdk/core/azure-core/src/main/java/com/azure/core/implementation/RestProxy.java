@@ -22,6 +22,7 @@ import com.azure.core.http.rest.PagedResponse;
 import com.azure.core.http.rest.Response;
 import com.azure.core.http.rest.ResponseBase;
 import com.azure.core.exception.UnexpectedLengthException;
+import com.azure.core.implementation.http.BufferedHttpResponse;
 import com.azure.core.implementation.http.ContentType;
 import com.azure.core.implementation.http.PagedResponseBase;
 import com.azure.core.implementation.http.UrlBuilder;
@@ -433,10 +434,11 @@ public class RestProxy implements InvocationHandler {
             }).switchIfEmpty(Mono.defer((Supplier<Mono<HttpDecodedResponse>>) () -> {
                 // bodyAsString() emits empty, indicate no body, create exception empty content string no exception
                 // body object.
+                String errorMessage = methodParser.getUnexpectedException(responseStatusCode).getErrorMessage();
                 Throwable exception =
                     instantiateUnexpectedException(methodParser.getUnexpectedException(responseStatusCode),
                         decodedResponse.getSourceResponse(),
-                        "",
+                        ImplUtils.isNullOrEmpty(errorMessage) ? "" : errorMessage,
                         null);
                 return Mono.error(exception);
                 //

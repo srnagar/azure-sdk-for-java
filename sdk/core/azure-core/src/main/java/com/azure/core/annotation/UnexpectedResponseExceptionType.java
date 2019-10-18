@@ -55,4 +55,6 @@ public @interface UnexpectedResponseExceptionType {
      * @return The HTTP status codes that trigger the exception to be thrown or returned.
      */
     int[] code() default {};
+
+    String errorMessage() default "";
 }

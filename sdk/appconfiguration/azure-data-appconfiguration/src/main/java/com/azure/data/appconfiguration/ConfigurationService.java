@@ -124,6 +124,8 @@ interface ConfigurationService {
 
     @Get("revisions")
     @ExpectedResponses({200, 206})
+    @UnexpectedResponseExceptionType(code = {416}, value = HttpResponseException.class, errorMessage = "Range not "
+        + "satisfiable")
     @UnexpectedResponseExceptionType(HttpResponseException.class)
     @ReturnValueWireType(ConfigurationSettingPage.class)
     Mono<PagedResponse<ConfigurationSetting>> listKeyValueRevisions(

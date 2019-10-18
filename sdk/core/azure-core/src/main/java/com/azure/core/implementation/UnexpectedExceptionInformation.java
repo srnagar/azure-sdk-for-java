@@ -15,13 +15,19 @@ public class UnexpectedExceptionInformation {
     private static final String EXCEPTION_BODY_METHOD = "getValue";
     private Class<? extends HttpResponseException> exceptionType;
     private Class<?> exceptionBodyType;
+    private String errorMessage;
 
     /**
      * Creates an UnexpectedExceptionInformation object with the given exception type and expected response body.
      * @param exceptionType Exception type to be thrown.
      */
     public UnexpectedExceptionInformation(Class<? extends HttpResponseException> exceptionType) {
+        this(exceptionType, null);
+    }
+
+    public UnexpectedExceptionInformation(Class<? extends HttpResponseException> exceptionType, String errorMessage) {
         this.exceptionType = exceptionType;
+        this.errorMessage = errorMessage;
 
         try {
             final Method exceptionBodyMethod = exceptionType.getDeclaredMethod(EXCEPTION_BODY_METHOD);
@@ -44,5 +50,9 @@ public class UnexpectedExceptionInformation {
      */
     public Class<?> getExceptionBodyType() {
         return exceptionBodyType;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
     }
 }
