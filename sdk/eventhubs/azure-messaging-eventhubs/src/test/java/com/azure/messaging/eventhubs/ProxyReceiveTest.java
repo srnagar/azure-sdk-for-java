@@ -8,7 +8,7 @@ import com.azure.core.util.logging.ClientLogger;
 import com.azure.messaging.eventhubs.jproxy.ProxyServer;
 import com.azure.messaging.eventhubs.jproxy.SimpleProxy;
 import com.azure.messaging.eventhubs.models.EventPosition;
-import com.azure.messaging.eventhubs.models.SendOptions;
+import com.azure.messaging.eventhubs.implementation.SendOptions;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Verify we can use jproxy hosted locally to receive messages.
  */
 public class ProxyReceiveTest extends IntegrationTestBase {
+
     private static final int PROXY_PORT = 8899;
     private static final AtomicBoolean HAS_PUSHED_EVENTS = new AtomicBoolean();
     private static final String PARTITION_ID = "0";
@@ -86,7 +87,6 @@ public class ProxyReceiveTest extends IntegrationTestBase {
         }
 
         consumer = builder.consumerGroup(EventHubClientBuilder.DEFAULT_CONSUMER_GROUP_NAME)
-            .startingPosition(EventPosition.fromEnqueuedTime(testData.getEnqueuedTime()))
             .buildAsyncConsumer();
     }
 
@@ -98,7 +98,8 @@ public class ProxyReceiveTest extends IntegrationTestBase {
     @Test
     public void testReceiverStartOfStreamFilters() {
         // Act & Assert
-        StepVerifier.create(consumer.receive(PARTITION_ID).take(NUMBER_OF_EVENTS))
+        StepVerifier.create(consumer.receive(PARTITION_ID, EventPosition.fromEnqueuedTime(testData.getEnqueuedTime()))
+            .take(NUMBER_OF_EVENTS))
             .expectNextCount(NUMBER_OF_EVENTS)
             .verifyComplete();
     }

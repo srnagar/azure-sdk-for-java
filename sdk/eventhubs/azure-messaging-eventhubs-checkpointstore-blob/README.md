@@ -99,18 +99,18 @@ class Program {
             return partitionEvent.getPartitionContext().updateCheckpoint(eventData);
           };                 
 
-        EventProcessor eventProcessor = new EventProcessorBuilder()
+        EventProcessor eventProcessorClient = new EventProcessorBuilder()
             .connectionString("<< CONNECTION STRING FOR THE EVENT HUB INSTANCE >>")
             .consumerGroupName("<< CONSUMER GROUP NAME >>")
             .processEvent(processEvent)
-            .eventProcessorStore(new BlobEventProcessorStore(blobContainerAsyncClient))
+            .checkpointStore(new BlobEventProcessorStore(blobContainerAsyncClient))
             .buildEventProcessor();
 
         // This will start the processor. It will start processing events from all partitions.
-        eventProcessor.start();
+        eventProcessorClient.start();
 
         // When the user wishes to stop processing events, they can call `stop()`.
-        eventProcessor.stop();
+        eventProcessorClient.stop();
     }
 }
 ```

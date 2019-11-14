@@ -79,7 +79,8 @@ import java.util.ServiceLoader;
  * @see EventHubClient
  * @see EventHubAsyncClient
  */
-@ServiceClientBuilder(serviceClients = {EventHubProducerAsyncClient.class, EventHubProducerClient.class})
+@ServiceClientBuilder(serviceClients = {EventHubProducerAsyncClient.class, EventHubProducerClient.class,
+    EventHubConsumerAsyncClient.class, EventHubConsumerClient.class})
 public class EventHubClientBuilder {
     /**
      * The name of the default consumer group in the Event Hubs service.
@@ -308,16 +309,16 @@ public class EventHubClientBuilder {
         return this;
     }
 
-    /**
-     * Sets the position within the partition where the consumer should begin reading events.
-     *
-     * @param eventPosition Position within an Event Hub partition to begin consuming events.
-     * @return The updated {@link EventHubClientBuilder} object.
-     */
-    public EventHubClientBuilder startingPosition(EventPosition eventPosition) {
-        this.startingPosition = eventPosition;
-        return this;
-    }
+//    /**
+//     * Sets the position within the partition where the consumer should begin reading events.
+//     *
+//     * @param eventPosition Position within an Event Hub partition to begin consuming events.
+//     * @return The updated {@link EventHubClientBuilder} object.
+//     */
+//    public EventHubClientBuilder startingPosition(EventPosition eventPosition) {
+//        this.startingPosition = eventPosition;
+//        return this;
+//    }
 
     /**
      * Sets the name of the consumer group this consumer is associated with. Events are read in the context of this
@@ -368,7 +369,7 @@ public class EventHubClientBuilder {
      *
      * @throws IllegalArgumentException If shared connection is not used and the credentials have not been set using
      * either {@link #connectionString(String)} or {@link #credential(String, String, TokenCredential)}. If
-     * {@link #startingPosition(EventPosition)} or {@link #consumerGroup(String)} have not been set.
+     * {@link #consumerGroup(String)} have not been set.
      * Or, if a proxy is specified but the transport type is not {@link TransportType#AMQP_WEB_SOCKETS web sockets}.
      */
     public EventHubConsumerAsyncClient buildAsyncConsumer() {
@@ -379,12 +380,8 @@ public class EventHubClientBuilder {
         if (CoreUtils.isNullOrEmpty(consumerGroup)) {
             throw logger.logExceptionAsError(new IllegalArgumentException("'consumerGroup' cannot be null or an empty "
                 + "string. using EventHubClientBuilder.consumerGroup(String)"));
-        } else if (startingPosition == null) {
-            throw logger.logExceptionAsError(new NullPointerException("'startingPosition' has not been set. Set it "
-                + "using EventHubClientBuilder.consumerGroup(String)"));
         }
-
-        return buildAsyncClient().createConsumer(consumerGroup, startingPosition, options);
+        return buildAsyncClient().createConsumer(consumerGroup, options);
     }
 
     /**
@@ -395,7 +392,7 @@ public class EventHubClientBuilder {
      *
      * @throws IllegalArgumentException If shared connection is not used and the credentials have not been set using
      * either {@link #connectionString(String)} or {@link #credential(String, String, TokenCredential)}. If
-     * {@link #startingPosition(EventPosition)} or {@link #consumerGroup(String)} have not been set.
+     * {@link #consumerGroup(String)} have not been set.
      * Or, if a proxy is specified but the transport type is not {@link TransportType#AMQP_WEB_SOCKETS web sockets}.
      */
     public EventHubConsumerClient buildConsumer() {

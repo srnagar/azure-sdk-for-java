@@ -178,9 +178,7 @@ class EventHubPartitionAsyncConsumer implements Closeable {
             }
         }
 
-        final PartitionContext partitionContext = new PartitionContext(partitionId, eventHubName, consumerGroup,
-            lastEnqueuedEventProperties.get());
-
-        return new PartitionEvent(partitionContext, event);
+        final PartitionContext partitionContext = new PartitionContext(partitionId, eventHubName, consumerGroup);
+        return new PartitionEvent(partitionContext, event, lastEnqueuedEventProperties.get());
     }
 }

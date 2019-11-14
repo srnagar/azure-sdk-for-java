@@ -3,6 +3,7 @@
 
 package com.azure.messaging.eventhubs.models;
 
+import com.azure.messaging.eventhubs.implementation.SendOptions;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

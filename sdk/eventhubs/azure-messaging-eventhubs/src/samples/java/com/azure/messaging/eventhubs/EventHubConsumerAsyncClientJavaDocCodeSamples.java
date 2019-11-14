@@ -21,11 +21,10 @@ public class EventHubConsumerAsyncClientJavaDocCodeSamples {
 
     public void initialization() {
         // BEGIN: com.azure.messaging.eventhubs.eventhubconsumerasyncclient.instantiation
-        // The required parameters are startingPosition, consumerGroup, and a way to authenticate with Event Hubs
+        // The required parameters are consumerGroup, and a way to authenticate with Event Hubs
         // using credentials.
         EventHubConsumerAsyncClient consumer = new EventHubClientBuilder()
             .connectionString("fake-string")
-            .startingPosition(EventPosition.latest())
             .consumerGroup(EventHubClientBuilder.DEFAULT_CONSUMER_GROUP_NAME)
             .buildAsyncConsumer();
         // END: com.azure.messaging.eventhubs.eventhubconsumerasyncclient.instantiation
@@ -37,7 +36,6 @@ public class EventHubConsumerAsyncClientJavaDocCodeSamples {
         // BEGIN: com.azure.messaging.eventhubs.eventhubconsumerasyncclient.receive#string
         EventHubConsumerAsyncClient consumer = new EventHubClientBuilder()
             .connectionString("fake-string")
-            .startingPosition(EventPosition.latest())
             .consumerGroup(EventHubClientBuilder.DEFAULT_CONSUMER_GROUP_NAME)
             .buildAsyncConsumer();
 
@@ -46,7 +44,7 @@ public class EventHubConsumerAsyncClientJavaDocCodeSamples {
 
         // Keep a reference to `subscription`. When the program is finished receiving events, call
         // subscription.dispose(). This will stop fetching events from the Event Hub.
-        Disposable subscription = consumer.receive(partitionId).subscribe(event -> {
+        Disposable subscription = consumer.receive(partitionId, EventPosition.latest()).subscribe(event -> {
             // process event
         }, error -> System.err.print(error.toString()));
         // END: com.azure.messaging.eventhubs.eventhubconsumerasyncclient.receive#string
@@ -64,11 +62,10 @@ public class EventHubConsumerAsyncClientJavaDocCodeSamples {
         EventHubConsumerAsyncClient consumer = new EventHubClientBuilder()
             .connectionString("fake-string")
             .consumerGroup(EventHubClientBuilder.DEFAULT_CONSUMER_GROUP_NAME)
-            .startingPosition(EventPosition.latest())
             .buildAsyncConsumer();
 
         // BEGIN: com.azure.messaging.eventhubs.eventhubconsumerasyncclient.receive#string-basesubscriber
-        consumer.receive(partitionId).subscribe(new BaseSubscriber<PartitionEvent>() {
+        consumer.receive(partitionId, EventPosition.latest()).subscribe(new BaseSubscriber<PartitionEvent>() {
             private static final int NUMBER_OF_EVENTS = 5;
             private final AtomicInteger currentNumberOfEvents = new AtomicInteger();
 
@@ -100,12 +97,11 @@ public class EventHubConsumerAsyncClientJavaDocCodeSamples {
         EventHubConsumerAsyncClient consumer = new EventHubClientBuilder()
             .connectionString("fake-string")
             .consumerGroup(EventHubClientBuilder.DEFAULT_CONSUMER_GROUP_NAME)
-            .startingPosition(EventPosition.latest())
             .buildAsyncConsumer();
 
         // BEGIN: com.azure.messaging.eventhubs.eventhubconsumerasyncclient.receive
         // Receives events from all partitions as they come in.
-        consumer.receive().subscribe(partitionEvent -> {
+        consumer.receive(EventPosition.latest()).subscribe(partitionEvent -> {
             PartitionContext context = partitionEvent.getPartitionContext();
             EventData event = partitionEvent.getEventData();
             System.out.printf("Event %s is from partition %s%n.", event.getSequenceNumber(), context.getPartitionId());
@@ -123,14 +119,12 @@ public class EventHubConsumerAsyncClientJavaDocCodeSamples {
         EventHubConsumerAsyncClient consumer = new EventHubClientBuilder()
             .connectionString("fake-string")
             .consumerGroup(EventHubClientBuilder.DEFAULT_CONSUMER_GROUP_NAME)
-            .startingPosition(EventPosition.latest())
             .consumerOptions(options)
             .buildAsyncConsumer();
 
         // Receives events from all partitions as they come in.
-        consumer.receive().subscribe(partitionEvent -> {
-            PartitionContext context = partitionEvent.getPartitionContext();
-            LastEnqueuedEventProperties properties = context.getLastEnqueuedEventProperties();
+        consumer.receive(EventPosition.latest()).subscribe(partitionEvent -> {
+            LastEnqueuedEventProperties properties = partitionEvent.getLastEnqueuedEventProperties();
             System.out.printf("Information received at %s. Sequence Id: %s", properties.getRetrievalTime(),
                 properties.getSequenceNumber());
         });

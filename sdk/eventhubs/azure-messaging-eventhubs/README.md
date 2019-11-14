@@ -183,7 +183,7 @@ Developers can create a producer by calling `buildProducer()` or `buildAsyncProd
 synchronous `EventHubProducerClient` is created. If `buildAsyncProducer` is used, an asynchronous
 `EventHubProducerAsyncClient` is returned.
 
-Specifying `batchOptions.partitionId(String)` will send events to a specific partition, and not, will allow for automatic
+Specifying `createBatchOptions.partitionId(String)` will send events to a specific partition, and not, will allow for automatic
 routing. In addition, specifying `partitionKey(String)` will tell Event Hubs service to hash the events and send them to
 the same partition.
 
@@ -227,8 +227,8 @@ Hubs service keep different events or batches of events together on the same par
 setting a `partition key` when publishing the events.
 
 ```java
-BatchOptions batchOptions = new BatchOptions().partitionKey("grouping-key");
-EventDataBatch eventDataBatch = producer.createBatch(batchOptions);
+BatchOptions createBatchOptions = new BatchOptions().partitionKey("grouping-key");
+EventDataBatch eventDataBatch = producer.createBatch(createBatchOptions);
 // add events to eventDataBatch
 producer.send(eventDataBatch);
 ```
@@ -299,10 +299,10 @@ processes events received from the Event Hub and writes to console.
 ```java
 class Program {
     public static void main(String[] args) {
-        EventProcessor eventProcessor = new EventProcessorBuilder()
+        EventProcessor eventProcessorClient = new EventProcessorBuilder()
             .consumerGroup("<< CONSUMER GROUP NAME >>")
             .connectionString("<< EVENT HUB CONNECTION STRING >>")
-            .eventProcessorStore(new InMemoryEventProcessorStore())
+            .checkpointStore(new InMemoryEventProcessorStore())
             .processEvent(partitionEvent -> {
                 System.out.println("Partition id = " + partitionEvent.getPartitionContext().getPartitionId() + " and "
                     + "sequence number of event = " + partitionEvent.getEventData().getSequenceNumber());
@@ -311,13 +311,13 @@ class Program {
             .buildEventProcessor();
 
         // This will start the processor. It will start processing events from all partitions.
-        eventProcessor.start();
+        eventProcessorClient.start();
         
         // (for demo purposes only - adding sleep to wait for receiving events)
         TimeUnit.SECONDS.sleep(2); 
 
         // When the user wishes to stop processing events, they can call `stop()`.
-        eventProcessor.stop();
+        eventProcessorClient.stop();
     }
 }
 ```

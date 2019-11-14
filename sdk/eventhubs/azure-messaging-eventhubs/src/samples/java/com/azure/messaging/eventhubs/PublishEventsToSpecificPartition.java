@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 package com.azure.messaging.eventhubs;
 
-import com.azure.messaging.eventhubs.models.BatchOptions;
+import com.azure.messaging.eventhubs.models.CreateBatchOptions;
 import java.util.concurrent.atomic.AtomicReference;
 import reactor.core.publisher.Flux;
 
@@ -49,7 +49,7 @@ public class PublishEventsToSpecificPartition {
             new EventData("EventData Sample 3".getBytes(UTF_8)));
 
         // Create a batch to send the events.
-        final BatchOptions options = new BatchOptions()
+        final CreateBatchOptions options = new CreateBatchOptions()
             .setPartitionId(firstPartition)
             .setMaximumSizeInBytes(256);
         final AtomicReference<EventDataBatch> currentBatch = new AtomicReference<>(

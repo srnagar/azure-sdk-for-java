@@ -7,7 +7,7 @@ import com.azure.core.amqp.TransportType;
 import com.azure.core.util.logging.ClientLogger;
 import com.azure.messaging.eventhubs.models.EventHubConsumerOptions;
 import com.azure.messaging.eventhubs.models.EventPosition;
-import com.azure.messaging.eventhubs.models.SendOptions;
+import com.azure.messaging.eventhubs.implementation.SendOptions;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -79,11 +79,12 @@ public class EventHubAsyncClientIntegrationTest extends IntegrationTestBase {
         // Arrange
         final EventHubConsumerOptions options = new EventHubConsumerOptions()
             .setPrefetchCount(2);
-        final EventHubConsumerAsyncClient consumer = client.createConsumer(DEFAULT_CONSUMER_GROUP_NAME,
-            EventPosition.fromEnqueuedTime(testData.getEnqueuedTime()), options);
+        final EventHubConsumerAsyncClient consumer = client.createConsumer(DEFAULT_CONSUMER_GROUP_NAME, options);
 
         // Act & Assert
-        StepVerifier.create(consumer.receive(PARTITION_ID).filter(x -> isMatchingEvent(x, testData.getMessageTrackingId()))
+        StepVerifier.create(consumer.receive(PARTITION_ID, EventPosition.fromEnqueuedTime(testData.getEnqueuedTime()))
+            .filter(x -> isMatchingEvent(x,
+                testData.getMessageTrackingId()))
             .take(NUMBER_OF_EVENTS))
             .expectNextCount(NUMBER_OF_EVENTS)
             .expectComplete()
@@ -122,7 +123,7 @@ public class EventHubAsyncClientIntegrationTest extends IntegrationTestBase {
                 final EventHubConsumerAsyncClient consumer = hubClient.createConsumer(DEFAULT_CONSUMER_GROUP_NAME, EventPosition.latest());
                 consumers.add(consumer);
 
-                consumer.receive(PARTITION_ID).filter(partitionEvent -> {
+                consumer.receive(PARTITION_ID, EventPosition.earliest()).filter(partitionEvent -> {
                     EventData event = partitionEvent.getEventData();
                     return event.getProperties() != null
                         && event.getProperties().containsKey(messageTrackingId)

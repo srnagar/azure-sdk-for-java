@@ -7,7 +7,7 @@ import com.azure.core.amqp.MessageConstant;
 import com.azure.core.amqp.implementation.MessageSerializer;
 import com.azure.core.util.logging.ClientLogger;
 import com.azure.messaging.eventhubs.models.EventPosition;
-import com.azure.messaging.eventhubs.models.SendOptions;
+import com.azure.messaging.eventhubs.implementation.SendOptions;
 import org.apache.qpid.proton.Proton;
 import org.apache.qpid.proton.amqp.Binary;
 import org.apache.qpid.proton.amqp.Symbol;
@@ -109,7 +109,7 @@ public class InteropAmqpPropertiesTest extends IntegrationTestBase {
         // Act & Assert
         // We're setting a tracking identifier because we don't want to receive some random operations. We want to
         // receive the event we sent.
-        StepVerifier.create(consumer.receive(PARTITION_ID).filter(event -> isMatchingEvent(event, messageTrackingValue)).take(1).map(x -> x.getEventData()))
+        StepVerifier.create(consumer.receive(PARTITION_ID, EventPosition.earliest()).filter(event -> isMatchingEvent(event, messageTrackingValue)).take(1).map(x -> x.getEventData()))
             .then(() -> producer.send(msgEvent, sendOptions).block(TIMEOUT))
             .assertNext(event -> {
                 validateAmqpProperties(message, expectedAnnotations, applicationProperties, event);
@@ -119,7 +119,7 @@ public class InteropAmqpPropertiesTest extends IntegrationTestBase {
 
         Assertions.assertNotNull(receivedEventData.get());
 
-        StepVerifier.create(consumer.receive(PARTITION_ID).filter(event -> isMatchingEvent(event, messageTrackingValue)).take(1).map(x -> x.getEventData()))
+        StepVerifier.create(consumer.receive(PARTITION_ID, EventPosition.earliest()).filter(event -> isMatchingEvent(event, messageTrackingValue)).take(1).map(x -> x.getEventData()))
             .then(() -> producer.send(receivedEventData.get(), sendOptions).block(TIMEOUT))
             .assertNext(event -> validateAmqpProperties(message, expectedAnnotations, applicationProperties, event))
             .verifyComplete();

@@ -5,9 +5,9 @@ package com.azure.messaging.eventhubs.checkpointstore.blob;
 
 import com.azure.core.http.policy.HttpLogDetailLevel;
 import com.azure.core.http.policy.HttpLogOptions;
-import com.azure.messaging.eventhubs.EventProcessor;
-import com.azure.messaging.eventhubs.EventProcessorBuilder;
-import com.azure.messaging.eventhubs.models.PartitionEvent;
+import com.azure.messaging.eventhubs.EventProcessorClient;
+import com.azure.messaging.eventhubs.EventProcessorClientBuilder;
+import com.azure.messaging.eventhubs.models.EventProcessorEvent;
 import com.azure.storage.blob.BlobContainerAsyncClient;
 import com.azure.storage.blob.BlobContainerClientBuilder;
 import java.util.concurrent.TimeUnit;
@@ -15,7 +15,7 @@ import java.util.function.Function;
 import reactor.core.publisher.Mono;
 
 /**
- * Sample for using {@link BlobEventProcessorStore} with {@link EventProcessor}.
+ * Sample for using {@link BlobCheckpointStore} with {@link EventProcessorClient}.
  */
 public class EventProcessorBlobEventProcessorStoreSample {
 
@@ -23,12 +23,12 @@ public class EventProcessorBlobEventProcessorStoreSample {
     private static final String SAS_TOKEN_STRING = "";
     private static final String STORAGE_CONNECTION_STRING = "";
 
-    public static final Function<PartitionEvent, Mono<Void>> PARTITION_PROCESSOR = partitionEvent -> {
+    public static final Function<EventProcessorEvent, Mono<Void>> PARTITION_PROCESSOR = partitionEvent -> {
         System.out.printf("Processing event from partition %s with sequence number %d %n",
             partitionEvent.getPartitionContext().getPartitionId(), partitionEvent.getEventData().getSequenceNumber());
 
         if (partitionEvent.getEventData().getSequenceNumber() % 10 == 0) {
-            return partitionEvent.getPartitionContext().updateCheckpoint(partitionEvent.getEventData());
+            return partitionEvent.updateCheckpoint();
         }
         return Mono.empty();
     };
@@ -47,16 +47,16 @@ public class EventProcessorBlobEventProcessorStoreSample {
             .httpLogOptions(new HttpLogOptions().setLogLevel(HttpLogDetailLevel.BODY_AND_HEADERS))
             .buildAsyncClient();
 
-        EventProcessorBuilder eventProcessorBuilder = new EventProcessorBuilder()
+        EventProcessorClientBuilder eventProcessorClientBuilder = new EventProcessorClientBuilder()
             .connectionString(EH_CONNECTION_STRING)
             .consumerGroup("<< CONSUMER GROUP NAME >>")
             .processEvent(PARTITION_PROCESSOR)
-            .eventProcessorStore(new BlobEventProcessorStore(blobContainerAsyncClient));
+            .eventProcessorStore(new BlobCheckpointStore(blobContainerAsyncClient));
 
-        EventProcessor eventProcessor = eventProcessorBuilder.buildEventProcessor();
-        eventProcessor.start();
+        EventProcessorClient eventProcessorClient = eventProcessorClientBuilder.buildEventProcessor();
+        eventProcessorClient.start();
         TimeUnit.MINUTES.sleep(5);
-        eventProcessor.stop();
+        eventProcessorClient.stop();
     }
 
 }

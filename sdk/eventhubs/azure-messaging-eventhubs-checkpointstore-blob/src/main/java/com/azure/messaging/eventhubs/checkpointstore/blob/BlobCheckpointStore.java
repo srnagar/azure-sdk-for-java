@@ -6,8 +6,8 @@ package com.azure.messaging.eventhubs.checkpointstore.blob;
 import com.azure.core.http.rest.Response;
 import com.azure.core.util.CoreUtils;
 import com.azure.core.util.logging.ClientLogger;
-import com.azure.messaging.eventhubs.EventProcessor;
-import com.azure.messaging.eventhubs.EventProcessorStore;
+import com.azure.messaging.eventhubs.CheckpointStore;
+import com.azure.messaging.eventhubs.EventProcessorClient;
 import com.azure.messaging.eventhubs.models.Checkpoint;
 import com.azure.messaging.eventhubs.models.PartitionOwnership;
 import com.azure.storage.blob.BlobAsyncClient;
@@ -29,14 +29,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
- * Implementation of {@link EventProcessorStore} that uses
+ * Implementation of {@link CheckpointStore} that uses
  * <a href="https://docs.microsoft.com/en-us/azure/storage/common/storage-introduction#blob-storage">Storage Blobs</a>
- * for persisting partition ownership and checkpoint information. {@link EventProcessor EventProcessors} can use this
+ * for persisting partition ownership and checkpoint information. {@link EventProcessorClient EventProcessors} can use this
  * implementation to load balance and update checkpoints.
  *
- * @see EventProcessor
+ * @see EventProcessorClient
  */
-public class BlobEventProcessorStore implements EventProcessorStore {
+public class BlobCheckpointStore implements CheckpointStore {
 
     private static final String SEQUENCE_NUMBER = "SequenceNumber";
     private static final String OFFSET = "Offset";
@@ -48,7 +48,7 @@ public class BlobEventProcessorStore implements EventProcessorStore {
     private static final ByteBuffer UPLOAD_DATA = ByteBuffer.wrap("".getBytes(UTF_8));
 
     private final BlobContainerAsyncClient blobContainerAsyncClient;
-    private final ClientLogger logger = new ClientLogger(BlobEventProcessorStore.class);
+    private final ClientLogger logger = new ClientLogger(BlobCheckpointStore.class);
     private final Map<String, BlobAsyncClient> blobClients = new ConcurrentHashMap<>();
 
     /**
@@ -57,22 +57,22 @@ public class BlobEventProcessorStore implements EventProcessorStore {
      * @param blobContainerAsyncClient The {@link BlobContainerAsyncClient} this instance will use to read and update
      * blobs in the storage container.
      */
-    public BlobEventProcessorStore(BlobContainerAsyncClient blobContainerAsyncClient) {
+    public BlobCheckpointStore(BlobContainerAsyncClient blobContainerAsyncClient) {
         this.blobContainerAsyncClient = blobContainerAsyncClient;
     }
 
     /**
-     * This method is called by the {@link EventProcessor} to get the list of all existing partition ownership from the
+     * This method is called by the {@link EventProcessorClient} to get the list of all existing partition ownership from the
      * Storage Blobs. Could return empty results if there are is no existing ownership information.
      *
      * @param eventHubName The Event Hub name to get ownership information.
-     * @param consumerGroupName The consumer group name.
+     * @param consumerGroup The consumer group name.
      * @return A flux of partition ownership details of all the partitions that have/had an owner.
      */
     @Override
     public Flux<PartitionOwnership> listOwnership(String fullyQualifiedNamespace, String eventHubName,
-        String consumerGroupName) {
-        String prefix = getBlobPrefix(eventHubName, consumerGroupName);
+        String consumerGroup) {
+        String prefix = getBlobPrefix(eventHubName, consumerGroup);
         BlobListDetails details = new BlobListDetails().setRetrieveMetadata(true);
         ListBlobsOptions options = new ListBlobsOptions().setPrefix(prefix).setDetails(details);
         return blobContainerAsyncClient.listBlobs(options)
@@ -83,7 +83,7 @@ public class BlobEventProcessorStore implements EventProcessorStore {
     }
 
     /**
-     * This method is called by the {@link EventProcessor} to claim ownership of a list of partitions. This will return
+     * This method is called by the {@link EventProcessorClient} to claim ownership of a list of partitions. This will return
      * the list of partitions that were owned successfully.
      *
      * @param requestedPartitionOwnerships Array of partition ownerships this instance is requesting to own.
@@ -105,10 +105,6 @@ public class BlobEventProcessorStore implements EventProcessorStore {
 
             Map<String, String> metadata = new HashMap<>();
             metadata.put(OWNER_ID, partitionOwnership.getOwnerId());
-            Long offset = partitionOwnership.getOffset();
-            metadata.put(OFFSET, offset == null ? null : String.valueOf(offset));
-            Long sequenceNumber = partitionOwnership.getSequenceNumber();
-            metadata.put(SEQUENCE_NUMBER, sequenceNumber == null ? null : String.valueOf(sequenceNumber));
             BlobRequestConditions blobRequestConditions = new BlobRequestConditions();
             if (CoreUtils.isNullOrEmpty(partitionOwnership.getETag())) {
                 // New blob should be created
@@ -131,6 +127,12 @@ public class BlobEventProcessorStore implements EventProcessorStore {
         });
     }
 
+    @Override
+    public Flux<Checkpoint> listCheckpoints(String fullyQualifiedNamespace, String eventHubName,
+        String consumerGroup) {
+        return Flux.empty();
+    }
+
     private Mono<PartitionOwnership> updateOwnershipETag(Response<?> response, PartitionOwnership ownership) {
         return Mono.just(ownership.setETag(response.getHeaders().get(ETAG).getValue()));
     }
@@ -142,7 +144,7 @@ public class BlobEventProcessorStore implements EventProcessorStore {
      * @return The new ETag on successful update.
      */
     @Override
-    public Mono<String> updateCheckpoint(Checkpoint checkpoint) {
+    public Mono<Void> updateCheckpoint(Checkpoint checkpoint) {
         if (checkpoint.getSequenceNumber() == null && checkpoint.getOffset() == null) {
             throw logger.logExceptionAsWarning(Exceptions
                 .propagate(new IllegalStateException(
@@ -162,12 +164,9 @@ public class BlobEventProcessorStore implements EventProcessorStore {
         String offset = checkpoint.getOffset() == null ? null : String.valueOf(checkpoint.getOffset());
         metadata.put(SEQUENCE_NUMBER, sequenceNumber);
         metadata.put(OFFSET, offset);
-        metadata.put(OWNER_ID, checkpoint.getOwnerId());
         BlobAsyncClient blobAsyncClient = blobClients.get(blobName);
-        BlobRequestConditions blobRequestConditions = new BlobRequestConditions().setIfMatch(checkpoint.getETag());
 
-        return blobAsyncClient.setMetadataWithResponse(metadata, blobRequestConditions)
-            .map(response -> response.getHeaders().get(ETAG).getValue());
+        return blobAsyncClient.setMetadata(metadata);
     }
 
     private String getBlobPrefix(String eventHubName, String consumerGroupName) {
@@ -196,12 +195,6 @@ public class BlobEventProcessorStore implements EventProcessorStore {
             switch (key) {
                 case OWNER_ID:
                     partitionOwnership.setOwnerId(value);
-                    break;
-                case SEQUENCE_NUMBER:
-                    partitionOwnership.setSequenceNumber(Long.valueOf(value));
-                    break;
-                case OFFSET:
-                    partitionOwnership.setOffset(Long.valueOf(value));
                     break;
                 default:
                     // do nothing, other metadata that we don't use

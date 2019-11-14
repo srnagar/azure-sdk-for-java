@@ -14,26 +14,27 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * A simple in-memory implementation of a {@link EventProcessorStore}. This implementation keeps track of partition
+ * A simple in-memory implementation of a {@link CheckpointStore}. This implementation keeps track of partition
  * ownership details including checkpointing information in-memory. Using this implementation will only facilitate
  * checkpointing and load balancing of Event Processors running within this process.
  */
-public class InMemoryEventProcessorStore implements EventProcessorStore {
+public class InMemoryCheckpointStore implements CheckpointStore {
 
     private final Map<String, PartitionOwnership> partitionOwnershipMap = new ConcurrentHashMap<>();
-    private final ClientLogger logger = new ClientLogger(InMemoryEventProcessorStore.class);
+    private final Map<String, Checkpoint> checkpointMap = new ConcurrentHashMap<>();
+    private final ClientLogger logger = new ClientLogger(InMemoryCheckpointStore.class);
 
     /**
      * {@inheritDoc}
      *
      * @param fullyQualifiedNamespace The fully qualified namespace of the Event Hub.
      * @param eventHubName The name of the Event Hub to list ownership of.
-     * @param consumerGroupName The name of the consumer group to list ownership of.
+     * @param consumerGroup The name of the consumer group to list ownership of.
      * @return A {@link Flux} of partition ownership information.
      */
     @Override
     public Flux<PartitionOwnership> listOwnership(String fullyQualifiedNamespace, String eventHubName,
-        String consumerGroupName) {
+        String consumerGroup) {
         logger.info("Listing partition ownership");
         return Flux.fromIterable(partitionOwnershipMap.values());
     }
@@ -65,6 +66,12 @@ public class InMemoryEventProcessorStore implements EventProcessorStore {
             });
     }
 
+    @Override
+    public Flux<Checkpoint> listCheckpoints(String fullyQualifiedNamespace, String eventHubName,
+        String consumerGroup) {
+        return Flux.empty();
+    }
+
     /**
      * Updates the in-memory storage with the provided checkpoint information.
      *
@@ -72,14 +79,8 @@ public class InMemoryEventProcessorStore implements EventProcessorStore {
      * @return A new ETag associated with the updated checkpoint.
      */
     @Override
-    public Mono<String> updateCheckpoint(final Checkpoint checkpoint) {
-        String updatedETag = UUID.randomUUID().toString();
-        partitionOwnershipMap.get(checkpoint.getPartitionId())
-            .setSequenceNumber(checkpoint.getSequenceNumber())
-            .setOffset(checkpoint.getOffset())
-            .setETag(updatedETag);
-        logger.info("Updated checkpoint for partition {} with sequence number {}", checkpoint.getPartitionId(),
-            checkpoint.getSequenceNumber());
-        return Mono.just(updatedETag);
+    public Mono<Void> updateCheckpoint(final Checkpoint checkpoint) {
+        checkpointMap.put(checkpoint.getPartitionId(), checkpoint);
+        return Mono.empty();
     }
 }

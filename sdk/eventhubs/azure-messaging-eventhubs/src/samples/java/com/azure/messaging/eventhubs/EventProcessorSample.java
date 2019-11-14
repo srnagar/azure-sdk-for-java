@@ -3,7 +3,7 @@
 
 package com.azure.messaging.eventhubs;
 
-import com.azure.messaging.eventhubs.models.PartitionEvent;
+import com.azure.messaging.eventhubs.models.EventProcessorEvent;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import org.slf4j.Logger;
@@ -11,56 +11,56 @@ import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 
 /**
- * Sample code to demonstrate how a customer might use {@link EventProcessor}.
+ * Sample code to demonstrate how a customer might use {@link EventProcessorClient}.
  */
 public class EventProcessorSample {
 
     private static final String EH_CONNECTION_STRING = "Endpoint={endpoint};SharedAccessKeyName={sharedAccessKeyName};SharedAccessKey={sharedAccessKey};EntityPath={eventHubName}";
 
     /**
-     * Main method to demonstrate starting and stopping a {@link EventProcessor}.
+     * Main method to demonstrate starting and stopping a {@link EventProcessorClient}.
      *
      * @param args The input arguments to this executable.
-     * @throws Exception If there are any errors while running the {@link EventProcessor}.
+     * @throws Exception If there are any errors while running the {@link EventProcessorClient}.
      */
     public static void main(String[] args) throws Exception {
 
         Logger logger = LoggerFactory.getLogger(EventProcessorSample.class);
-        Function<PartitionEvent, Mono<Void>> processEvent = partitionEvent -> {
+        Function<EventProcessorEvent, Mono<Void>> processEvent = eventProcessorEvent -> {
             logger.info(
                 "Processing event: Event Hub name = {}; consumer group name = {}; partition id = {}; sequence number = {}",
-                partitionEvent.getPartitionContext().getEventHubName(),
-                partitionEvent.getPartitionContext().getConsumerGroup(),
-                partitionEvent.getPartitionContext().getPartitionId(),
-                partitionEvent.getEventData().getSequenceNumber());
-            return partitionEvent.getPartitionContext().updateCheckpoint(partitionEvent.getEventData());
+                eventProcessorEvent.getPartitionContext().getEventHubName(),
+                eventProcessorEvent.getPartitionContext().getConsumerGroup(),
+                eventProcessorEvent.getPartitionContext().getPartitionId(),
+                eventProcessorEvent.getEventData().getSequenceNumber());
+            return eventProcessorEvent.updateCheckpoint();
         };
 
-        EventProcessorBuilder eventProcessorBuilder = new EventProcessorBuilder()
+        EventProcessorClientBuilder eventProcessorClientBuilder = new EventProcessorClientBuilder()
             .consumerGroup(EventHubClientBuilder.DEFAULT_CONSUMER_GROUP_NAME)
             .connectionString(EH_CONNECTION_STRING)
             .processEvent(processEvent)
-            .eventProcessorStore(new InMemoryEventProcessorStore());
+            .eventProcessorStore(new InMemoryCheckpointStore());
 
-        EventProcessor eventProcessor = eventProcessorBuilder.buildEventProcessor();
+        EventProcessorClient eventProcessorClient = eventProcessorClientBuilder.buildEventProcessor();
         System.out.println("Starting event processor");
-        eventProcessor.start();
-        eventProcessor.start(); // should be a no-op
+        eventProcessorClient.start();
+        eventProcessorClient.start(); // should be a no-op
 
         // Continue to perform other tasks while the processor is running in the background.
         Thread.sleep(TimeUnit.MINUTES.toMillis(1));
 
         System.out.println("Stopping event processor");
-        eventProcessor.stop();
+        eventProcessorClient.stop();
 
         Thread.sleep(TimeUnit.SECONDS.toMillis(40));
         System.out.println("Starting a new instance of event processor");
-        eventProcessor = eventProcessorBuilder.buildEventProcessor();
-        eventProcessor.start();
+        eventProcessorClient = eventProcessorClientBuilder.buildEventProcessor();
+        eventProcessorClient.start();
         // Continue to perform other tasks while the processor is running in the background.
         Thread.sleep(TimeUnit.MINUTES.toMillis(1));
         System.out.println("Stopping event processor");
-        eventProcessor.stop();
+        eventProcessorClient.stop();
         System.out.println("Exiting process");
     }
 }

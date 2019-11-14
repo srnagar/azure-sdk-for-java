@@ -32,7 +32,7 @@ public final class EventPosition {
      */
     private static final String END_OF_STREAM = "@latest";
 
-    private static final EventPosition EARLIEST = fromOffset(START_OF_STREAM, false);
+    private static final EventPosition EARLIEST = new EventPosition(false, START_OF_STREAM, null, null);
     private static final EventPosition LATEST =  new EventPosition(false, END_OF_STREAM, null, null);
 
     private final boolean isInclusive;
@@ -99,20 +99,7 @@ public final class EventPosition {
      * @return An {@link EventPosition} object.
      */
     public static EventPosition fromOffset(long offset) {
-        return fromOffset(offset, true);
-    }
-
-    /**
-     * Creates a position to an event in the partition at the provided offset. If {@code isInclusive} is true, the event
-     * with the same offset is returned. Otherwise, the next event is received.
-     *
-     * @param offset The offset of an event with respect to its relative position in the
-     * @param isInclusive If true, the event with the {@code offset} is included; otherwise, the next event will be
-     *     received.
-     * @return An {@link EventPosition} object.
-     */
-    public static EventPosition fromOffset(long offset, boolean isInclusive) {
-        return new EventPosition(isInclusive, offset, null, null);
+        return new EventPosition(true, offset, null, null);
     }
 
     /**

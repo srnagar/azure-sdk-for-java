@@ -12,7 +12,7 @@ import com.azure.storage.blob.BlobContainerClientBuilder;
 import java.util.StringJoiner;
 
 /**
- * Sample that demonstrates the use {@link BlobEventProcessorStore} for storing and updating partition ownership records
+ * Sample that demonstrates the use {@link BlobCheckpointStore} for storing and updating partition ownership records
  * in Storage Blobs.
  */
 public class BlobEventProcessorStoreSample {
@@ -32,7 +32,7 @@ public class BlobEventProcessorStoreSample {
             .httpLogOptions(new HttpLogOptions().setLogLevel(HttpLogDetailLevel.BODY_AND_HEADERS))
             .buildAsyncClient();
 
-        BlobEventProcessorStore blobEventProcessorStore = new BlobEventProcessorStore(blobContainerAsyncClient);
+        BlobCheckpointStore blobEventProcessorStore = new BlobCheckpointStore(blobContainerAsyncClient);
         blobEventProcessorStore.listOwnership("namespace", "abc", "xyz")
             .subscribe(BlobEventProcessorStoreSample::printPartitionOwnership);
 
@@ -40,9 +40,7 @@ public class BlobEventProcessorStoreSample {
         Checkpoint checkpoint = new Checkpoint()
             .setConsumerGroupName("xyz")
             .setEventHubName("abc")
-            .setOwnerId("owner1")
             .setPartitionId("0")
-            .setETag("")
             .setSequenceNumber(2L)
             .setOffset(250L);
         blobEventProcessorStore.updateCheckpoint(checkpoint)
@@ -55,8 +53,7 @@ public class BlobEventProcessorStoreSample {
                 .setEventHubName("abc")
                 .setConsumerGroupName("xyz")
                 .setOwnerId("owner1")
-                .setPartitionId(String.valueOf(i))
-                .setOwnerLevel(0);
+                .setPartitionId(String.valueOf(i));
             pos[i] = po;
         }
         blobEventProcessorStore.claimOwnership(pos).subscribe(BlobEventProcessorStoreSample::printPartitionOwnership,
@@ -70,7 +67,6 @@ public class BlobEventProcessorStoreSample {
                 .add("ownerId=" + partitionOwnership.getOwnerId())
                 .add("cg=" + partitionOwnership.getConsumerGroupName())
                 .add("eh=" + partitionOwnership.getEventHubName())
-                .add("offset=" + partitionOwnership.getOffset())
                 .add("etag=" + partitionOwnership.getETag())
                 .add("lastModified=" + partitionOwnership.getLastModifiedTime())
                 .toString();

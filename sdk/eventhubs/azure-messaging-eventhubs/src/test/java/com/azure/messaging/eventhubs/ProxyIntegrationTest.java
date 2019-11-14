@@ -11,7 +11,7 @@ import com.azure.core.util.IterableStream;
 import com.azure.core.util.logging.ClientLogger;
 import com.azure.messaging.eventhubs.models.EventPosition;
 import com.azure.messaging.eventhubs.models.PartitionEvent;
-import com.azure.messaging.eventhubs.models.SendOptions;
+import com.azure.messaging.eventhubs.implementation.SendOptions;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
@@ -24,10 +24,11 @@ import java.util.stream.Collectors;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
- * Tests simple receive and send scenarios through proxy. Requires that {@link Configuration#PROPERTY_HTTP_PROXY}
- * is set.
+ * Tests simple receive and send scenarios through proxy. Requires that {@link Configuration#PROPERTY_HTTP_PROXY} is
+ * set.
  */
 public class ProxyIntegrationTest extends IntegrationTestBase {
+
     private static final String PARTITION_ID = "0";
 
     private EventHubProducerClient sender;
@@ -41,7 +42,8 @@ public class ProxyIntegrationTest extends IntegrationTestBase {
     protected void beforeTest() {
         final ProxyConfiguration proxyConfiguration = getProxyConfiguration();
 
-        Assumptions.assumeTrue(proxyConfiguration != null, "Cannot run proxy integration tests without setting proxy configuration.");
+        Assumptions.assumeTrue(proxyConfiguration != null,
+            "Cannot run proxy integration tests without setting proxy configuration.");
 
         sender = new EventHubClientBuilder()
             .connectionString(getConnectionString())
@@ -77,15 +79,16 @@ public class ProxyIntegrationTest extends IntegrationTestBase {
         final EventHubProducerAsyncClient producer = new EventHubClientBuilder()
             .connectionString(getConnectionString()).buildAsyncProducer();
         final EventHubConsumerClient receiver = new EventHubClientBuilder()
-                .connectionString(getConnectionString())
-                .consumerGroup(EventHubClientBuilder.DEFAULT_CONSUMER_GROUP_NAME)
-                .startingPosition(EventPosition.earliest())
-                .buildConsumer();
+            .connectionString(getConnectionString())
+            .consumerGroup(EventHubClientBuilder.DEFAULT_CONSUMER_GROUP_NAME)
+            .buildConsumer();
 
         producer.send(TestUtils.getEvents(numberOfEvents, messageId), sendOptions).block();
 
         // Act
-        final IterableStream<PartitionEvent> receive = receiver.receive(PARTITION_ID, 15, Duration.ofSeconds(30));
+        final IterableStream<PartitionEvent> receive = receiver
+            .receive(PARTITION_ID, 15, Duration.ofSeconds(30), EventPosition
+                .earliest());
 
         // Assert
         Assertions.assertNotNull(receive);

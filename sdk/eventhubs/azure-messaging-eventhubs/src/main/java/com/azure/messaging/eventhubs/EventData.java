@@ -6,6 +6,7 @@ package com.azure.messaging.eventhubs;
 import com.azure.core.util.Context;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
@@ -119,7 +120,11 @@ public class EventData implements Comparable<EventData> {
      * @param body The string that will be UTF-8 encoded to create an event.
      */
     public EventData(String body) {
-        this(body.getBytes(UTF_8));
+        this(body, UTF_8);
+    }
+
+    public EventData(String body, Charset charset) {
+        this(body.getBytes(charset));
     }
 
     /**
@@ -237,6 +242,10 @@ public class EventData implements Comparable<EventData> {
      */
     public String getBodyAsString() {
         return UTF_8.decode(body).toString();
+    }
+
+    public String getBodyAsString(Charset charset) {
+        return new String(body.array(), charset);
     }
 
     /**

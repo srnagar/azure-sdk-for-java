@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 package com.azure.messaging.eventhubs;
 
-import com.azure.messaging.eventhubs.models.BatchOptions;
+import com.azure.messaging.eventhubs.models.CreateBatchOptions;
 import java.util.concurrent.atomic.AtomicReference;
 import reactor.core.publisher.Flux;
 
@@ -51,7 +51,7 @@ public class PublishEventsWithPartitionKey {
         // Note that there is no means of accurately predicting which partition will be associated with a given partition key;
         // we can only be assured that it will be a consistent choice of partition. If you have a need to understand which
         // exact partition an event is published to, you will need to use an Event Hub producer associated with that partition.
-        final BatchOptions options = new BatchOptions()
+        final CreateBatchOptions options = new CreateBatchOptions()
             .setPartitionKey("basketball")
             .setMaximumSizeInBytes(256);
         final AtomicReference<EventDataBatch> currentBatch = new AtomicReference<>(

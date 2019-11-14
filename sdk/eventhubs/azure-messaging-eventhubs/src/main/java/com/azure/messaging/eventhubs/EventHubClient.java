@@ -127,8 +127,7 @@ class EventHubClient implements Closeable {
      */
     EventHubConsumerClient createConsumer(String consumerGroup, EventPosition eventPosition,
             EventHubConsumerOptions options) {
-        final EventHubConsumerAsyncClient consumer = client.createConsumer(consumerGroup, eventPosition, options);
-
+        final EventHubConsumerAsyncClient consumer = client.createConsumer(consumerGroup, options);
         return new EventHubConsumerClient(consumer, retry.getTryTimeout());
     }
 

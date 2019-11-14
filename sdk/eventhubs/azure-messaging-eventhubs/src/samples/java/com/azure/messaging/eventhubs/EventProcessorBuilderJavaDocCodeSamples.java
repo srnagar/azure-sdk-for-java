@@ -6,23 +6,23 @@ package com.azure.messaging.eventhubs;
 import reactor.core.publisher.Mono;
 
 /**
- * Code snippets for {@link EventProcessorBuilder}.
+ * Code snippets for {@link EventProcessorClientBuilder}.
  */
 public class EventProcessorBuilderJavaDocCodeSamples {
 
     /**
-     * Code snippet for showing how to create a new instance of {@link EventProcessor}.
+     * Code snippet for showing how to create a new instance of {@link EventProcessorClient}.
      *
-     * @return A new instance of {@link EventProcessor}
+     * @return A new instance of {@link EventProcessorClient}
      */
     // BEGIN: com.azure.messaging.eventhubs.eventprocessorbuilder.instantiation
-    public EventProcessor createEventProcessor() {
+    public EventProcessorClient createEventProcessor() {
         String connectionString = "Endpoint={endpoint};SharedAccessKeyName={sharedAccessKeyName};"
             + "SharedAccessKey={sharedAccessKey};EntityPath={eventHubName}";
 
-        EventProcessor eventProcessor = new EventProcessorBuilder()
+        EventProcessorClient eventProcessorClient = new EventProcessorClientBuilder()
             .consumerGroup("consumer-group")
-            .eventProcessorStore(new InMemoryEventProcessorStore())
+            .eventProcessorStore(new InMemoryCheckpointStore())
             .processEvent(partitionEvent -> {
                 System.out.println("Partition id = " + partitionEvent.getPartitionContext().getPartitionId() + " and "
                     + "sequence number of event = " + partitionEvent.getEventData().getSequenceNumber());
@@ -30,7 +30,7 @@ public class EventProcessorBuilderJavaDocCodeSamples {
             })
             .connectionString(connectionString)
             .buildEventProcessor();
-        return eventProcessor;
+        return eventProcessorClient;
     }
     // END: com.azure.messaging.eventhubs.eventprocessorbuilder.instantiation
 

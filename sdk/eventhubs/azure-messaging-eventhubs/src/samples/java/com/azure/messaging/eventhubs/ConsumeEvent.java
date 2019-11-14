@@ -2,8 +2,8 @@
 // Licensed under the MIT License.
 package com.azure.messaging.eventhubs;
 
+import com.azure.messaging.eventhubs.implementation.SendOptions;
 import com.azure.messaging.eventhubs.models.EventPosition;
-import com.azure.messaging.eventhubs.models.SendOptions;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 
@@ -17,6 +17,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * Sample demonstrates how to receive events from an Azure Event Hub instance.
  */
 public class ConsumeEvent {
+
     private static final Duration OPERATION_TIMEOUT = Duration.ofSeconds(30);
     private static final int NUMBER_OF_EVENTS = 10;
 
@@ -24,8 +25,7 @@ public class ConsumeEvent {
      * Main method to invoke this demo about how to receive events from an Azure Event Hub instance.
      *
      * @param args Unused arguments to the program.
-     * @throws InterruptedException The countdown latch was interrupted while waiting for this sample to
-     *         complete.
+     * @throws InterruptedException The countdown latch was interrupted while waiting for this sample to complete.
      */
     public static void main(String[] args) throws InterruptedException {
         CountDownLatch countDownLatch = new CountDownLatch(NUMBER_OF_EVENTS);
@@ -45,7 +45,6 @@ public class ConsumeEvent {
         EventHubConsumerAsyncClient consumer = new EventHubClientBuilder()
             .connectionString(connectionString)
             .consumerGroup(EventHubClientBuilder.DEFAULT_CONSUMER_GROUP_NAME)
-            .startingPosition(EventPosition.latest())
             .buildAsyncConsumer();
 
         // To create a consumer, we need to know what partition to connect to. We take the first partition id.
@@ -61,14 +60,15 @@ public class ConsumeEvent {
 
         // We start receiving any events that come from `firstPartition`, print out the contents, and decrement the
         // countDownLatch.
-        Disposable subscription = consumer.receive(firstPartition).subscribe(partitionEvent -> {
-            EventData event = partitionEvent.getEventData();
-            String contents = UTF_8.decode(event.getBody()).toString();
-            System.out.println(String.format("[%s] Sequence Number: %s. Contents: %s", countDownLatch.getCount(),
-                event.getSequenceNumber(), contents));
+        Disposable subscription = consumer.receive(firstPartition, EventPosition.earliest())
+            .subscribe(partitionEvent -> {
+                EventData event = partitionEvent.getEventData();
+                String contents = UTF_8.decode(event.getBody()).toString();
+                System.out.println(String.format("[%s] Sequence Number: %s. Contents: %s", countDownLatch.getCount(),
+                    event.getSequenceNumber(), contents));
 
-            countDownLatch.countDown();
-        });
+                countDownLatch.countDown();
+            });
 
         EventHubProducerAsyncClient producer = new EventHubClientBuilder()
             .connectionString(connectionString)
@@ -88,7 +88,8 @@ public class ConsumeEvent {
             // We wait for all the events to be received before continuing.
             boolean isSuccessful = countDownLatch.await(OPERATION_TIMEOUT.getSeconds(), TimeUnit.SECONDS);
             if (!isSuccessful) {
-                System.err.printf("Did not complete successfully. There are: %s events left.", countDownLatch.getCount());
+                System.err
+                    .printf("Did not complete successfully. There are: %s events left.", countDownLatch.getCount());
             }
         } finally {
             // Dispose and close of all the resources we've created.

@@ -15,6 +15,7 @@ import java.time.Instant;
  * Code snippets demonstrating various {@link EventHubConsumerClient} scenarios.
  */
 public class EventHubConsumerJavaDocCodeSamples {
+
     /**
      * Code snippet for creating an EventHubConsumer
      *
@@ -27,7 +28,6 @@ public class EventHubConsumerJavaDocCodeSamples {
         EventHubConsumerClient consumer = new EventHubClientBuilder()
             .connectionString("event-hub-instance-connection-string")
             .consumerGroup("$DEFAULT")
-            .startingPosition(EventPosition.latest())
             .buildConsumer();
         // END: com.azure.messaging.eventhubs.eventhubconsumerclient.instantiation
 
@@ -43,12 +43,12 @@ public class EventHubConsumerJavaDocCodeSamples {
         EventHubConsumerClient consumer = new EventHubClientBuilder()
             .connectionString("event-hub-instance-connection-string")
             .consumerGroup(EventHubClientBuilder.DEFAULT_CONSUMER_GROUP_NAME)
-            .startingPosition(EventPosition.fromEnqueuedTime(twelveHoursAgo))
             .buildConsumer();
 
         // Obtain partitionId from EventHubConsumerClient.getPartitionIds().
         String partitionId = "0";
-        IterableStream<PartitionEvent> events = consumer.receive(partitionId, 100, Duration.ofSeconds(30));
+        IterableStream<PartitionEvent> events = consumer
+            .receive(partitionId, 100, Duration.ofSeconds(30), EventPosition.fromEnqueuedTime(twelveHoursAgo));
 
         for (PartitionEvent partitionEvent : events) {
             // For each event, perform some sort of processing.
@@ -56,7 +56,8 @@ public class EventHubConsumerJavaDocCodeSamples {
         }
 
         // Gets the next set of events to consume and process.
-        IterableStream<PartitionEvent> nextEvents = consumer.receive(partitionId, 100, Duration.ofSeconds(30));
+        IterableStream<PartitionEvent> nextEvents = consumer
+            .receive(partitionId, 100, Duration.ofSeconds(30), EventPosition.earliest());
         // END: com.azure.messaging.eventhubs.eventhubconsumerclient.receive#string-int-duration
 
         for (PartitionEvent partitionEvent : nextEvents) {

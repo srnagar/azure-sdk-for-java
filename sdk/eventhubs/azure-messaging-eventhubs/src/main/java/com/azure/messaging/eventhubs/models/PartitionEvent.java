@@ -14,6 +14,7 @@ import java.util.Objects;
 public class PartitionEvent {
     private final PartitionContext partitionContext;
     private final EventData eventData;
+    private final LastEnqueuedEventProperties lastEnqueuedEventProperties;
 
     /**
      * Creates an instance of PartitionEvent.
@@ -22,9 +23,11 @@ public class PartitionEvent {
      * @param eventData The event data received from the Event Hub.
      * @throws NullPointerException if {@code partitionContext} or {@code eventData} is {@code null}.
      */
-    public PartitionEvent(final PartitionContext partitionContext, final EventData eventData) {
+    public PartitionEvent(final PartitionContext partitionContext, final EventData eventData,
+        LastEnqueuedEventProperties lastEnqueuedEventProperties) {
         this.partitionContext = Objects.requireNonNull(partitionContext, "'partitionContext' cannot be null");
         this.eventData = Objects.requireNonNull(eventData, "'eventData' cannot be null");
+        this.lastEnqueuedEventProperties = lastEnqueuedEventProperties;
     }
 
     /**
@@ -43,5 +46,9 @@ public class PartitionEvent {
      */
     public EventData getEventData() {
         return eventData;
+    }
+
+    public LastEnqueuedEventProperties getLastEnqueuedEventProperties() {
+        return lastEnqueuedEventProperties;
     }
 }

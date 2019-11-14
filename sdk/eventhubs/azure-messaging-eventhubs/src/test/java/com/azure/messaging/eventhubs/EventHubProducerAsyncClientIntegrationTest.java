@@ -4,8 +4,8 @@
 package com.azure.messaging.eventhubs;
 
 import com.azure.core.util.logging.ClientLogger;
-import com.azure.messaging.eventhubs.models.BatchOptions;
-import com.azure.messaging.eventhubs.models.SendOptions;
+import com.azure.messaging.eventhubs.models.CreateBatchOptions;
+import com.azure.messaging.eventhubs.implementation.SendOptions;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
@@ -110,7 +110,7 @@ public class EventHubProducerAsyncClientIntegrationTest extends IntegrationTestB
             new EventData("Event 2".getBytes(UTF_8)),
             new EventData("Event 3".getBytes(UTF_8)));
 
-        final BatchOptions options = new BatchOptions().setPartitionKey("my-partition-key");
+        final CreateBatchOptions options = new CreateBatchOptions().setPartitionKey("my-partition-key");
         final Mono<EventDataBatch> createBatch = producer.createBatch(options)
             .map(batch -> {
                 Assertions.assertEquals(options.getPartitionKey(), batch.getPartitionKey());
@@ -157,7 +157,7 @@ public class EventHubProducerAsyncClientIntegrationTest extends IntegrationTestB
         Assertions.assertNotNull(partitionIds);
 
         for (String partitionId : partitionIds) {
-            final EventDataBatch batch = producer.createBatch(new BatchOptions().setPartitionId(partitionId)).block(TIMEOUT);
+            final EventDataBatch batch = producer.createBatch(new CreateBatchOptions().setPartitionId(partitionId)).block(TIMEOUT);
             Assertions.assertNotNull(batch);
 
             Assertions.assertTrue(batch.tryAdd(TestUtils.getEvent("event", "test guid", Integer.parseInt(partitionId))));
@@ -179,7 +179,7 @@ public class EventHubProducerAsyncClientIntegrationTest extends IntegrationTestB
             .buildAsyncProducer();
 
         // Act & Assert
-        StepVerifier.create(client.getProperties())
+        StepVerifier.create(client.getEventHubProperties())
             .assertNext(properties -> {
                 Assertions.assertEquals(getEventHubName(), properties.getName());
                 Assertions.assertEquals(2, properties.getPartitionIds().length);

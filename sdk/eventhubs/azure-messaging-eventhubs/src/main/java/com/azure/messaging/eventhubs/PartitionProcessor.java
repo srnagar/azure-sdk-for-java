@@ -6,20 +6,20 @@ package com.azure.messaging.eventhubs;
 import com.azure.core.util.logging.ClientLogger;
 import com.azure.messaging.eventhubs.models.CloseContext;
 import com.azure.messaging.eventhubs.models.CloseReason;
-import com.azure.messaging.eventhubs.models.EventProcessingErrorContext;
+import com.azure.messaging.eventhubs.models.EventProcessorEvent;
+import com.azure.messaging.eventhubs.models.ProcessorErrorContext;
 import com.azure.messaging.eventhubs.models.EventPosition;
 import com.azure.messaging.eventhubs.models.InitializationContext;
-import com.azure.messaging.eventhubs.models.PartitionEvent;
 import reactor.core.publisher.Mono;
 
 /**
- * An abstract class defining all the operations that a partition processor can perform. Users of {@link EventProcessor}
- * should extend from this class and implement {@link #processEvent(PartitionEvent)} for processing events.
+ * An abstract class defining all the operations that a partition processor can perform. Users of {@link EventProcessorClient}
+ * should extend from this class and implement {@link #processEvent(EventProcessorEvent)} for processing events.
  * Additionally, users can override:
  * <ul>
  *     <li>{@link #initialize(InitializationContext)} - This method is called before at the beginning of processing a
  *     partition.</li>
- *     <li>{@link #processError(EventProcessingErrorContext)} - This method is called if there is an error while
+ *     <li>{@link #processError(ProcessorErrorContext)} - This method is called if there is an error while
  *     processing events</li>
  *     <li>{@link #close(CloseContext)} - This method is called at the end of processing a partition.
  *     The {@link CloseReason} specifies why the processing of a partition stopped.</li>
@@ -34,7 +34,7 @@ public abstract class PartitionProcessor {
     private final ClientLogger logger = new ClientLogger(PartitionProcessor.class);
 
     /**
-     * This method is called when this {@link EventProcessor} takes ownership of a new partition and before any events
+     * This method is called when this {@link EventProcessorClient} takes ownership of a new partition and before any events
      * from this partition are received. By default, each partition is processed from
      * {@link EventPosition#earliest()}. To start processing from a different position, use
      * {@link InitializationContext#setInitialPosition(EventPosition)} to
@@ -55,19 +55,15 @@ public abstract class PartitionProcessor {
      * @param partitionEvent The partition information and the next event data from this partition.
      * @return a representation of the deferred computation of this call.
      */
-    public abstract Mono<Void> processEvent(PartitionEvent partitionEvent);
+    public abstract Mono<Void> processEvent(EventProcessorEvent partitionEvent);
 
     /**
      * This method is called when an error occurs while receiving events from Event Hub. An error also marks the end of
      * event data stream.
      *
-     * @param eventProcessingErrorContext The error details and partition information where the error occurred.
+     * @param processorErrorContext The error details and partition information where the error occurred.
      */
-    public void processError(EventProcessingErrorContext eventProcessingErrorContext) {
-        logger.warning("Error occurred in partition processor for partition {}",
-            eventProcessingErrorContext.getPartitionContext().getPartitionId(),
-            eventProcessingErrorContext.getThrowable());
-    }
+    public abstract void processError(ProcessorErrorContext processorErrorContext);
 
     /**
      * This method is called before the partition processor is closed. A partition processor could be closed for various

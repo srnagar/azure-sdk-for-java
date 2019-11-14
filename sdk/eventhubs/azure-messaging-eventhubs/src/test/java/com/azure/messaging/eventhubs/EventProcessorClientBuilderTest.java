@@ -14,9 +14,9 @@ import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 
 /**
- * Unit tests for {@link EventProcessorBuilder}.
+ * Unit tests for {@link EventProcessorClientBuilder}.
  */
-public class EventProcessorBuilderTest {
+public class EventProcessorClientBuilderTest {
 
     private static final String NAMESPACE_NAME = "dummyNamespaceName";
     private static final String DEFAULT_DOMAIN_NAME = "servicebus.windows.net/";
@@ -43,8 +43,8 @@ public class EventProcessorBuilderTest {
     @Test
     public void testEventProcessorBuilderMissingProperties() {
         assertThrows(NullPointerException.class, () -> {
-            EventProcessor eventProcessor = new EventProcessorBuilder()
-                .eventProcessorStore(new InMemoryEventProcessorStore())
+            EventProcessorClient eventProcessorClient = new EventProcessorClientBuilder()
+                .eventProcessorStore(new InMemoryCheckpointStore())
                 .processEvent(partitionEvent -> {
                     System.out.println("Partition id = " + partitionEvent.getPartitionContext().getPartitionId() + " and "
                         + "sequence number of event = " + partitionEvent.getEventData().getSequenceNumber());
@@ -56,7 +56,7 @@ public class EventProcessorBuilderTest {
 
     @Test
     public void testEventProcessorBuilderWithProcessEvent() {
-        EventProcessor eventProcessor = new EventProcessorBuilder()
+        EventProcessorClient eventProcessorClient = new EventProcessorClientBuilder()
             .connectionString(CORRECT_CONNECTION_STRING)
             .consumerGroup("consumer-group")
             .processEvent(partitionEvent -> {
@@ -64,9 +64,9 @@ public class EventProcessorBuilderTest {
                     + "sequence number of event = " + partitionEvent.getEventData().getSequenceNumber());
                 return Mono.empty();
             })
-            .eventProcessorStore(new InMemoryEventProcessorStore())
+            .eventProcessorStore(new InMemoryCheckpointStore())
             .buildEventProcessor();
-        assertNotNull(eventProcessor);
+        assertNotNull(eventProcessorClient);
     }
 
 }

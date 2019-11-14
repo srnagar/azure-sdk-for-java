@@ -6,17 +6,17 @@ package com.azure.messaging.eventhubs;
 import reactor.core.publisher.Mono;
 
 /**
- * Code snippets for {@link EventProcessor}.
+ * Code snippets for {@link EventProcessorClient}.
  */
 public final class EventProcessorJavaDocCodeSamples {
 
     /**
-     * Code snippet for showing how to start and stop an {@link EventProcessor}.
+     * Code snippet for showing how to start and stop an {@link EventProcessorClient}.
      */
     public void startStopSample() {
         String connectionString = "Endpoint={endpoint};SharedAccessKeyName={sharedAccessKeyName};"
             + "SharedAccessKey={sharedAccessKey};EntityPath={eventHubName}";
-        EventProcessor eventProcessor = new EventProcessorBuilder()
+        EventProcessorClient eventProcessorClient = new EventProcessorClientBuilder()
             .connectionString(connectionString)
             .processEvent(partitionEvent -> {
                 System.out.println("Partition id = " + partitionEvent.getPartitionContext().getPartitionId() + " and "
@@ -27,9 +27,9 @@ public final class EventProcessorJavaDocCodeSamples {
             .buildEventProcessor();
 
         // BEGIN: com.azure.messaging.eventhubs.eventprocessor.startstop
-        eventProcessor.start();
+        eventProcessorClient.start();
         // Continue to perform other tasks while the processor is running in the background.
-        eventProcessor.stop();
+        eventProcessorClient.stop();
         // END: com.azure.messaging.eventhubs.eventprocessor.startstop
     }
 }
