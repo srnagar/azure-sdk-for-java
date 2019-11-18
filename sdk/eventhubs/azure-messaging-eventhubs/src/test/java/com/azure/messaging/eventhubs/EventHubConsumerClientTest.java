@@ -11,13 +11,13 @@ import com.azure.core.amqp.implementation.AmqpReceiveLink;
 import com.azure.core.amqp.implementation.CBSAuthorizationType;
 import com.azure.core.amqp.implementation.ConnectionOptions;
 import com.azure.core.amqp.implementation.MessageSerializer;
-import com.azure.core.amqp.models.ProxyConfiguration;
+import com.azure.core.amqp.models.ProxyOptions;
 import com.azure.core.credential.TokenCredential;
 import com.azure.core.util.IterableStream;
 import com.azure.messaging.eventhubs.implementation.EventHubAmqpConnection;
+import com.azure.messaging.eventhubs.implementation.EventHubConsumerOptions;
 import com.azure.messaging.eventhubs.implementation.EventHubManagementNode;
 import com.azure.messaging.eventhubs.implementation.EventHubSession;
-import com.azure.messaging.eventhubs.models.EventHubConsumerOptions;
 import com.azure.messaging.eventhubs.models.EventPosition;
 import com.azure.messaging.eventhubs.models.LastEnqueuedEventProperties;
 import com.azure.messaging.eventhubs.models.PartitionEvent;
@@ -62,6 +62,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class EventHubConsumerClientTest {
+
     private static final String PAYLOAD = "hello";
     private static final byte[] PAYLOAD_BYTES = PAYLOAD.getBytes(UTF_8);
     private static final int PREFETCH = 5;
@@ -105,7 +106,7 @@ public class EventHubConsumerClientTest {
 
         connectionOptions = new ConnectionOptions(HOSTNAME, "event-hub-path", tokenCredential,
             CBSAuthorizationType.SHARED_ACCESS_SIGNATURE, TransportType.AMQP_WEB_SOCKETS, new RetryOptions(),
-            ProxyConfiguration.SYSTEM_DEFAULTS, Schedulers.parallel());
+            ProxyOptions.SYSTEM_DEFAULTS, Schedulers.parallel());
         linkProvider = new EventHubConnection(Mono.just(connection), connectionOptions);
         when(connection.createSession(argThat(name -> name.endsWith(PARTITION_ID))))
             .thenReturn(Mono.fromCallable(() -> session));
@@ -146,7 +147,8 @@ public class EventHubConsumerClientTest {
         final int numberToReceive = 3;
 
         // Act
-        final IterableStream<PartitionEvent> receive = consumer.receive(PARTITION_ID, numberToReceive, EventPosition.earliest());
+        final IterableStream<PartitionEvent> receive = consumer
+            .receive(PARTITION_ID, numberToReceive, EventPosition.earliest());
 
         // Assert
         Assertions.assertNotNull(receive);
@@ -172,7 +174,8 @@ public class EventHubConsumerClientTest {
         final int numberToReceive = 3;
 
         // Act
-        final IterableStream<PartitionEvent> receive = consumer.receive(PARTITION_ID, numberOfEvents, EventPosition.earliest());
+        final IterableStream<PartitionEvent> receive = consumer
+            .receive(PARTITION_ID, numberOfEvents, EventPosition.earliest());
 
         // Assert
         Assertions.assertNotNull(receive);
@@ -237,8 +240,10 @@ public class EventHubConsumerClientTest {
         sendMessages(sink, numberOfEvents, PARTITION_ID);
 
         // Act
-        final IterableStream<PartitionEvent> receive = consumer.receive(PARTITION_ID, firstReceive, EventPosition.earliest());
-        final IterableStream<PartitionEvent> receive2 = consumer.receive(PARTITION_ID, secondReceive, EventPosition.earliest());
+        final IterableStream<PartitionEvent> receive = consumer
+            .receive(PARTITION_ID, firstReceive, EventPosition.earliest());
+        final IterableStream<PartitionEvent> receive2 = consumer
+            .receive(PARTITION_ID, secondReceive, EventPosition.earliest());
 
         // Assert
         final Map<Integer, PartitionEvent> firstActual = receive.stream()
@@ -251,11 +256,13 @@ public class EventHubConsumerClientTest {
 
         int startingIndex = 0;
         int endIndex = firstReceive;
-        IntStream.range(startingIndex, endIndex).forEachOrdered(number -> Assertions.assertTrue(firstActual.containsKey(number)));
+        IntStream.range(startingIndex, endIndex)
+            .forEachOrdered(number -> Assertions.assertTrue(firstActual.containsKey(number)));
 
         startingIndex += firstReceive;
         endIndex += secondReceive;
-        IntStream.range(startingIndex, endIndex).forEachOrdered(number -> Assertions.assertTrue(secondActual.containsKey(number)));
+        IntStream.range(startingIndex, endIndex)
+            .forEachOrdered(number -> Assertions.assertTrue(secondActual.containsKey(number)));
     }
 
     /**
@@ -271,7 +278,8 @@ public class EventHubConsumerClientTest {
         sendMessages(sink, numberOfEvents, PARTITION_ID);
 
         // Act
-        final IterableStream<PartitionEvent> receive = consumer.receive(PARTITION_ID, firstReceive, timeout, EventPosition.earliest());
+        final IterableStream<PartitionEvent> receive = consumer
+            .receive(PARTITION_ID, firstReceive, EventPosition.earliest(), timeout);
 
         // Assert
         final Map<Integer, PartitionEvent> firstActual = receive.stream()
@@ -290,10 +298,11 @@ public class EventHubConsumerClientTest {
 
         // Act
         EventHubConsumerClient consumer = new EventHubClientBuilder()
-            .connectionString("Endpoint=sb://doesnotexist.servicebus.windows.net/;SharedAccessKeyName=doesnotexist;SharedAccessKey=dGhpcyBpcyBub3QgYSB2YWxpZCBrZXkgLi4uLi4uLi4=;EntityPath=dummy-event-hub")
+            .connectionString(
+                "Endpoint=sb://doesnotexist.servicebus.windows.net/;SharedAccessKeyName=doesnotexist;SharedAccessKey=dGhpcyBpcyBub3QgYSB2YWxpZCBrZXkgLi4uLi4uLi4=;EntityPath=dummy-event-hub")
             .consumerGroup(CONSUMER_GROUP)
-            .consumerOptions(options)
-            .buildConsumer();
+            .prefetchCount(100)
+            .buildConsumerClient();
 
         Assertions.assertEquals("dummy-event-hub", consumer.getEventHubName());
         Assertions.assertEquals("doesnotexist.servicebus.windows.net", consumer.getFullyQualifiedNamespace());
@@ -365,7 +374,8 @@ public class EventHubConsumerClientTest {
             .thenReturn(Mono.just(link3));
 
         // Act & Assert
-        StepVerifier.create(asyncClient.receive(EventPosition.earliest()).filter(e -> isMatchingEvent(e, messageTrackingUUID)))
+        StepVerifier
+            .create(asyncClient.receive(EventPosition.earliest()).filter(e -> isMatchingEvent(e, messageTrackingUUID)))
             .then(() -> sendMessages(processor2sink, 2, id2))
             .assertNext(event -> assertPartition(id2, event))
             .assertNext(event -> assertPartition(id2, event))

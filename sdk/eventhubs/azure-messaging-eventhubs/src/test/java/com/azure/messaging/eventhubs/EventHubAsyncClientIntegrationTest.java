@@ -3,19 +3,15 @@
 
 package com.azure.messaging.eventhubs;
 
+import static com.azure.messaging.eventhubs.EventHubClientBuilder.DEFAULT_CONSUMER_GROUP_NAME;
+import static com.azure.messaging.eventhubs.TestUtils.isMatchingEvent;
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import com.azure.core.amqp.TransportType;
 import com.azure.core.util.logging.ClientLogger;
-import com.azure.messaging.eventhubs.models.EventHubConsumerOptions;
-import com.azure.messaging.eventhubs.models.EventPosition;
+import com.azure.messaging.eventhubs.implementation.EventHubConsumerOptions;
 import com.azure.messaging.eventhubs.implementation.SendOptions;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
-import reactor.core.publisher.Flux;
-import reactor.test.StepVerifier;
-
+import com.azure.messaging.eventhubs.models.EventPosition;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,10 +19,13 @@ import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import static com.azure.messaging.eventhubs.EventHubClientBuilder.DEFAULT_CONSUMER_GROUP_NAME;
-import static com.azure.messaging.eventhubs.TestUtils.isMatchingEvent;
-import static java.nio.charset.StandardCharsets.UTF_8;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
 
 /**
  * Tests scenarios on {@link EventHubAsyncClient}.
@@ -47,9 +46,7 @@ public class EventHubAsyncClientIntegrationTest extends IntegrationTestBase {
     protected void beforeTest(TransportType transportType) {
         builder = createBuilder()
             .transportType(transportType);
-        EventHubConnection connection = builder.buildConnection();
-        client = new EventHubClientBuilder()
-            .connection(connection)
+        client = builder
             .buildAsyncClient();
 
         if (HAS_PUSHED_EVENTS.getAndSet(true)) {
@@ -120,10 +117,10 @@ public class EventHubAsyncClientIntegrationTest extends IntegrationTestBase {
 
         try {
             for (final EventHubAsyncClient hubClient : clients) {
-                final EventHubConsumerAsyncClient consumer = hubClient.createConsumer(DEFAULT_CONSUMER_GROUP_NAME, EventPosition.latest());
+                final EventHubConsumerAsyncClient consumer = hubClient.createConsumer(DEFAULT_CONSUMER_GROUP_NAME);
                 consumers.add(consumer);
 
-                consumer.receive(PARTITION_ID, EventPosition.earliest()).filter(partitionEvent -> {
+                consumer.receive(PARTITION_ID, EventPosition.latest()).filter(partitionEvent -> {
                     EventData event = partitionEvent.getEventData();
                     return event.getProperties() != null
                         && event.getProperties().containsKey(messageTrackingId)
@@ -170,7 +167,7 @@ public class EventHubAsyncClientIntegrationTest extends IntegrationTestBase {
         StepVerifier.create(client.getProperties())
             .assertNext(properties -> {
                 Assertions.assertEquals(getEventHubName(), properties.getName());
-                Assertions.assertEquals(2, properties.getPartitionIds().length);
+                Assertions.assertEquals(2, properties.getPartitionIds().stream().count());
             })
             .expectComplete()
             .verify(TIMEOUT);

@@ -59,10 +59,13 @@ public class InMemoryCheckpointStore implements CheckpointStore {
                 .info("Ownership of partition {} claimed by {}", partitionOwnership.getPartitionId(),
                     partitionOwnership.getOwnerId()))
             .map(partitionOwnership -> {
-                partitionOwnership.setETag(UUID.randomUUID().toString())
-                    .setLastModifiedTime(System.currentTimeMillis());
-                partitionOwnershipMap.put(partitionOwnership.getPartitionId(), partitionOwnership);
-                return partitionOwnership;
+                PartitionOwnership updatedPartitionOwnership =
+                    new PartitionOwnership(partitionOwnership.getFullyQualifiedNamespace(),
+                        partitionOwnership.getEventHubName(), partitionOwnership.getConsumerGroup(),
+                        partitionOwnership.getPartitionId(), partitionOwnership.getOwnerId(),
+                        System.currentTimeMillis(), UUID.randomUUID().toString());
+                partitionOwnershipMap.put(partitionOwnership.getPartitionId(), updatedPartitionOwnership);
+                return updatedPartitionOwnership;
             });
     }
 

@@ -7,9 +7,10 @@ import com.azure.core.amqp.implementation.TracerProvider;
 import com.azure.core.util.Context;
 import com.azure.core.util.tracing.ProcessKind;
 import com.azure.core.util.tracing.Tracer;
-import com.azure.messaging.eventhubs.models.EventProcessorEvent;
+import com.azure.messaging.eventhubs.implementation.EventHubConsumerOptions;
+import com.azure.messaging.eventhubs.implementation.PartitionProcessor;
+import com.azure.messaging.eventhubs.models.ProcessorEvent;
 import com.azure.messaging.eventhubs.models.ProcessorErrorContext;
-import com.azure.messaging.eventhubs.models.EventHubConsumerOptions;
 import com.azure.messaging.eventhubs.models.EventPosition;
 import com.azure.messaging.eventhubs.models.PartitionEvent;
 import java.io.Closeable;
@@ -152,7 +153,7 @@ public class EventProcessorClientTest {
         StepVerifier.create(eventProcessorStore.listOwnership("ns", "test-eh", "test-consumer"))
             .assertNext(partitionOwnership -> {
                 assertEquals("1", partitionOwnership.getPartitionId(), "Partition");
-                assertEquals("test-consumer", partitionOwnership.getConsumerGroupName(), "Consumer");
+                assertEquals("test-consumer", partitionOwnership.getConsumerGroup(), "Consumer");
                 assertEquals("test-eh", partitionOwnership.getEventHubName(), "EventHub name");
                 assertEquals(eventProcessorClient.getIdentifier(), partitionOwnership.getOwnerId(), "OwnerId");
                 assertTrue(partitionOwnership.getLastModifiedTime() >= beforeTest, "LastModifiedTime");
@@ -413,7 +414,7 @@ public class EventProcessorClientTest {
     }
 
     private PartitionEvent getEvent(EventData event) {
-        PartitionContext context = new PartitionContext("foo", "bar", "baz");
+        PartitionContext context = new PartitionContext("ns", "foo", "bar", "baz");
         return new PartitionEvent(context, event, null);
     }
 
@@ -427,16 +428,16 @@ public class EventProcessorClientTest {
         }
 
         @Override
-        public Mono<Void> processEvent(EventProcessorEvent partitionEvent) {
-            return Mono.error(new IllegalStateException());
+        public void processEvent(ProcessorEvent partitionEvent) {
+            throw new IllegalStateException();
         }
     }
 
     private static final class TestPartitionProcessor extends PartitionProcessor {
 
         @Override
-        public Mono<Void> processEvent(EventProcessorEvent partitionEvent) {
-            return partitionEvent.updateCheckpoint();
+        public void processEvent(ProcessorEvent partitionEvent) {
+            partitionEvent.updateCheckpoint().subscribe();
         }
 
         @Override

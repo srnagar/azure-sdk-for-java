@@ -9,6 +9,7 @@ import com.azure.core.amqp.exception.ErrorCondition;
 import com.azure.core.amqp.implementation.AmqpConstants;
 import com.azure.core.amqp.implementation.ErrorContextProvider;
 import com.azure.core.util.logging.ClientLogger;
+import java.nio.ByteBuffer;
 import org.apache.qpid.proton.Proton;
 import org.apache.qpid.proton.amqp.Binary;
 import org.apache.qpid.proton.amqp.Symbol;
@@ -59,7 +60,7 @@ public final class EventDataBatch {
      *
      * @return The number of {@link EventData events} in the batch.
      */
-    public int getSize() {
+    public int getCount() {
         return events.size();
     }
 
@@ -89,7 +90,7 @@ public final class EventDataBatch {
 
         final int size;
         try {
-            size = getSize(eventData, events.isEmpty());
+            size = getCount(eventData, events.isEmpty());
         } catch (BufferOverflowException exception) {
             throw logger.logExceptionAsWarning(new AmqpException(false, ErrorCondition.LINK_PAYLOAD_SIZE_EXCEEDED,
                 String.format(Locale.US, "Size of the payload exceeded maximum message size: %s kb",
@@ -121,7 +122,7 @@ public final class EventDataBatch {
         return partitionId;
     }
 
-    private int getSize(final EventData eventData, final boolean isFirst) {
+    private int getCount(final EventData eventData, final boolean isFirst) {
         Objects.requireNonNull(eventData, "'eventData' cannot be null.");
 
         final Message amqpMessage = createAmqpMessage(eventData, partitionKey);
@@ -223,7 +224,7 @@ public final class EventDataBatch {
         }
 
         if (event.getBody() != null) {
-            message.setBody(new Data(Binary.create(event.getBody())));
+            message.setBody(new Data(Binary.create(ByteBuffer.wrap(event.getBody()))));
         }
 
         return message;

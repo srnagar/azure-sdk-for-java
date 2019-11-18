@@ -152,7 +152,7 @@ public class BlobCheckpointStore implements CheckpointStore {
         }
 
         String partitionId = checkpoint.getPartitionId();
-        String blobName = getBlobName(checkpoint.getEventHubName(), checkpoint.getConsumerGroupName(), partitionId);
+        String blobName = getBlobName(checkpoint.getEventHubName(), checkpoint.getConsumerGroup(), partitionId);
         if (!blobClients.containsKey(blobName)) {
             blobClients.put(blobName, blobContainerAsyncClient.getBlobAsyncClient(blobName));
         }

@@ -8,11 +8,11 @@ import com.azure.messaging.eventhubs.EventProcessorClientBuilder;
 import reactor.core.publisher.Mono;
 
 // TODO: implement and add javadoc
-public class EventProcessorEvent {
+public class ProcessorEvent {
     private final EventData eventData;
     private final PartitionContext partitionContext;
 
-    public EventProcessorEvent(final PartitionContext partitionContext, final EventData eventData) {
+    public ProcessorEvent(final PartitionContext partitionContext, final EventData eventData) {
         this.eventData = eventData;
         this.partitionContext = partitionContext;
     }

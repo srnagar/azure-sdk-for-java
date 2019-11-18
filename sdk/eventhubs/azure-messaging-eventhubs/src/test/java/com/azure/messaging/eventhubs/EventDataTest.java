@@ -70,7 +70,7 @@ public class EventDataTest {
         final EventData eventData = new EventData(byteArray);
 
         // Assert
-        final byte[] actual = eventData.getBody().array();
+        final byte[] actual = eventData.getBody();
         Assertions.assertNotNull(actual);
         Assertions.assertEquals(0, actual.length);
     }
@@ -85,53 +85,6 @@ public class EventDataTest {
 
         // Assert
         Assertions.assertNotNull(eventData.getBody());
-        Assertions.assertEquals(PAYLOAD, UTF_8.decode(eventData.getBody()).toString());
-    }
-
-    /**
-     * Verify that the Comparable interface is implemented correctly for EventData by sorting events by their squence
-     * numbers.
-     */
-    @Test
-    public void comparableEventDataSequenceNumbers() {
-        // Arrange
-        final EventData[] events = new EventData[]{
-            constructMessage(19),
-            constructMessage(22),
-            constructMessage(25),
-            constructMessage(88),
-        };
-
-        final List<EventData> unordered = new ArrayList<>();
-        unordered.add(events[1]);
-        unordered.add(events[0]);
-        unordered.add(events[3]);
-        unordered.add(events[2]);
-
-        // Act
-        Collections.sort(unordered);
-
-        // Assert
-        for (int i = 0; i < events.length; i++) {
-            Assertions.assertSame(events[i], unordered.get(i));
-        }
-    }
-
-    /**
-     * Creates an event with the sequence number set.
-     */
-    private static EventData constructMessage(long sequenceNumber) {
-        final HashMap<Symbol, Object> properties = new HashMap<>();
-        properties.put(getSymbol(SEQUENCE_NUMBER_ANNOTATION_NAME.getValue()), sequenceNumber);
-        properties.put(getSymbol(OFFSET_ANNOTATION_NAME.getValue()), String.valueOf(OFFSET));
-        properties.put(getSymbol(PARTITION_KEY_ANNOTATION_NAME.getValue()), PARTITION_KEY);
-        properties.put(getSymbol(ENQUEUED_TIME_UTC_ANNOTATION_NAME.getValue()), Date.from(ENQUEUED_TIME));
-
-        final byte[] contents = "boo".getBytes(UTF_8);
-        final Message message = Proton.message();
-        message.setMessageAnnotations(new MessageAnnotations(properties));
-        message.setBody(new Data(new Binary(contents)));
-
-        return MESSAGE_SERIALIZER.deserialize(message, EventData.class);
+        Assertions.assertEquals(PAYLOAD, UTF_8.decode(ByteBuffer.wrap(eventData.getBody())).toString());
     }
 }

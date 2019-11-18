@@ -5,7 +5,7 @@ package com.azure.messaging.eventhubs.models;
 
 import com.azure.core.annotation.Immutable;
 import com.azure.messaging.eventhubs.EventProcessorClient;
-import com.azure.messaging.eventhubs.PartitionProcessor;
+import com.azure.messaging.eventhubs.implementation.PartitionProcessor;
 import java.util.Objects;
 
 /**
@@ -13,6 +13,8 @@ import java.util.Objects;
  */
 @Immutable
 public class PartitionContext {
+
+    private final String fullyQualifiedNamespace;
     private final String partitionId;
     private final String eventHubName;
     private final String consumerGroup;
@@ -26,10 +28,17 @@ public class PartitionContext {
      * @param consumerGroup The consumer group name associated with the {@link EventProcessorClient}.
      * @throws NullPointerException if {@code partitionId} or {@code eventHubName} or {@code consumerGroup} is null.
      */
-    public PartitionContext(String partitionId, String eventHubName, String consumerGroup) {
+    public PartitionContext(String fullyQualifiedNamespace, String partitionId, String eventHubName,
+        String consumerGroup) {
+        this.fullyQualifiedNamespace = Objects.requireNonNull(fullyQualifiedNamespace, "'fullyQualifiedNamespace' "
+            + "cannot be null");
         this.partitionId = Objects.requireNonNull(partitionId, "partitionId cannot be null.");
         this.eventHubName = Objects.requireNonNull(eventHubName, "eventHubName cannot be null.");
         this.consumerGroup = Objects.requireNonNull(consumerGroup, "consumerGroup cannot be null.");
+    }
+
+    public String getFullyQualifiedNamespace() {
+        return fullyQualifiedNamespace;
     }
 
     /**

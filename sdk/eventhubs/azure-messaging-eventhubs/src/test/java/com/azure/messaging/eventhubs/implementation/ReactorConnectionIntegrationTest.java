@@ -13,10 +13,10 @@ import com.azure.core.amqp.implementation.MessageSerializer;
 import com.azure.core.amqp.implementation.ReactorConnection;
 import com.azure.core.amqp.implementation.ReactorHandlerProvider;
 import com.azure.core.amqp.implementation.ReactorProvider;
-import com.azure.core.amqp.models.ProxyConfiguration;
+import com.azure.core.amqp.models.ProxyOptions;
 import com.azure.core.credential.TokenCredential;
 import com.azure.core.util.logging.ClientLogger;
-import com.azure.messaging.eventhubs.EventHubSharedAccessKeyCredential;
+import com.azure.messaging.eventhubs.EventHubSharedKeyCredential;
 import com.azure.messaging.eventhubs.IntegrationTestBase;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -51,7 +51,7 @@ public class ReactorConnectionIntegrationTest extends IntegrationTestBase {
 
         TokenCredential tokenCredential = null;
         try {
-            tokenCredential = new EventHubSharedAccessKeyCredential(connectionString.getSharedAccessKeyName(),
+            tokenCredential = new EventHubSharedKeyCredential(connectionString.getSharedAccessKeyName(),
                 connectionString.getSharedAccessKey(), ClientConstants.TOKEN_VALIDITY);
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             Assertions.fail("Could not create tokenProvider :" + e);
@@ -59,7 +59,7 @@ public class ReactorConnectionIntegrationTest extends IntegrationTestBase {
 
         final ConnectionOptions options = new ConnectionOptions(connectionString.getEndpoint().getHost(),
             connectionString.getEntityPath(), tokenCredential, SHARED_ACCESS_SIGNATURE, TransportType.AMQP,
-            RETRY_OPTIONS, ProxyConfiguration.SYSTEM_DEFAULTS, Schedulers.single());
+            RETRY_OPTIONS, ProxyOptions.SYSTEM_DEFAULTS, Schedulers.single());
 
         AzureTokenManagerProvider tokenManagerProvider = new AzureTokenManagerProvider(options.getAuthorizationType(),
             options.getHostname(), ClientConstants.AZURE_ACTIVE_DIRECTORY_SCOPE);

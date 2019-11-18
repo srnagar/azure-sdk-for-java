@@ -114,7 +114,7 @@ class EventHubMessageSerializer implements MessageSerializer {
         setSystemProperties(eventData, message);
 
         if (eventData.getBody() != null) {
-            message.setBody(new Data(Binary.create(eventData.getBody())));
+            message.setBody(new Data(Binary.create(ByteBuffer.wrap(eventData.getBody()))));
         }
 
         return message;

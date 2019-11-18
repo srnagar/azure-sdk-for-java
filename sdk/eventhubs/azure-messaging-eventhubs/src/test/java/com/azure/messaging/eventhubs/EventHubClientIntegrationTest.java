@@ -65,7 +65,7 @@ public class EventHubClientIntegrationTest extends IntegrationTestBase {
         Assertions.assertTrue(properties.getCreatedAt().isBefore(Instant.now()));
 
         Assertions.assertNotNull(properties.getPartitionIds());
-        Assertions.assertTrue(properties.getPartitionIds().length > 1);
+        Assertions.assertTrue(properties.getPartitionIds().stream().count() > 1);
     }
 
     /**
@@ -76,7 +76,7 @@ public class EventHubClientIntegrationTest extends IntegrationTestBase {
         // Arrange
         final ConnectionStringProperties connectionProperties = getConnectionStringProperties();
         final EventHubProperties properties = client.getProperties();
-        final String partitionId = properties.getPartitionIds()[0];
+        final String partitionId = properties.getPartitionIds().stream().findFirst().orElse(null);
 
         // Act
         final PartitionProperties partitionProperties = client.getPartitionProperties(partitionId);

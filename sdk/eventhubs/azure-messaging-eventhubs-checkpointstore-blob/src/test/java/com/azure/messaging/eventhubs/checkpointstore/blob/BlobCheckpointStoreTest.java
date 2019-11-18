@@ -82,7 +82,7 @@ public class BlobCheckpointStoreTest {
     public void testUpdateCheckpoint() {
         Checkpoint checkpoint = new Checkpoint()
             .setEventHubName("eh")
-            .setConsumerGroupName("cg")
+            .setConsumerGroup("cg")
             .setPartitionId("0")
             .setSequenceNumber(2L)
             .setOffset(100L);
@@ -140,7 +140,7 @@ public class BlobCheckpointStoreTest {
     public void testUpdateCheckpointError() {
         Checkpoint checkpoint = new Checkpoint()
             .setEventHubName("eh")
-            .setConsumerGroupName("cg")
+            .setConsumerGroup("cg")
             .setPartitionId("0")
             .setSequenceNumber(2L)
             .setOffset(100L);

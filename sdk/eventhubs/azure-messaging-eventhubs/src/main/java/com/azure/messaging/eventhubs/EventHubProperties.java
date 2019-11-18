@@ -5,8 +5,10 @@ package com.azure.messaging.eventhubs;
 
 import com.azure.core.annotation.Immutable;
 
+import com.azure.core.util.IterableStream;
 import java.time.Instant;
 import java.util.Arrays;
+import reactor.core.publisher.Flux;
 
 /**
  * Holds information about an Event Hub which can come handy while performing operations like
@@ -55,7 +57,7 @@ public final class EventHubProperties {
      *
      * @return The list of partition identifiers of the Event Hub.
      */
-    public String[] getPartitionIds() {
-        return partitionIds;
+    public IterableStream<String> getPartitionIds() {
+        return new IterableStream<>(Flux.fromArray(partitionIds));
     }
 }

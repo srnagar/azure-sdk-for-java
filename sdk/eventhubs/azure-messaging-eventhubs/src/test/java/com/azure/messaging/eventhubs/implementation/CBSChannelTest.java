@@ -18,11 +18,11 @@ import com.azure.core.amqp.implementation.ReactorHandlerProvider;
 import com.azure.core.amqp.implementation.ReactorProvider;
 import com.azure.core.amqp.implementation.RequestResponseChannel;
 import com.azure.core.amqp.implementation.TokenManagerProvider;
-import com.azure.core.amqp.models.ProxyConfiguration;
+import com.azure.core.amqp.models.ProxyOptions;
 import com.azure.core.credential.TokenCredential;
 import com.azure.core.util.CoreUtils;
 import com.azure.core.util.logging.ClientLogger;
-import com.azure.messaging.eventhubs.EventHubSharedAccessKeyCredential;
+import com.azure.messaging.eventhubs.EventHubSharedKeyCredential;
 import com.azure.messaging.eventhubs.IntegrationTestBase;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -63,7 +63,7 @@ public class CBSChannelTest extends IntegrationTestBase {
 
         TokenCredential tokenCredential = null;
         try {
-            tokenCredential = new EventHubSharedAccessKeyCredential(connectionString.getSharedAccessKeyName(),
+            tokenCredential = new EventHubSharedKeyCredential(connectionString.getSharedAccessKeyName(),
                 connectionString.getSharedAccessKey(), ClientConstants.TOKEN_VALIDITY);
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             Assertions.fail("Could not create tokenProvider :" + e);
@@ -71,7 +71,7 @@ public class CBSChannelTest extends IntegrationTestBase {
 
         final ConnectionOptions connectionOptions = new ConnectionOptions(connectionString.getEndpoint().getHost(),
             connectionString.getEntityPath(), tokenCredential, SHARED_ACCESS_SIGNATURE, TransportType.AMQP,
-            RETRY_OPTIONS, ProxyConfiguration.SYSTEM_DEFAULTS, Schedulers.elastic());
+            RETRY_OPTIONS, ProxyOptions.SYSTEM_DEFAULTS, Schedulers.elastic());
         final RetryOptions retryOptions = new RetryOptions().setTryTimeout(Duration.ofMinutes(5));
 
         ReactorProvider reactorProvider = new ReactorProvider();
@@ -115,7 +115,7 @@ public class CBSChannelTest extends IntegrationTestBase {
 
         TokenCredential tokenProvider = null;
         try {
-            tokenProvider = new EventHubSharedAccessKeyCredential(connectionString.getSharedAccessKeyName(), "Invalid shared access key.", duration);
+            tokenProvider = new EventHubSharedKeyCredential(connectionString.getSharedAccessKeyName(), "Invalid shared access key.", duration);
         } catch (Exception e) {
             Assertions.fail("Could not create token provider: " + e.toString());
         }

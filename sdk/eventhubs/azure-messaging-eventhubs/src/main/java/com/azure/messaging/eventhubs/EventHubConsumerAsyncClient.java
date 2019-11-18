@@ -10,20 +10,20 @@ import com.azure.core.annotation.Immutable;
 import com.azure.core.annotation.ReturnType;
 import com.azure.core.annotation.ServiceMethod;
 import com.azure.core.util.logging.ClientLogger;
+import com.azure.messaging.eventhubs.implementation.EventHubConsumerOptions;
 import com.azure.messaging.eventhubs.implementation.EventHubManagementNode;
-import com.azure.messaging.eventhubs.models.EventHubConsumerOptions;
 import com.azure.messaging.eventhubs.models.EventPosition;
 import com.azure.messaging.eventhubs.models.PartitionContext;
 import com.azure.messaging.eventhubs.models.PartitionEvent;
-import reactor.core.publisher.BaseSubscriber;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
+import com.azure.messaging.eventhubs.models.ReceiveOptions;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import reactor.core.publisher.BaseSubscriber;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * A consumer responsible for reading {@link EventData} from a specific Event Hub partition in the context of a specific
@@ -155,7 +155,7 @@ public class EventHubConsumerAsyncClient implements Closeable {
      */
     @ServiceMethod(returns = ReturnType.COLLECTION)
     public Flux<String> getPartitionIds() {
-        return getEventHubProperties().flatMapMany(properties -> Flux.fromArray(properties.getPartitionIds()));
+        return getEventHubProperties().flatMapMany(properties -> Flux.fromStream(properties.getPartitionIds().stream()));
     }
 
     /**
@@ -181,7 +181,7 @@ public class EventHubConsumerAsyncClient implements Closeable {
      * @throws IllegalArgumentException if {@code partitionId} is an empty string.
      */
     public Flux<PartitionEvent> receive(String partitionId, EventPosition startingPosition) {
-        // TODO: implement this
+
 
         if (partitionId == null) {
             return Flux.error(logger.logExceptionAsError(new NullPointerException("'partitionId' cannot be null.")));
@@ -193,6 +193,21 @@ public class EventHubConsumerAsyncClient implements Closeable {
         return openPartitionConsumers
             .computeIfAbsent(partitionId, id -> createPartitionConsumer(id, startingPosition)).receive();
     }
+
+    public Flux<PartitionEvent> receive(String partitionId, EventPosition startingPosition,
+        ReceiveOptions receiveOptions) {
+        // TODO: implement this
+        if (partitionId == null) {
+            return Flux.error(logger.logExceptionAsError(new NullPointerException("'partitionId' cannot be null.")));
+        } else if (partitionId.isEmpty()) {
+            return Flux.error(logger.logExceptionAsError(
+                new IllegalArgumentException("'partitionId' cannot be an empty string.")));
+        }
+
+        return openPartitionConsumers
+            .computeIfAbsent(partitionId, id -> createPartitionConsumer(id, startingPosition)).receive();
+    }
+
     /**
      * Begin consuming events from all partitions starting at {@link EventPosition#earliest()}} until there are no more
      * subscribers.
@@ -203,6 +218,16 @@ public class EventHubConsumerAsyncClient implements Closeable {
      * @throws IllegalArgumentException if {@code partitionId} is an empty string.
      */
     public Flux<PartitionEvent> receive(EventPosition startingPosition) {
+        return getPartitionIds().map(id -> {
+            final EventHubPartitionAsyncConsumer partitionConsumer = createPartitionConsumer(id,
+                startingPosition);
+            logger.info("Creating receive-all-consumer for partition '{}'", id);
+            openPartitionConsumers.put("receive-all-" + id, partitionConsumer);
+            return partitionConsumer;
+        }).flatMap(consumer -> consumer.receive());
+    }
+
+    public Flux<PartitionEvent> receive(EventPosition startingPosition, ReceiveOptions receiveOptions) {
         return getPartitionIds().map(id -> {
             final EventHubPartitionAsyncConsumer partitionConsumer = createPartitionConsumer(id,
                 startingPosition);

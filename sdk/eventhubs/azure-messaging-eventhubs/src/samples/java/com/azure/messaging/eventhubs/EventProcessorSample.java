@@ -3,12 +3,11 @@
 
 package com.azure.messaging.eventhubs;
 
-import com.azure.messaging.eventhubs.models.EventProcessorEvent;
+import com.azure.messaging.eventhubs.models.ProcessorEvent;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
+import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import reactor.core.publisher.Mono;
 
 /**
  * Sample code to demonstrate how a customer might use {@link EventProcessorClient}.
@@ -26,23 +25,23 @@ public class EventProcessorSample {
     public static void main(String[] args) throws Exception {
 
         Logger logger = LoggerFactory.getLogger(EventProcessorSample.class);
-        Function<EventProcessorEvent, Mono<Void>> processEvent = eventProcessorEvent -> {
+        Consumer<ProcessorEvent> processEvent = eventProcessorEvent -> {
             logger.info(
                 "Processing event: Event Hub name = {}; consumer group name = {}; partition id = {}; sequence number = {}",
                 eventProcessorEvent.getPartitionContext().getEventHubName(),
                 eventProcessorEvent.getPartitionContext().getConsumerGroup(),
                 eventProcessorEvent.getPartitionContext().getPartitionId(),
                 eventProcessorEvent.getEventData().getSequenceNumber());
-            return eventProcessorEvent.updateCheckpoint();
+            eventProcessorEvent.updateCheckpoint().subscribe();
         };
 
         EventProcessorClientBuilder eventProcessorClientBuilder = new EventProcessorClientBuilder()
             .consumerGroup(EventHubClientBuilder.DEFAULT_CONSUMER_GROUP_NAME)
             .connectionString(EH_CONNECTION_STRING)
             .processEvent(processEvent)
-            .eventProcessorStore(new InMemoryCheckpointStore());
+            .checkpointStore(new InMemoryCheckpointStore());
 
-        EventProcessorClient eventProcessorClient = eventProcessorClientBuilder.buildEventProcessor();
+        EventProcessorClient eventProcessorClient = eventProcessorClientBuilder.buildEventProcessorClient();
         System.out.println("Starting event processor");
         eventProcessorClient.start();
         eventProcessorClient.start(); // should be a no-op
@@ -55,7 +54,7 @@ public class EventProcessorSample {
 
         Thread.sleep(TimeUnit.SECONDS.toMillis(40));
         System.out.println("Starting a new instance of event processor");
-        eventProcessorClient = eventProcessorClientBuilder.buildEventProcessor();
+        eventProcessorClient = eventProcessorClientBuilder.buildEventProcessorClient();
         eventProcessorClient.start();
         // Continue to perform other tasks while the processor is running in the background.
         Thread.sleep(TimeUnit.MINUTES.toMillis(1));

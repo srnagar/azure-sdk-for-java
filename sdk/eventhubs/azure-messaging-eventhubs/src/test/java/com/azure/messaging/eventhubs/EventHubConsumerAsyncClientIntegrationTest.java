@@ -4,7 +4,7 @@
 package com.azure.messaging.eventhubs;
 
 import com.azure.core.util.logging.ClientLogger;
-import com.azure.messaging.eventhubs.models.EventHubConsumerOptions;
+import com.azure.messaging.eventhubs.implementation.EventHubConsumerOptions;
 import com.azure.messaging.eventhubs.models.EventPosition;
 import com.azure.messaging.eventhubs.models.LastEnqueuedEventProperties;
 import com.azure.messaging.eventhubs.models.PartitionContext;
@@ -86,11 +86,11 @@ public class EventHubConsumerAsyncClientIntegrationTest extends IntegrationTestB
         try {
             for (int i = 0; i < partitionIds.size(); i++) {
                 final String partitionId = partitionIds.get(i);
-                final EventHubConsumerAsyncClient consumer = client.createConsumer(DEFAULT_CONSUMER_GROUP_NAME,
-                    EventPosition.fromEnqueuedTime(Instant.now()));
+                final EventHubConsumerAsyncClient consumer = client.createConsumer(DEFAULT_CONSUMER_GROUP_NAME);
                 consumers[i] = consumer;
 
-                final Disposable subscription = consumer.receive(partitionId, EventPosition.earliest()).take(numberOfEvents)
+                final Disposable subscription = consumer.receive(partitionId,
+                    EventPosition.fromEnqueuedTime(Instant.now())).take(numberOfEvents)
                     .subscribe(
                         event -> logger.info("Event[{}] received. partition: {}", event.getEventData().getSequenceNumber(), partitionId),
                         error -> Assertions.fail("An error should not have occurred:" + error.toString()),
@@ -294,7 +294,7 @@ public class EventHubConsumerAsyncClientIntegrationTest extends IntegrationTestB
     public void getEventHubProperties() {
         final EventHubConsumerAsyncClient consumer = createBuilder()
             .consumerGroup(DEFAULT_CONSUMER_GROUP_NAME)
-            .buildAsyncConsumer();
+            .buildAsyncConsumerClient();
 
         // Act & Assert
         try {
@@ -302,7 +302,7 @@ public class EventHubConsumerAsyncClientIntegrationTest extends IntegrationTestB
                 .assertNext(properties -> {
                     Assertions.assertNotNull(properties);
                     Assertions.assertEquals(consumer.getEventHubName(), properties.getName());
-                    Assertions.assertEquals(2, properties.getPartitionIds().length);
+                    Assertions.assertEquals(2, properties.getPartitionIds().stream().count());
                 }).verifyComplete();
         } finally {
             dispose(consumer);
@@ -316,7 +316,7 @@ public class EventHubConsumerAsyncClientIntegrationTest extends IntegrationTestB
     public void getPartitionIds() {
         final EventHubConsumerAsyncClient consumer = createBuilder()
             .consumerGroup(DEFAULT_CONSUMER_GROUP_NAME)
-            .buildAsyncConsumer();
+            .buildAsyncConsumerClient();
 
         // Act & Assert
         try {
@@ -335,7 +335,7 @@ public class EventHubConsumerAsyncClientIntegrationTest extends IntegrationTestB
     public void getPartitionProperties() {
         final EventHubConsumerAsyncClient consumer = createBuilder()
             .consumerGroup(DEFAULT_CONSUMER_GROUP_NAME)
-            .buildAsyncConsumer();
+            .buildAsyncConsumerClient();
 
         // Act & Assert
         try {

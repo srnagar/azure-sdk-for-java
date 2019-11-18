@@ -50,7 +50,7 @@ public class EventHubClientMetadataIntegrationTest extends IntegrationTestBase {
             .assertNext(properties -> {
                 Assertions.assertNotNull(properties);
                 Assertions.assertEquals(eventHubName, properties.getName());
-                Assertions.assertEquals(expectedPartitionIds.length, properties.getPartitionIds().length);
+                Assertions.assertEquals(expectedPartitionIds.length, properties.getPartitionIds().stream().count());
             }).verifyComplete();
     }
 
@@ -106,7 +106,7 @@ public class EventHubClientMetadataIntegrationTest extends IntegrationTestBase {
     public void getPartitionPropertiesInvalidToken() throws InvalidKeyException, NoSuchAlgorithmException {
         // Arrange
         final ConnectionStringProperties original = getConnectionStringProperties();
-        final TokenCredential invalidTokenCredential = new EventHubSharedAccessKeyCredential(
+        final TokenCredential invalidTokenCredential = new EventHubSharedKeyCredential(
             original.getSharedAccessKeyName(), "invalid-sas-key-value", TIMEOUT);
         final EventHubAsyncClient invalidClient = createBuilder()
             .credential(original.getEndpoint().getHost(), original.getEntityPath(), invalidTokenCredential)
@@ -132,7 +132,7 @@ public class EventHubClientMetadataIntegrationTest extends IntegrationTestBase {
     public void getPartitionPropertiesNonExistentHub() throws InvalidKeyException, NoSuchAlgorithmException {
         // Arrange
         final ConnectionStringProperties original = getConnectionStringProperties();
-        final TokenCredential validCredentials = new EventHubSharedAccessKeyCredential(
+        final TokenCredential validCredentials = new EventHubSharedKeyCredential(
             original.getSharedAccessKeyName(), original.getSharedAccessKey(), TIMEOUT);
         final EventHubAsyncClient invalidClient = createBuilder()
             .credential(original.getEndpoint().getHost(), "does-not-exist", validCredentials)

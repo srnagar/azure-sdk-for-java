@@ -4,6 +4,7 @@ package com.azure.messaging.eventhubs;
 
 import com.azure.messaging.eventhubs.models.EventPosition;
 import com.azure.messaging.eventhubs.implementation.SendOptions;
+import java.nio.ByteBuffer;
 import reactor.core.Disposable;
 
 import java.time.Duration;
@@ -40,7 +41,7 @@ public class ConsumeEventsFromKnownSequenceNumberPosition {
             .connectionString(connectionString)
             .consumerGroup(EventHubClientBuilder.DEFAULT_CONSUMER_GROUP_NAME);
 
-        EventHubConsumerAsyncClient earliestConsumer = builder.buildAsyncConsumer();
+        EventHubConsumerAsyncClient earliestConsumer = builder.buildAsyncConsumerClient();
 
         earliestConsumer.getPartitionIds().flatMap(partitionId -> earliestConsumer.getPartitionProperties(partitionId))
             .subscribe(
@@ -75,14 +76,14 @@ public class ConsumeEventsFromKnownSequenceNumberPosition {
         EventHubConsumerAsyncClient consumer = new EventHubClientBuilder()
             .connectionString(connectionString)
             .consumerGroup(EventHubClientBuilder.DEFAULT_CONSUMER_GROUP_NAME)
-            .buildAsyncConsumer();
+            .buildAsyncConsumerClient();
 
         // We start receiving any events that come from `firstPartition`, print out the contents, and decrement the
         // countDownLatch.
         Disposable subscription = consumer.receive(lastEnqueuedSequencePartitionId,
             EventPosition.fromSequenceNumber(lastEnqueuedSequenceNumber, false)).subscribe(partitionEvent -> {
             EventData event = partitionEvent.getEventData();
-            String contents = UTF_8.decode(event.getBody()).toString();
+            String contents = UTF_8.decode(ByteBuffer.wrap(event.getBody())).toString();
             // ex. The last enqueued sequence number is 99. If isInclusive is true, the received event starting from the same
             // event with sequence number of '99'. Otherwise, the event with sequence number of '100' will be the first
             // event received.
@@ -92,7 +93,7 @@ public class ConsumeEventsFromKnownSequenceNumberPosition {
             semaphore.release();
         });
 
-        EventHubProducerAsyncClient producer = builder.buildAsyncProducer();
+        EventHubProducerAsyncClient producer = builder.buildAsyncProducerClient();
 
         // Because the consumer is only listening to new events, we need to send some events to that partition.
         // This sends the events to `lastEnqueuedSequencePartitionId`.

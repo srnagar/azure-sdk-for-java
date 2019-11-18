@@ -45,7 +45,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @see EventHubProducerClient
  * @see EventHubProducerAsyncClient
  */
-public class EventData implements Comparable<EventData> {
+public class EventData {
     /*
      * These are properties owned by the service and set when a message is received.
      */
@@ -83,7 +83,7 @@ public class EventData implements Comparable<EventData> {
      * @param context A specified key-value pair of type {@link Context}.
      * @throws NullPointerException if {@code body} or if {@code context} is {@code null}.
      */
-    public EventData(byte[] body, Context context) {
+    EventData(byte[] body, Context context) {
         this(ByteBuffer.wrap(body), context);
     }
 
@@ -104,7 +104,7 @@ public class EventData implements Comparable<EventData> {
      * @param context A specified key-value pair of type {@link Context}.
      * @throws NullPointerException if {@code body} or if {@code context} is {@code null}.
      */
-    public EventData(ByteBuffer body, Context context) {
+    EventData(ByteBuffer body, Context context) {
         Objects.requireNonNull(body, "'body' cannot be null.");
         Objects.requireNonNull(body, "'context' cannot be null.");
 
@@ -123,7 +123,7 @@ public class EventData implements Comparable<EventData> {
         this(body, UTF_8);
     }
 
-    public EventData(String body, Charset charset) {
+    EventData(String body, Charset charset) {
         this(body.getBytes(charset));
     }
 
@@ -162,7 +162,7 @@ public class EventData implements Comparable<EventData> {
      * @return The updated EventData object.
      * @throws NullPointerException if {@code key} or {@code value} is null.
      */
-    public EventData addProperty(String key, Object value) {
+    EventData addProperty(String key, Object value) {
         Objects.requireNonNull(key, "'key' cannot be null.");
         Objects.requireNonNull(value, "'value' cannot be null.");
 
@@ -178,7 +178,7 @@ public class EventData implements Comparable<EventData> {
      * @return The updated EventData object.
      * @throws NullPointerException if {@code key} or {@code value} is null.
      */
-    public EventData addContext(String key, Object value) {
+    EventData addContext(String key, Object value) {
         Objects.requireNonNull(key, "The 'key' parameter cannot be null.");
         Objects.requireNonNull(value, "The 'value' parameter cannot be null.");
         this.context = context.addData(key, value);
@@ -205,7 +205,7 @@ public class EventData implements Comparable<EventData> {
      *
      * @return the {@link Context} object set on the event
      */
-    public Context getContext() {
+    Context getContext() {
         return context;
     }
 
@@ -231,8 +231,8 @@ public class EventData implements Comparable<EventData> {
      *
      * @return ByteBuffer representing the data.
      */
-    public ByteBuffer getBody() {
-        return body.duplicate();
+    public byte[] getBody() {
+        return body.duplicate().array();
     }
 
     /**
@@ -244,7 +244,7 @@ public class EventData implements Comparable<EventData> {
         return UTF_8.decode(body).toString();
     }
 
-    public String getBodyAsString(Charset charset) {
+    String getBodyAsString(Charset charset) {
         return new String(body.array(), charset);
     }
 
@@ -288,41 +288,6 @@ public class EventData implements Comparable<EventData> {
      */
     public Long getSequenceNumber() {
         return systemProperties.getSequenceNumber();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int compareTo(EventData other) {
-        return Long.compare(
-            this.getSequenceNumber(),
-            other.getSequenceNumber()
-        );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        EventData eventData = (EventData) o;
-        return Objects.equals(body, eventData.body);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        return Objects.hash(body);
     }
 
     /**

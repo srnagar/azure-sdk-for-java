@@ -1,20 +1,20 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-package com.azure.messaging.eventhubs;
+package com.azure.messaging.eventhubs.implementation;
 
 import com.azure.core.util.logging.ClientLogger;
+import com.azure.messaging.eventhubs.EventProcessorClient;
 import com.azure.messaging.eventhubs.models.CloseContext;
 import com.azure.messaging.eventhubs.models.CloseReason;
-import com.azure.messaging.eventhubs.models.EventProcessorEvent;
+import com.azure.messaging.eventhubs.models.ProcessorEvent;
 import com.azure.messaging.eventhubs.models.ProcessorErrorContext;
 import com.azure.messaging.eventhubs.models.EventPosition;
 import com.azure.messaging.eventhubs.models.InitializationContext;
-import reactor.core.publisher.Mono;
 
 /**
  * An abstract class defining all the operations that a partition processor can perform. Users of {@link EventProcessorClient}
- * should extend from this class and implement {@link #processEvent(EventProcessorEvent)} for processing events.
+ * should extend from this class and implement {@link #processEvent(ProcessorEvent)} for processing events.
  * Additionally, users can override:
  * <ul>
  *     <li>{@link #initialize(InitializationContext)} - This method is called before at the beginning of processing a
@@ -42,10 +42,9 @@ public abstract class PartitionProcessor {
      * @param initializationContext The initialization context before events from the partition are processed.
      * @return a representation of the deferred computation of this call.
      */
-    public Mono<Void> initialize(InitializationContext initializationContext) {
+    public void initialize(InitializationContext initializationContext) {
         logger.info("Initializing partition processor for partition {}",
             initializationContext.getPartitionContext().getPartitionId());
-        return Mono.empty();
     }
 
     /**
@@ -55,7 +54,7 @@ public abstract class PartitionProcessor {
      * @param partitionEvent The partition information and the next event data from this partition.
      * @return a representation of the deferred computation of this call.
      */
-    public abstract Mono<Void> processEvent(EventProcessorEvent partitionEvent);
+    public abstract void processEvent(ProcessorEvent partitionEvent);
 
     /**
      * This method is called when an error occurs while receiving events from Event Hub. An error also marks the end of
@@ -74,10 +73,9 @@ public abstract class PartitionProcessor {
      * events is closed.
      * @return a representation of the deferred computation of this call.
      */
-    public Mono<Void> close(CloseContext closeContext) {
+    public void close(CloseContext closeContext) {
         logger.info("Closing partition processor for partition {} with close reason {}",
             closeContext.getPartitionContext().getPartitionId(), closeContext.getCloseReason());
-        return Mono.empty();
     }
 
 }

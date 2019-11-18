@@ -62,7 +62,7 @@ public class EventDataBatchIntegrationTest extends IntegrationTestBase {
         while (batch.tryAdd(createData())) {
             // We only print every 100th item or it'll be really spammy.
             if (count % 100 == 0) {
-                logger.verbose("Batch size: {}", batch.getSize());
+                logger.verbose("Batch size: {}", batch.getCount());
             }
 
             count++;
@@ -84,7 +84,7 @@ public class EventDataBatchIntegrationTest extends IntegrationTestBase {
         while (batch.tryAdd(createData())) {
             // We only print every 100th item or it'll be really spammy.
             if (count % 100 == 0) {
-                logger.verbose("Batch size: {}", batch.getSize());
+                logger.verbose("Batch size: {}", batch.getCount());
             }
             count++;
         }
@@ -116,7 +116,7 @@ public class EventDataBatchIntegrationTest extends IntegrationTestBase {
             count++;
         }
 
-        final CountDownLatch countDownLatch = new CountDownLatch(batch.getSize());
+        final CountDownLatch countDownLatch = new CountDownLatch(batch.getCount());
         final List<EventHubConsumerAsyncClient> consumers = new ArrayList<>();
         try {
             // Creating consumers on all the partitions and subscribing to the receive event.
@@ -125,10 +125,10 @@ public class EventDataBatchIntegrationTest extends IntegrationTestBase {
 
             for (String id : partitionIds) {
                 final EventHubConsumerAsyncClient consumer =
-                    client.createConsumer(EventHubClientBuilder.DEFAULT_CONSUMER_GROUP_NAME, EventPosition.latest());
+                    client.createConsumer(EventHubClientBuilder.DEFAULT_CONSUMER_GROUP_NAME);
 
                 consumers.add(consumer);
-                consumer.receive(id, EventPosition.earliest()).subscribe(partitionEvent -> {
+                consumer.receive(id, EventPosition.latest()).subscribe(partitionEvent -> {
                     EventData event = partitionEvent.getEventData();
                     if (event.getPartitionKey() == null || !PARTITION_KEY.equals(event.getPartitionKey())) {
                         return;
@@ -189,7 +189,7 @@ public class EventDataBatchIntegrationTest extends IntegrationTestBase {
         }
 
         // Act & Assert
-        Assertions.assertEquals(count, batch.getSize());
+        Assertions.assertEquals(count, batch.getCount());
         StepVerifier.create(producer.send(batch.getEvents(), sendOptions))
             .verifyComplete();
     }

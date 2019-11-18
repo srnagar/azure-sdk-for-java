@@ -11,7 +11,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
-import reactor.core.publisher.Mono;
 
 /**
  * Unit tests for {@link EventProcessorClientBuilder}.
@@ -44,13 +43,12 @@ public class EventProcessorClientBuilderTest {
     public void testEventProcessorBuilderMissingProperties() {
         assertThrows(NullPointerException.class, () -> {
             EventProcessorClient eventProcessorClient = new EventProcessorClientBuilder()
-                .eventProcessorStore(new InMemoryCheckpointStore())
+                .checkpointStore(new InMemoryCheckpointStore())
                 .processEvent(partitionEvent -> {
                     System.out.println("Partition id = " + partitionEvent.getPartitionContext().getPartitionId() + " and "
                         + "sequence number of event = " + partitionEvent.getEventData().getSequenceNumber());
-                    return Mono.empty();
                 })
-                .buildEventProcessor();
+                .buildEventProcessorClient();
         });
     }
 
@@ -62,10 +60,9 @@ public class EventProcessorClientBuilderTest {
             .processEvent(partitionEvent -> {
                 System.out.println("Partition id = " + partitionEvent.getPartitionContext().getPartitionId() + " and "
                     + "sequence number of event = " + partitionEvent.getEventData().getSequenceNumber());
-                return Mono.empty();
             })
-            .eventProcessorStore(new InMemoryCheckpointStore())
-            .buildEventProcessor();
+            .checkpointStore(new InMemoryCheckpointStore())
+            .buildEventProcessorClient();
         assertNotNull(eventProcessorClient);
     }
 

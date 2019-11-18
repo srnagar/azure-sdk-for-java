@@ -238,8 +238,8 @@ final class PartitionBasedLoadBalancer {
             .noneMatch(partitionOwnership -> {
                 return partitionOwnership.getEventHubName() == null
                     || !partitionOwnership.getEventHubName().equals(this.eventHubName)
-                    || partitionOwnership.getConsumerGroupName() == null
-                    || !partitionOwnership.getConsumerGroupName().equals(this.consumerGroupName)
+                    || partitionOwnership.getConsumerGroup() == null
+                    || !partitionOwnership.getConsumerGroup().equals(this.consumerGroupName)
                     || partitionOwnership.getPartitionId() == null
                     || partitionOwnership.getLastModifiedTime() == null
                     || partitionOwnership.getETag() == null;
@@ -342,12 +342,8 @@ final class PartitionBasedLoadBalancer {
         final Map<String, PartitionOwnership> partitionOwnershipMap,
         final String partitionIdToClaim) {
         PartitionOwnership previousPartitionOwnership = partitionOwnershipMap.get(partitionIdToClaim);
-        PartitionOwnership partitionOwnershipRequest = new PartitionOwnership()
-            .setOwnerId(this.ownerId)
-            .setPartitionId(partitionIdToClaim)
-            .setConsumerGroupName(this.consumerGroupName)
-            .setEventHubName(this.eventHubName)
-            .setETag(previousPartitionOwnership == null ? null : previousPartitionOwnership.getETag());
+        PartitionOwnership partitionOwnershipRequest = new PartitionOwnership("", this.eventHubName,
+            this.consumerGroupName, partitionIdToClaim, this.ownerId, null, previousPartitionOwnership.getETag());
         return partitionOwnershipRequest;
     }
 }

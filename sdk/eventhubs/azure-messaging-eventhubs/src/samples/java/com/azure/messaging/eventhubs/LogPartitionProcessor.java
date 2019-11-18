@@ -3,7 +3,8 @@
 
 package com.azure.messaging.eventhubs;
 
-import com.azure.messaging.eventhubs.models.EventProcessorEvent;
+import com.azure.messaging.eventhubs.implementation.PartitionProcessor;
+import com.azure.messaging.eventhubs.models.ProcessorEvent;
 import com.azure.messaging.eventhubs.models.ProcessorErrorContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,18 +21,18 @@ public class LogPartitionProcessor extends PartitionProcessor {
     /**
      * {@inheritDoc}
      *
-     * @param eventProcessorEvent {@link EventData} and the partition information associated with this event.
+     * @param processorEvent {@link EventData} and the partition information associated with this event.
      * @return a representation of the deferred computation of this call.
      */
     @Override
-    public Mono<Void> processEvent(EventProcessorEvent eventProcessorEvent) {
+    public void processEvent(ProcessorEvent processorEvent) {
         logger.info(
             "Processing event: Event Hub name = {}; consumer group name = {}; partition id = {}; sequence number = {}",
-            eventProcessorEvent.getPartitionContext().getEventHubName(),
-            eventProcessorEvent.getPartitionContext().getConsumerGroup(),
-            eventProcessorEvent.getPartitionContext().getPartitionId(),
-            eventProcessorEvent.getEventData().getSequenceNumber());
-        return eventProcessorEvent.updateCheckpoint();
+            processorEvent.getPartitionContext().getEventHubName(),
+            processorEvent.getPartitionContext().getConsumerGroup(),
+            processorEvent.getPartitionContext().getPartitionId(),
+            processorEvent.getEventData().getSequenceNumber());
+        processorEvent.updateCheckpoint().subscribe();
     }
 
     @Override

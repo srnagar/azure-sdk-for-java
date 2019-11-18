@@ -14,20 +14,19 @@ import com.azure.core.amqp.implementation.ConnectionOptions;
 import com.azure.core.amqp.implementation.RetryUtil;
 import com.azure.core.util.logging.ClientLogger;
 import com.azure.messaging.eventhubs.implementation.EventHubAmqpConnection;
+import com.azure.messaging.eventhubs.implementation.EventHubConsumerOptions;
 import com.azure.messaging.eventhubs.implementation.EventHubManagementNode;
 import com.azure.messaging.eventhubs.implementation.EventHubSession;
-import com.azure.messaging.eventhubs.models.EventHubConsumerOptions;
 import com.azure.messaging.eventhubs.models.EventPosition;
-import reactor.core.publisher.Mono;
-
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import reactor.core.publisher.Mono;
 
 /**
  * Class that manages the connection to Azure Event Hubs.
  */
-public class EventHubConnection implements Closeable {
+class EventHubConnection implements Closeable {
     private final ClientLogger logger = new ClientLogger(EventHubConnection.class);
     private final AtomicBoolean hasConnection = new AtomicBoolean();
     private final ConnectionOptions connectionOptions;

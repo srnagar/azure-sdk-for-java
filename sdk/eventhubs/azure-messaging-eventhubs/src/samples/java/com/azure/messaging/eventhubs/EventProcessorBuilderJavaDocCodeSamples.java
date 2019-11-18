@@ -3,8 +3,6 @@
 
 package com.azure.messaging.eventhubs;
 
-import reactor.core.publisher.Mono;
-
 /**
  * Code snippets for {@link EventProcessorClientBuilder}.
  */
@@ -22,14 +20,13 @@ public class EventProcessorBuilderJavaDocCodeSamples {
 
         EventProcessorClient eventProcessorClient = new EventProcessorClientBuilder()
             .consumerGroup("consumer-group")
-            .eventProcessorStore(new InMemoryCheckpointStore())
+            .checkpointStore(new InMemoryCheckpointStore())
             .processEvent(partitionEvent -> {
                 System.out.println("Partition id = " + partitionEvent.getPartitionContext().getPartitionId() + " and "
                     + "sequence number of event = " + partitionEvent.getEventData().getSequenceNumber());
-                return Mono.empty();
             })
             .connectionString(connectionString)
-            .buildEventProcessor();
+            .buildEventProcessorClient();
         return eventProcessorClient;
     }
     // END: com.azure.messaging.eventhubs.eventprocessorbuilder.instantiation

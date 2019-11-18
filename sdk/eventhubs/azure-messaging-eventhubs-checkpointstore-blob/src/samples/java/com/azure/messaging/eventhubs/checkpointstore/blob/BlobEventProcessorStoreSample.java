@@ -38,7 +38,7 @@ public class BlobEventProcessorStoreSample {
 
         System.out.println("Updating checkpoint");
         Checkpoint checkpoint = new Checkpoint()
-            .setConsumerGroupName("xyz")
+            .setConsumerGroup("xyz")
             .setEventHubName("abc")
             .setPartitionId("0")
             .setSequenceNumber(2L)

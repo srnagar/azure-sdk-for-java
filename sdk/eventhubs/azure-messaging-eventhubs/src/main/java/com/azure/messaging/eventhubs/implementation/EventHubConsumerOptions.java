@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-package com.azure.messaging.eventhubs.models;
+package com.azure.messaging.eventhubs.implementation;
 
 import com.azure.core.annotation.Fluent;
 import com.azure.core.util.logging.ClientLogger;
@@ -16,23 +16,23 @@ import java.util.Optional;
  * The baseline set of options that can be specified when creating an {@link EventHubConsumerClient} or an
  * {@link EventHubConsumerAsyncClient} to configure its behavior.
  *
- * @see EventHubClientBuilder#buildAsyncConsumer()
+ * @see EventHubClientBuilder#buildAsyncConsumerClient()
  */
 @Fluent
 public class EventHubConsumerOptions implements Cloneable {
     /**
      * The minimum value allowed for the prefetch count of the consumer.
      */
-    static final int MINIMUM_PREFETCH_COUNT = 1;
+    public static final int MINIMUM_PREFETCH_COUNT = 1;
     /**
      * The maximum value allowed for the prefetch count of the consumer.
      */
-    static final int MAXIMUM_PREFETCH_COUNT = 8000;
+    public static final int MAXIMUM_PREFETCH_COUNT = 8000;
 
     private final ClientLogger logger = new ClientLogger(EventHubConsumerOptions.class);
 
     // Default number of events to fetch when creating the consumer.
-    static final int DEFAULT_PREFETCH_COUNT = 500;
+    public static final int DEFAULT_PREFETCH_COUNT = 500;
 
     private boolean trackLastEnqueuedEventProperties;
     private Long ownerLevel;

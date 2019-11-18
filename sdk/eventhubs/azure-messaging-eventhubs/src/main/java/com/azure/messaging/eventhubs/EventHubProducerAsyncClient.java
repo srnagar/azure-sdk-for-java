@@ -185,7 +185,7 @@ public class EventHubProducerAsyncClient implements Closeable {
      */
     @ServiceMethod(returns = ReturnType.COLLECTION)
     public Flux<String> getPartitionIds() {
-        return getEventHubProperties().flatMapMany(properties -> Flux.fromArray(properties.getPartitionIds()));
+        return getEventHubProperties().flatMapMany(properties -> Flux.fromStream(properties.getPartitionIds().stream()));
     }
 
     /**
@@ -221,7 +221,7 @@ public class EventHubProducerAsyncClient implements Closeable {
             return monoError(logger, new NullPointerException("'options' cannot be null."));
         }
 
-        final CreateBatchOptions clone = options.clone();
+        final CreateBatchOptions clone = options;
 
         if (!CoreUtils.isNullOrEmpty(clone.getPartitionKey())
                 && !CoreUtils.isNullOrEmpty(clone.getPartitionId())) {
@@ -400,11 +400,11 @@ public class EventHubProducerAsyncClient implements Closeable {
         }
 
         if (!CoreUtils.isNullOrEmpty(batch.getPartitionId())) {
-            logger.info("Sending batch with size[{}] to partitionId[{}].", batch.getSize(), batch.getPartitionId());
+            logger.info("Sending batch with size[{}] to partitionId[{}].", batch.getCount(), batch.getPartitionId());
         } else if (!CoreUtils.isNullOrEmpty(batch.getPartitionKey())) {
-            logger.info("Sending batch with size[{}] with partitionKey[{}].", batch.getSize(), batch.getPartitionKey());
+            logger.info("Sending batch with size[{}] with partitionKey[{}].", batch.getCount(), batch.getPartitionKey());
         } else {
-            logger.info("Sending batch with size[{}] to be distributed round-robin in service.", batch.getSize());
+            logger.info("Sending batch with size[{}] to be distributed round-robin in service.", batch.getCount());
         }
 
         final String partitionKey = batch.getPartitionKey();

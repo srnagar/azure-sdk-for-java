@@ -5,6 +5,7 @@ package com.azure.messaging.eventhubs;
 
 import com.azure.core.exception.AzureException;
 import com.azure.messaging.eventhubs.implementation.ManagementChannel;
+import java.util.stream.Collectors;
 import org.apache.qpid.proton.Proton;
 import org.apache.qpid.proton.amqp.messaging.AmqpValue;
 import org.apache.qpid.proton.message.Message;
@@ -182,7 +183,8 @@ public class EventHubMessageSerializerTest {
         Assertions.assertNotNull(properties);
         Assertions.assertEquals(eventHubName, properties.getName());
         Assertions.assertEquals(createdAt, properties.getCreatedAt());
-        Assertions.assertArrayEquals(partitionIds, properties.getPartitionIds());
+        Assertions.assertArrayEquals(partitionIds,
+            properties.getPartitionIds().stream().collect(Collectors.toList()).toArray());
     }
 
     /**

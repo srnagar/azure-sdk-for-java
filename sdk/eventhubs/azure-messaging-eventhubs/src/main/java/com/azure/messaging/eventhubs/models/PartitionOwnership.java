@@ -3,30 +3,36 @@
 
 package com.azure.messaging.eventhubs.models;
 
-import com.azure.core.annotation.Fluent;
-import java.util.Objects;
+import com.azure.core.annotation.Immutable;
 
 /**
  * A model class to hold partition ownership information.
  */
-@Fluent
+@Immutable
 public class PartitionOwnership {
 
-    private String fullyQualifiedNamespace;
-    private String eventHubName;
-    private String consumerGroupName;
-    private String partitionId;
-    private String ownerId;
-    private Long lastModifiedTime;
-    private String eTag;
+    private final String fullyQualifiedNamespace;
+    private final String eventHubName;
+    private final String consumerGroup;
+    private final String partitionId;
+    private final String ownerId;
+    private final Long lastModifiedTime;
+    private final String eTag;
+
+    public PartitionOwnership(String fullyQualifiedNamespace, String eventHubName, String consumerGroup,
+        String partitionId, String ownerId, Long lastModifiedTime, String eTag) {
+        this.fullyQualifiedNamespace = fullyQualifiedNamespace;
+        this.eventHubName = eventHubName;
+        this.consumerGroup = consumerGroup;
+        this.partitionId = partitionId;
+        this.ownerId = ownerId;
+        this.lastModifiedTime = lastModifiedTime;
+        this.eTag = eTag;
+    }
 
     // TODO: add javadoc
     public String getFullyQualifiedNamespace() {
         return fullyQualifiedNamespace;
-    }
-
-    public void setFullyQualifiedNamespace(final String fullyQualifiedNamespace) {
-        this.fullyQualifiedNamespace = fullyQualifiedNamespace;
     }
 
     /**
@@ -39,34 +45,12 @@ public class PartitionOwnership {
     }
 
     /**
-     * Sets the Event Hub name associated with this ownership record.
-     *
-     * @param eventHubName The Event Hub name associated with this ownership record.
-     * @return The updated {@link PartitionOwnership} instance.
-     */
-    public PartitionOwnership setEventHubName(String eventHubName) {
-        this.eventHubName = Objects.requireNonNull(eventHubName, "eventHubName cannot be null.");
-        return this;
-    }
-
-    /**
      * Gets the consumer group name associated with this ownership record.
      *
      * @return The consumer group name associated with this ownership record.
      */
-    public String getConsumerGroupName() {
-        return consumerGroupName;
-    }
-
-    /**
-     * Sets the consumer group name associated with this ownership record.
-     *
-     * @param consumerGroupName The consumer group name associated with this ownership record.
-     * @return The updated {@link PartitionOwnership} instance.
-     */
-    public PartitionOwnership setConsumerGroupName(String consumerGroupName) {
-        this.consumerGroupName = Objects.requireNonNull(consumerGroupName, "consumerGroupName cannot be null.");
-        return this;
+    public String getConsumerGroup() {
+        return consumerGroup;
     }
 
     /**
@@ -79,34 +63,12 @@ public class PartitionOwnership {
     }
 
     /**
-     * Sets the partition id associated with this ownership record.
-     *
-     * @param partitionId The partition id associated with this ownership record.
-     * @return The updated {@link PartitionOwnership} instance.
-     */
-    public PartitionOwnership setPartitionId(String partitionId) {
-        this.partitionId = Objects.requireNonNull(partitionId, "partitionId cannot be null.");
-        return this;
-    }
-
-    /**
-     * Sets the unique event processor identifier as the owner of the partition id in this ownership record.
+     * Gets the unique event processor identifier as the owner of the partition id in this ownership record.
      *
      * @return The unique event processor identifier as the owner of the partition id in this ownership record.
      */
     public String getOwnerId() {
         return ownerId;
-    }
-
-    /**
-     * Returns the unique event processor identifier that owns the partition id in this ownership record.
-     *
-     * @param ownerId The unique event processor identifier that owns the partition id in this ownership record.
-     * @return The updated {@link PartitionOwnership} instance.
-     */
-    public PartitionOwnership setOwnerId(String ownerId) {
-        this.ownerId = Objects.requireNonNull(ownerId, "ownerId cannot be null.");
-        return this;
     }
 
     /**
@@ -116,17 +78,6 @@ public class PartitionOwnership {
      */
     public Long getLastModifiedTime() {
         return lastModifiedTime;
-    }
-
-    /**
-     * Sets the last modified time of this ownership record as epoch millis.
-     *
-     * @param lastModifiedTime The last modified time of this ownership record as epoch millis.
-     * @return The updated {@link PartitionOwnership} instance.
-     */
-    public PartitionOwnership setLastModifiedTime(Long lastModifiedTime) {
-        this.lastModifiedTime = lastModifiedTime;
-        return this;
     }
 
     /**
@@ -142,22 +93,5 @@ public class PartitionOwnership {
      */
     public String getETag() {
         return eTag;
-    }
-
-    /**
-     * Sets the ETag with the last known successful update to partition ownership record. An ETag is a unique identifier
-     * that is generated when a data record is successfully created/updated. This ETag is used to achieve optimistic
-     * concurrency in a distributed event processor setup. When multiple instances of event processor try to update the
-     * same partition ownership record, ETag is used to verify that the last values read by the instance requesting the
-     * update is still the latest ETag for this record. If the ETag in the store does not match the ETag in the update
-     * request, then the update is expected to fail as there was an update since the last time an event processor read
-     * this record.
-     *
-     * @param eTag The eTag for this ownership record.
-     * @return The updated {@link PartitionOwnership} instance.
-     */
-    public PartitionOwnership setETag(String eTag) {
-        this.eTag = eTag;
-        return this;
     }
 }

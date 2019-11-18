@@ -6,21 +6,20 @@ package com.azure.messaging.eventhubs;
 import com.azure.core.amqp.implementation.AmqpReceiveLink;
 import com.azure.core.amqp.implementation.MessageSerializer;
 import com.azure.core.util.logging.ClientLogger;
-import com.azure.messaging.eventhubs.models.EventHubConsumerOptions;
+import com.azure.messaging.eventhubs.implementation.EventHubConsumerOptions;
 import com.azure.messaging.eventhubs.models.LastEnqueuedEventProperties;
 import com.azure.messaging.eventhubs.models.PartitionContext;
 import com.azure.messaging.eventhubs.models.PartitionEvent;
-import org.apache.qpid.proton.message.Message;
-import reactor.core.publisher.EmitterProcessor;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
+import org.apache.qpid.proton.message.Message;
+import reactor.core.publisher.EmitterProcessor;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * A package-private consumer responsible for reading {@link EventData} from a specific Event Hub partition in the
@@ -178,7 +177,7 @@ class EventHubPartitionAsyncConsumer implements Closeable {
             }
         }
 
-        final PartitionContext partitionContext = new PartitionContext(partitionId, eventHubName, consumerGroup);
+        final PartitionContext partitionContext = new PartitionContext("", partitionId, eventHubName, consumerGroup);
         return new PartitionEvent(partitionContext, event, lastEnqueuedEventProperties.get());
     }
 }

@@ -6,27 +6,27 @@ package com.azure.messaging.eventhubs;
 import com.azure.core.amqp.RetryOptions;
 import com.azure.core.amqp.TransportType;
 import com.azure.core.amqp.implementation.TracerProvider;
-import com.azure.core.amqp.models.ProxyConfiguration;
+import com.azure.core.amqp.models.ProxyOptions;
 import com.azure.core.credential.TokenCredential;
 import com.azure.core.exception.AzureException;
 import com.azure.core.util.Configuration;
 import com.azure.core.util.logging.ClientLogger;
 import com.azure.core.util.tracing.Tracer;
+import com.azure.messaging.eventhubs.implementation.PartitionProcessor;
 import com.azure.messaging.eventhubs.models.CloseContext;
-import com.azure.messaging.eventhubs.models.EventProcessorEvent;
+import com.azure.messaging.eventhubs.models.ProcessorEvent;
 import com.azure.messaging.eventhubs.models.ProcessorErrorContext;
 import com.azure.messaging.eventhubs.models.EventPosition;
 import com.azure.messaging.eventhubs.models.InitializationContext;
 import java.util.Objects;
 import java.util.ServiceLoader;
-import java.util.function.Function;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
-import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 
 /**
  * This class provides a fluent builder API to help aid the configuration and instantiation of the {@link
- * EventProcessorClient}. Calling {@link #buildEventProcessor()} constructs a new instance of {@link
+ * EventProcessorClient}. Calling {@link #buildEventProcessorClient()} constructs a new instance of {@link
  * EventProcessorClient}.
  *
  * <p>
@@ -37,7 +37,7 @@ import reactor.core.scheduler.Scheduler;
  * <li>{@link #consumerGroup(String) Consumer group name}.</li>
  * <li>{@link CheckpointStore} - An implementation of EventProcessorStore that stores checkpoint and
  * partition ownership information to enable load balancing.</li>
- * <li>{@link #processEvent(Function)} - A callback that processes events received from the Event Hub.</li>
+ * <li>{@link #processEvent(Consumer)} - A callback that processes events received from the Event Hub.</li>
  * <li>Credentials -
  *  <strong>Credentials are required</strong> to perform operations against Azure Event Hubs. They can be set by using
  *  one of the following methods:
@@ -66,10 +66,10 @@ public class EventProcessorClientBuilder {
     private final EventHubClientBuilder eventHubClientBuilder;
     private String consumerGroup;
     private CheckpointStore checkpointStore;
-    private Function<EventProcessorEvent, Mono<Void>> processEvent;
-    private Function<ProcessorErrorContext, Mono<Void>> processError;
-    private Function<InitializationContext, Mono<Void>> initializePartition;
-    private Function<CloseContext, Mono<Void>> closePartition;
+    private Consumer<ProcessorEvent> processEvent;
+    private Consumer<ProcessorErrorContext> processError;
+    private Consumer<InitializationContext> processPartitionInitialization;
+    private Consumer<CloseContext> processPartitionClose;
 
     private Supplier<PartitionProcessor> partitionProcessorSupplier;
     private boolean trackLastEnqueuedEventInformation;
@@ -165,11 +165,11 @@ public class EventProcessorClientBuilder {
      * Sets the proxy configuration to use for {@link EventHubAsyncClient}. When a proxy is configured, {@link
      * TransportType#AMQP_WEB_SOCKETS} must be used for the transport type.
      *
-     * @param proxyConfiguration The proxy configuration to use.
+     * @param proxyOptions The proxy configuration to use.
      * @return The updated {@link EventProcessorClientBuilder} object.
      */
-    public EventProcessorClientBuilder proxyConfiguration(ProxyConfiguration proxyConfiguration) {
-        eventHubClientBuilder.proxyConfiguration(proxyConfiguration);
+    public EventProcessorClientBuilder proxy(ProxyOptions proxyOptions) {
+        eventHubClientBuilder.proxy(proxyOptions);
         return this;
     }
 
@@ -203,7 +203,7 @@ public class EventProcessorClientBuilder {
      * @param retryOptions The retry policy to use.
      * @return The updated {@link EventProcessorClientBuilder} object.
      */
-    public EventProcessorClientBuilder retryOptions(RetryOptions retryOptions) {
+    public EventProcessorClientBuilder retry(RetryOptions retryOptions) {
         eventHubClientBuilder.retry(retryOptions);
         return this;
     }
@@ -233,7 +233,7 @@ public class EventProcessorClientBuilder {
      * @return The updated {@link EventProcessorClientBuilder} instance.
      * @throws NullPointerException if {@code eventProcessorStore} is {@code null}.
      */
-    public EventProcessorClientBuilder eventProcessorStore(CheckpointStore checkpointStore) {
+    public EventProcessorClientBuilder checkpointStore(CheckpointStore checkpointStore) {
         this.checkpointStore = Objects.requireNonNull(checkpointStore, "'eventProcessorStore' cannot be null");
         return this;
     }
@@ -246,7 +246,7 @@ public class EventProcessorClientBuilder {
      * @return The updated {@link EventProcessorClientBuilder} instance.
      * @throws NullPointerException if {@code processEvent} is {@code null}.
      */
-    public EventProcessorClientBuilder processEvent(Function<EventProcessorEvent, Mono<Void>> processEvent) {
+    public EventProcessorClientBuilder processEvent(Consumer<ProcessorEvent> processEvent) {
         this.processEvent = Objects.requireNonNull(processEvent, "'processEvent' cannot be null");
         return this;
     }
@@ -258,7 +258,7 @@ public class EventProcessorClientBuilder {
      * @param processError The function to call when an error occurs while processing events.
      * @return The updated {@link EventProcessorClientBuilder} instance.
      */
-    public EventProcessorClientBuilder processError(Function<ProcessorErrorContext, Mono<Void>> processError) {
+    public EventProcessorClientBuilder processError(Consumer<ProcessorErrorContext> processError) {
         this.processError = Objects.requireNonNull(processError);
         return this;
     }
@@ -272,9 +272,9 @@ public class EventProcessorClientBuilder {
      * @param initializePartition The function to call before processing starts for a partition
      * @return The updated {@link EventProcessorClientBuilder} instance.
      */
-    public EventProcessorClientBuilder initializePartitionProcessing(
-        Function<InitializationContext, Mono<Void>> initializePartition) {
-        this.initializePartition = initializePartition;
+    public EventProcessorClientBuilder processPartitionInitialization(
+        Consumer<InitializationContext> initializePartition) {
+        this.processPartitionInitialization = initializePartition;
         return this;
     }
 
@@ -285,15 +285,8 @@ public class EventProcessorClientBuilder {
      * @param closePartition The function to call after processing for a partition stops.
      * @return The updated {@link EventProcessorClientBuilder} instance.
      */
-    public EventProcessorClientBuilder closePartitionProcessing(Function<CloseContext, Mono<Void>> closePartition) {
-        this.closePartition = closePartition;
-        return this;
-    }
-
-    // TODO: add javadoc
-    public EventProcessorClientBuilder partitionProcessorSupplier(
-        Supplier<PartitionProcessor> partitionProcessorSupplier) {
-        this.partitionProcessorSupplier = partitionProcessorSupplier;
+    public EventProcessorClientBuilder processPartitionClose(Consumer<CloseContext> closePartition) {
+        this.processPartitionClose = closePartition;
         return this;
     }
 
@@ -318,9 +311,9 @@ public class EventProcessorClientBuilder {
      * #connectionString(String)} or {@link #credential(String, String, TokenCredential)}. Or, if a proxy is specified
      * but the transport type is not {@link TransportType#AMQP_WEB_SOCKETS web sockets}.
      */
-    public EventProcessorClient buildEventProcessor() {
+    public EventProcessorClient buildEventProcessorClient() {
         Objects.requireNonNull(processEvent, "'processEvent' cannot be null");
-        Objects.requireNonNull(checkpointStore, "'eventProcessStore' cannot be null");
+        Objects.requireNonNull(checkpointStore, "'checkpointStore' cannot be null");
         Objects.requireNonNull(consumerGroup, "'consumerGroup' cannot be null");
 
         final TracerProvider tracerProvider = new TracerProvider(ServiceLoader.load(Tracer.class));
@@ -332,29 +325,29 @@ public class EventProcessorClientBuilder {
     private Supplier<PartitionProcessor> getPartitionProcessorSupplier() {
         return () -> new PartitionProcessor() {
             @Override
-            public Mono<Void> processEvent(EventProcessorEvent eventProcessorEvent) {
-                return processEvent.apply(eventProcessorEvent);
+            public void processEvent(ProcessorEvent processorEvent) {
+                processEvent.accept(processorEvent);
             }
 
             @Override
-            public Mono<Void> initialize(InitializationContext initializationContext) {
-                if (initializePartition != null) {
-                    return initializePartition.apply(initializationContext);
+            public void initialize(InitializationContext initializationContext) {
+                if (processPartitionInitialization != null) {
+                    processPartitionInitialization.accept(initializationContext);
                 }
-                return super.initialize(initializationContext);
+                super.initialize(initializationContext);
             }
 
             @Override
             public void processError(ProcessorErrorContext processorErrorContext) {
-                processError.apply(processorErrorContext);
+                processError.accept(processorErrorContext);
             }
 
             @Override
-            public Mono<Void> close(CloseContext closeContext) {
-                if (closePartition != null) {
-                    return closePartition.apply(closeContext);
+            public void close(CloseContext closeContext) {
+                if (processPartitionClose != null) {
+                    processPartitionClose.accept(closeContext);
                 }
-                return super.close(closeContext);
+                super.close(closeContext);
             }
         };
     }

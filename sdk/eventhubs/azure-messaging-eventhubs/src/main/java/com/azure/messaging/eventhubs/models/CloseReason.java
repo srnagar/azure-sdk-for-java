@@ -4,7 +4,7 @@
 package com.azure.messaging.eventhubs.models;
 
 import com.azure.messaging.eventhubs.EventProcessorClient;
-import com.azure.messaging.eventhubs.PartitionProcessor;
+import com.azure.messaging.eventhubs.implementation.PartitionProcessor;
 
 /**
  * Enumeration of all possible reasons a {@link PartitionProcessor} may be closed.

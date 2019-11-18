@@ -7,7 +7,7 @@ import com.azure.core.http.policy.HttpLogDetailLevel;
 import com.azure.core.http.policy.HttpLogOptions;
 import com.azure.messaging.eventhubs.EventProcessorClient;
 import com.azure.messaging.eventhubs.EventProcessorClientBuilder;
-import com.azure.messaging.eventhubs.models.EventProcessorEvent;
+import com.azure.messaging.eventhubs.models.ProcessorEvent;
 import com.azure.storage.blob.BlobContainerAsyncClient;
 import com.azure.storage.blob.BlobContainerClientBuilder;
 import java.util.concurrent.TimeUnit;
@@ -23,7 +23,7 @@ public class EventProcessorBlobEventProcessorStoreSample {
     private static final String SAS_TOKEN_STRING = "";
     private static final String STORAGE_CONNECTION_STRING = "";
 
-    public static final Function<EventProcessorEvent, Mono<Void>> PARTITION_PROCESSOR = partitionEvent -> {
+    public static final Function<ProcessorEvent, Mono<Void>> PARTITION_PROCESSOR = partitionEvent -> {
         System.out.printf("Processing event from partition %s with sequence number %d %n",
             partitionEvent.getPartitionContext().getPartitionId(), partitionEvent.getEventData().getSequenceNumber());
 
@@ -51,7 +51,7 @@ public class EventProcessorBlobEventProcessorStoreSample {
             .connectionString(EH_CONNECTION_STRING)
             .consumerGroup("<< CONSUMER GROUP NAME >>")
             .processEvent(PARTITION_PROCESSOR)
-            .eventProcessorStore(new BlobCheckpointStore(blobContainerAsyncClient));
+            .checkpointStore(new BlobCheckpointStore(blobContainerAsyncClient));
 
         EventProcessorClient eventProcessorClient = eventProcessorClientBuilder.buildEventProcessor();
         eventProcessorClient.start();

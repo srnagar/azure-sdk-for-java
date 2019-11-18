@@ -3,20 +3,19 @@
 
 package com.azure.messaging.eventhubs;
 
-import com.azure.core.amqp.exception.AmqpException;
 import com.azure.core.amqp.implementation.TracerProvider;
 import com.azure.core.util.Context;
 import com.azure.core.util.logging.ClientLogger;
 import com.azure.core.util.tracing.ProcessKind;
+import com.azure.messaging.eventhubs.implementation.EventHubConsumerOptions;
+import com.azure.messaging.eventhubs.implementation.PartitionProcessor;
 import com.azure.messaging.eventhubs.models.CloseContext;
 import com.azure.messaging.eventhubs.models.CloseReason;
-import com.azure.messaging.eventhubs.models.EventHubConsumerOptions;
 import com.azure.messaging.eventhubs.models.EventPosition;
-import com.azure.messaging.eventhubs.models.EventProcessorEvent;
+import com.azure.messaging.eventhubs.models.ProcessorEvent;
 import com.azure.messaging.eventhubs.models.ProcessorErrorContext;
 import com.azure.messaging.eventhubs.models.InitializationContext;
 import com.azure.messaging.eventhubs.models.PartitionContext;
-import com.azure.messaging.eventhubs.models.PartitionEvent;
 import com.azure.messaging.eventhubs.models.PartitionOwnership;
 import reactor.core.publisher.Signal;
 
@@ -103,8 +102,8 @@ class PartitionPumpManager {
             return;
         }
 
-        PartitionContext partitionContext = new PartitionContext(claimedOwnership.getPartitionId(),
-            claimedOwnership.getEventHubName(), claimedOwnership.getConsumerGroupName());
+        PartitionContext partitionContext = new PartitionContext("", claimedOwnership.getPartitionId(),
+            claimedOwnership.getEventHubName(), claimedOwnership.getConsumerGroup());
         PartitionProcessor partitionProcessor = this.partitionProcessorFactory.get();
 
         InitializationContext initializationContext = new InitializationContext(partitionContext,
@@ -123,7 +122,7 @@ class PartitionPumpManager {
 
         EventHubConsumerOptions eventHubConsumerOptions = new EventHubConsumerOptions().setOwnerLevel(0L);
         EventHubConsumerAsyncClient eventHubConsumer = eventHubClientBuilder.buildAsyncClient()
-            .createConsumer(claimedOwnership.getConsumerGroupName(), eventHubConsumerOptions);
+            .createConsumer(claimedOwnership.getConsumerGroup(), eventHubConsumerOptions);
 
         partitionPumps.put(claimedOwnership.getPartitionId(), eventHubConsumer);
         eventHubConsumer.receive(claimedOwnership.getPartitionId(), startFromEventPosition).subscribe(partitionEvent -> {
@@ -133,10 +132,7 @@ class PartitionPumpManager {
                 if (processSpanContext.getData(SPAN_CONTEXT_KEY).isPresent()) {
                     eventData.addContext(SPAN_CONTEXT_KEY, processSpanContext);
                 }
-                partitionProcessor.processEvent(new EventProcessorEvent(partitionContext, eventData)).doOnEach(signal ->
-                    endProcessTracingSpan(processSpanContext, signal)).subscribe(unused -> {
-                    }, /* event processing returned error */ ex -> handleProcessingError(claimedOwnership,
-                    eventHubConsumer, partitionProcessor, ex, partitionContext, "user code error"));
+                partitionProcessor.processEvent(new ProcessorEvent(partitionContext, eventData));
             } catch (Exception ex) {
                 /* event processing threw an exception */
                 handleProcessingError(claimedOwnership, eventHubConsumer, partitionProcessor, ex, partitionContext, "user code error");

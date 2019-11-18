@@ -55,7 +55,7 @@ public class InteropAmqpPropertiesTest extends IntegrationTestBase {
 
         client = createBuilder().buildAsyncClient();
         producer = client.createProducer();
-        consumer = client.createConsumer(EventHubClientBuilder.DEFAULT_CONSUMER_GROUP_NAME, EventPosition.latest());
+        consumer = client.createConsumer(EventHubClientBuilder.DEFAULT_CONSUMER_GROUP_NAME);
     }
 
     @Override
@@ -163,7 +163,7 @@ public class InteropAmqpPropertiesTest extends IntegrationTestBase {
         Assertions.assertTrue(actual.getSystemProperties().containsKey(MessageConstant.ABSOLUTE_EXPIRY_TIME.getValue()));
         Assertions.assertEquals(message.getExpiryTime(), actual.getSystemProperties().get(MessageConstant.ABSOLUTE_EXPIRY_TIME.getValue()));
 
-        Assertions.assertEquals(PAYLOAD, UTF_8.decode(actual.getBody()).toString());
+        Assertions.assertEquals(PAYLOAD, UTF_8.decode(ByteBuffer.wrap(actual.getBody())).toString());
 
         messageAnnotations.forEach((key, value) -> {
             Assertions.assertTrue(actual.getSystemProperties().containsKey(key.toString()));

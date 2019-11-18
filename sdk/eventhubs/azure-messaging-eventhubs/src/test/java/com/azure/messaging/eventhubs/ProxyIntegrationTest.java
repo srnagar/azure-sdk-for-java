@@ -5,7 +5,7 @@ package com.azure.messaging.eventhubs;
 
 import com.azure.core.amqp.RetryOptions;
 import com.azure.core.amqp.TransportType;
-import com.azure.core.amqp.models.ProxyConfiguration;
+import com.azure.core.amqp.models.ProxyOptions;
 import com.azure.core.util.Configuration;
 import com.azure.core.util.IterableStream;
 import com.azure.core.util.logging.ClientLogger;
@@ -40,17 +40,17 @@ public class ProxyIntegrationTest extends IntegrationTestBase {
 
     @Override
     protected void beforeTest() {
-        final ProxyConfiguration proxyConfiguration = getProxyConfiguration();
+        final ProxyOptions proxyOptions = getProxyConfiguration();
 
-        Assumptions.assumeTrue(proxyConfiguration != null,
+        Assumptions.assumeTrue(proxyOptions != null,
             "Cannot run proxy integration tests without setting proxy configuration.");
 
         sender = new EventHubClientBuilder()
             .connectionString(getConnectionString())
             .retry(new RetryOptions().setMaxRetries(0))
-            .proxyConfiguration(proxyConfiguration)
+            .proxy(proxyOptions)
             .transportType(TransportType.AMQP_WEB_SOCKETS)
-            .buildProducer();
+            .buildProducerClient();
 
         sendOptions = new SendOptions().setPartitionId(PARTITION_ID);
     }
@@ -77,18 +77,17 @@ public class ProxyIntegrationTest extends IntegrationTestBase {
         final int numberOfEvents = 15;
         final String messageId = UUID.randomUUID().toString();
         final EventHubProducerAsyncClient producer = new EventHubClientBuilder()
-            .connectionString(getConnectionString()).buildAsyncProducer();
+            .connectionString(getConnectionString()).buildAsyncProducerClient();
         final EventHubConsumerClient receiver = new EventHubClientBuilder()
             .connectionString(getConnectionString())
             .consumerGroup(EventHubClientBuilder.DEFAULT_CONSUMER_GROUP_NAME)
-            .buildConsumer();
+            .buildConsumerClient();
 
         producer.send(TestUtils.getEvents(numberOfEvents, messageId), sendOptions).block();
 
         // Act
         final IterableStream<PartitionEvent> receive = receiver
-            .receive(PARTITION_ID, 15, Duration.ofSeconds(30), EventPosition
-                .earliest());
+            .receive(PARTITION_ID, 15, EventPosition.earliest(), Duration.ofSeconds(30));
 
         // Assert
         Assertions.assertNotNull(receive);

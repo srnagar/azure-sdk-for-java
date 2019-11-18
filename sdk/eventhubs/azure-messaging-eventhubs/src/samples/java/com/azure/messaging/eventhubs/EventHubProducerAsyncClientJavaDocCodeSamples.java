@@ -27,7 +27,7 @@ public class EventHubProducerAsyncClientJavaDocCodeSamples {
         // The required parameters is a way to authenticate with Event Hubs using credentials.
         EventHubProducerAsyncClient producer = new EventHubClientBuilder()
             .connectionString("event-hubs-namespace-connection-string", "event-hub-name")
-            .buildAsyncProducer();
+            .buildAsyncProducerClient();
         // END: com.azure.messaging.eventhubs.eventhubasyncproducerclient.instantiation
 
         producer.close();
@@ -44,7 +44,7 @@ public class EventHubProducerAsyncClientJavaDocCodeSamples {
         SendOptions options = new SendOptions()
             .setPartitionId("foo");
 
-        EventHubProducerAsyncClient producer = builder.buildAsyncProducer();
+        EventHubProducerAsyncClient producer = builder.buildAsyncProducerClient();
         producer.send(eventData, options);
         // END: com.azure.messaging.eventhubs.eventhubasyncproducerclient.instantiation#partitionId
 
@@ -62,7 +62,7 @@ public class EventHubProducerAsyncClientJavaDocCodeSamples {
             new EventData("wheat".getBytes(UTF_8))
         );
 
-        EventHubProducerAsyncClient producer = builder.buildAsyncProducer();
+        EventHubProducerAsyncClient producer = builder.buildAsyncProducerClient();
         SendOptions options = new SendOptions()
             .setPartitionKey("bread");
 
@@ -76,7 +76,7 @@ public class EventHubProducerAsyncClientJavaDocCodeSamples {
      * Code snippet demonstrating how to create an {@link EventDataBatch} and send it.
      */
     public void sendEventDataBatch() {
-        final EventHubProducerAsyncClient producer = builder.buildAsyncProducer();
+        final EventHubProducerAsyncClient producer = builder.buildAsyncProducerClient();
 
         // BEGIN: com.azure.messaging.eventhubs.eventhubasyncproducerclient.send#eventDataBatch
         final Flux<EventData> telemetryEvents = Flux.just(

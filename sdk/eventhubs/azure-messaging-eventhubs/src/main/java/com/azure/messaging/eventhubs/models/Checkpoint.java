@@ -3,20 +3,35 @@
 
 package com.azure.messaging.eventhubs.models;
 
-import com.azure.core.annotation.Fluent;
-import com.azure.messaging.eventhubs.PartitionProcessor;
+import com.azure.core.annotation.Immutable;
+import com.azure.messaging.eventhubs.implementation.PartitionProcessor;
 
 /**
  * A model class to hold checkpoint data. A checkpoint represents the last successfully processed event by a {@link
  * PartitionProcessor} for a particular partition of an Event Hub.
  */
-@Fluent
+@Immutable
 public class Checkpoint {
-    private String eventHubName;
-    private String consumerGroupName;
-    private String partitionId;
-    private Long offset;
-    private Long sequenceNumber;
+    private final String fullyQualifiedNamespace;
+    private final String eventHubName;
+    private final String consumerGroup;
+    private final String partitionId;
+    private final Long offset;
+    private final Long sequenceNumber;
+
+    public Checkpoint(String fullyQualifiedNamespace, String eventHubName, String consumerGroup, String partitionId,
+        Long offset, Long sequenceNumber) {
+        this.fullyQualifiedNamespace = fullyQualifiedNamespace;
+        this.eventHubName = eventHubName;
+        this.consumerGroup = consumerGroup;
+        this.partitionId = partitionId;
+        this.offset = offset;
+        this.sequenceNumber = sequenceNumber;
+    }
+
+    public String getFullyQualifiedNamespace() {
+        return fullyQualifiedNamespace;
+    }
 
     /**
      * Gets the Event Hub name associated with this checkpoint.
@@ -28,34 +43,12 @@ public class Checkpoint {
     }
 
     /**
-     * Sets the Event Hub name associated with this checkpoint.
-     *
-     * @param eventHubName The Event Hub name associated with this checkpoint.
-     * @return The updated {@link Checkpoint} instance.
-     */
-    public Checkpoint setEventHubName(String eventHubName) {
-        this.eventHubName = eventHubName;
-        return this;
-    }
-
-    /**
      * Gets the consumer group name associated with this checkpoint.
      *
      * @return The consumer group name associated with this checkpoint.
      */
-    public String getConsumerGroupName() {
-        return consumerGroupName;
-    }
-
-    /**
-     * Sets the consumer group name associated with this checkpoint.
-     *
-     * @param consumerGroupName The consumer group name associated with this checkpoint.
-     * @return The updated {@link Checkpoint} instance.
-     */
-    public Checkpoint setConsumerGroupName(String consumerGroupName) {
-        this.consumerGroupName = consumerGroupName;
-        return this;
+    public String getConsumerGroup() {
+        return consumerGroup;
     }
 
     /**
@@ -68,17 +61,6 @@ public class Checkpoint {
     }
 
     /**
-     * Sets the partition id associated with this checkpoint.
-     *
-     * @param partitionId The partition id associated with this checkpoint.
-     * @return The updated {@link Checkpoint} instance.
-     */
-    public Checkpoint setPartitionId(String partitionId) {
-        this.partitionId = partitionId;
-        return this;
-    }
-
-    /**
      * Gets the offset of the last successfully processed event to store as checkpoint.
      *
      * @return The offset of the last successfully processed event to store as checkpoint.
@@ -88,33 +70,11 @@ public class Checkpoint {
     }
 
     /**
-     * Sets the offset of the last successfully processed event to store as checkpoint.
-     *
-     * @param offset The offset of the last successfully processed event to store as checkpoint.
-     * @return The updated {@link Checkpoint} instance.
-     */
-    public Checkpoint setOffset(Long offset) {
-        this.offset = offset;
-        return this;
-    }
-
-    /**
      * Gets the sequence number of the last successfully processed event to store as checkpoint.
      *
      * @return The sequence number of the last successfully processed event to store as checkpoint.
      */
     public Long getSequenceNumber() {
         return sequenceNumber;
-    }
-
-    /**
-     * Sets the sequence number of the last successfully processed event to store as checkpoint.
-     *
-     * @param sequenceNumber The sequence number of the last successfully processed event to store as checkpoint.
-     * @return The updated {@link Checkpoint} instance.
-     */
-    public Checkpoint setSequenceNumber(Long sequenceNumber) {
-        this.sequenceNumber = sequenceNumber;
-        return this;
     }
 }
