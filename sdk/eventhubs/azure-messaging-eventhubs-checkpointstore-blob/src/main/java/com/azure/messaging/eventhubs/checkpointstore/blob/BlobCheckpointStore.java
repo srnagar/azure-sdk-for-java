@@ -95,7 +95,7 @@ public class BlobCheckpointStore implements CheckpointStore {
         return Flux.fromArray(requestedPartitionOwnerships).flatMap(partitionOwnership -> {
             String partitionId = partitionOwnership.getPartitionId();
             String blobName = getBlobName(partitionOwnership.getEventHubName(),
-                partitionOwnership.getConsumerGroupName(), partitionId);
+                partitionOwnership.getConsumerGroup(), partitionId);
 
             if (!blobClients.containsKey(blobName)) {
                 blobClients.put(blobName, blobContainerAsyncClient.getBlobAsyncClient(blobName));
@@ -134,7 +134,10 @@ public class BlobCheckpointStore implements CheckpointStore {
     }
 
     private Mono<PartitionOwnership> updateOwnershipETag(Response<?> response, PartitionOwnership ownership) {
-        return Mono.just(ownership.setETag(response.getHeaders().get(ETAG).getValue()));
+        PartitionOwnership updatedOwnership = new PartitionOwnership(ownership.getFullyQualifiedNamespace(),
+            ownership.getEventHubName(), ownership.getConsumerGroup(), ownership.getPartitionId(),
+            ownership.getOwnerId(), ownership.getLastModifiedTime(), response.getHeaders().get(ETAG).getValue());
+        return Mono.just(updatedOwnership);
     }
 
     /**
@@ -178,33 +181,20 @@ public class BlobCheckpointStore implements CheckpointStore {
     }
 
     private PartitionOwnership convertToPartitionOwnership(BlobItem blobItem) {
-        PartitionOwnership partitionOwnership = new PartitionOwnership();
         logger.info("Found blob for partition {}", blobItem.getName());
 
         String[] names = blobItem.getName().split(BLOB_PATH_SEPARATOR);
-        partitionOwnership.setEventHubName(names[0]);
-        partitionOwnership.setConsumerGroupName(names[1]);
-        partitionOwnership.setPartitionId(names[2]);
 
         if (CoreUtils.isNullOrEmpty(blobItem.getMetadata())) {
             logger.warning("No metadata available for blob {}", blobItem.getName());
-            return partitionOwnership;
+            return null;
         }
-
-        blobItem.getMetadata().forEach((key, value) -> {
-            switch (key) {
-                case OWNER_ID:
-                    partitionOwnership.setOwnerId(value);
-                    break;
-                default:
-                    // do nothing, other metadata that we don't use
-                    break;
-            }
-        });
+        String ownerId = blobItem.getMetadata().get(OWNER_ID);
         BlobItemProperties blobProperties = blobItem.getProperties();
-        partitionOwnership.setLastModifiedTime(blobProperties.getLastModified().toInstant().toEpochMilli());
-        partitionOwnership.setETag(blobProperties.getETag());
-        return partitionOwnership;
+        PartitionOwnership updatedOwnership = new PartitionOwnership("",
+            names[0], names[1], names[2], ownerId, blobProperties.getLastModified().toInstant().toEpochMilli(),
+            blobProperties.getETag());
+        return updatedOwnership;
     }
 
 }

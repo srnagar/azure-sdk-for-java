@@ -5,7 +5,7 @@ package com.azure.core.amqp.implementation;
 
 import com.azure.core.amqp.RetryOptions;
 import com.azure.core.amqp.TransportType;
-import com.azure.core.amqp.models.ProxyConfiguration;
+import com.azure.core.amqp.models.ProxyOptions;
 import com.azure.core.annotation.Immutable;
 import com.azure.core.credential.TokenCredential;
 import reactor.core.scheduler.Scheduler;
@@ -20,7 +20,7 @@ public class ConnectionOptions {
     private final TokenCredential tokenCredential;
     private final TransportType transport;
     private final RetryOptions retryOptions;
-    private final ProxyConfiguration proxyConfiguration;
+    private final ProxyOptions proxyOptions;
     private final Scheduler scheduler;
     private final String hostname;
     private final String entityPath;
@@ -28,14 +28,14 @@ public class ConnectionOptions {
 
     public ConnectionOptions(String hostname, String entityPath, TokenCredential tokenCredential,
                              CBSAuthorizationType authorizationType, TransportType transport, RetryOptions retryOptions,
-                             ProxyConfiguration proxyConfiguration, Scheduler scheduler) {
+                             ProxyOptions proxyOptions, Scheduler scheduler) {
         this.hostname = Objects.requireNonNull(hostname, "'hostname' is required.");
         this.entityPath = Objects.requireNonNull(entityPath, "'entityPath' is required.");
         this.tokenCredential = Objects.requireNonNull(tokenCredential, "'tokenCredential' is required.");
         this.authorizationType = Objects.requireNonNull(authorizationType, "'authorizationType' is required.");
         this.transport = Objects.requireNonNull(transport, "'transport' is required.");
         this.retryOptions = Objects.requireNonNull(retryOptions, "'retryOptions' is required.");
-        this.proxyConfiguration = Objects.requireNonNull(proxyConfiguration, "'proxyConfiguration' is required.");
+        this.proxyOptions = Objects.requireNonNull(proxyOptions, "'proxyConfiguration' is required.");
         this.scheduler = Objects.requireNonNull(scheduler, "'scheduler' is required.");
     }
 
@@ -63,8 +63,8 @@ public class ConnectionOptions {
         return retryOptions;
     }
 
-    public ProxyConfiguration getProxyConfiguration() {
-        return proxyConfiguration;
+    public ProxyOptions getProxyOptions() {
+        return proxyOptions;
     }
 
     public Scheduler getScheduler() {

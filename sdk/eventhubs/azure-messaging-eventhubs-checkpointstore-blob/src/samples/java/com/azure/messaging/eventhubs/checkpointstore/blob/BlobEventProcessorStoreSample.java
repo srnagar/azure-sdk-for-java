@@ -37,23 +37,14 @@ public class BlobEventProcessorStoreSample {
             .subscribe(BlobEventProcessorStoreSample::printPartitionOwnership);
 
         System.out.println("Updating checkpoint");
-        Checkpoint checkpoint = new Checkpoint()
-            .setConsumerGroup("xyz")
-            .setEventHubName("abc")
-            .setPartitionId("0")
-            .setSequenceNumber(2L)
-            .setOffset(250L);
+        Checkpoint checkpoint = new Checkpoint("", "xyz", "abc", "0 ", 2L, 250L);
         blobEventProcessorStore.updateCheckpoint(checkpoint)
             .subscribe(etag -> System.out.println(etag), error -> System.out
                 .println(error.getMessage()));
 
         PartitionOwnership[] pos = new PartitionOwnership[5];
         for (int i = 0; i < 5; i++) {
-            PartitionOwnership po = new PartitionOwnership()
-                .setEventHubName("abc")
-                .setConsumerGroupName("xyz")
-                .setOwnerId("owner1")
-                .setPartitionId(String.valueOf(i));
+            PartitionOwnership po = new PartitionOwnership("", "abc", "xyz", "owner1", String.valueOf(i), null, null);
             pos[i] = po;
         }
         blobEventProcessorStore.claimOwnership(pos).subscribe(BlobEventProcessorStoreSample::printPartitionOwnership,
@@ -65,7 +56,7 @@ public class BlobEventProcessorStoreSample {
             new StringJoiner(",")
                 .add("pid=" + partitionOwnership.getPartitionId())
                 .add("ownerId=" + partitionOwnership.getOwnerId())
-                .add("cg=" + partitionOwnership.getConsumerGroupName())
+                .add("cg=" + partitionOwnership.getConsumerGroup())
                 .add("eh=" + partitionOwnership.getEventHubName())
                 .add("etag=" + partitionOwnership.getETag())
                 .add("lastModified=" + partitionOwnership.getLastModifiedTime())

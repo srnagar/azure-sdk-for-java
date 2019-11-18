@@ -73,19 +73,14 @@ public class BlobCheckpointStoreTest {
                 assertEquals("owner1", partitionOwnership.getOwnerId());
                 assertEquals("0", partitionOwnership.getPartitionId());
                 assertEquals("eh", partitionOwnership.getEventHubName());
-                assertEquals("cg", partitionOwnership.getConsumerGroupName());
+                assertEquals("cg", partitionOwnership.getConsumerGroup());
                 assertEquals("etag", partitionOwnership.getETag());
             }).verifyComplete();
     }
 
     @Test
     public void testUpdateCheckpoint() {
-        Checkpoint checkpoint = new Checkpoint()
-            .setEventHubName("eh")
-            .setConsumerGroup("cg")
-            .setPartitionId("0")
-            .setSequenceNumber(2L)
-            .setOffset(100L);
+        Checkpoint checkpoint = new Checkpoint("", "eh", "cg", "0", 2L, 100L);
 
         Map<String, String> headers = new HashMap<>();
         headers.put("eTag", "etag2");
@@ -120,7 +115,7 @@ public class BlobCheckpointStoreTest {
                 assertEquals("owner1", partitionOwnership.getOwnerId());
                 assertEquals("0", partitionOwnership.getPartitionId());
                 assertEquals("eh", partitionOwnership.getEventHubName());
-                assertEquals("cg", partitionOwnership.getConsumerGroupName());
+                assertEquals("cg", partitionOwnership.getConsumerGroup());
                 assertEquals("etag2", partitionOwnership.getETag());
             }).verifyComplete();
     }
@@ -138,12 +133,7 @@ public class BlobCheckpointStoreTest {
 
     @Test
     public void testUpdateCheckpointError() {
-        Checkpoint checkpoint = new Checkpoint()
-            .setEventHubName("eh")
-            .setConsumerGroup("cg")
-            .setPartitionId("0")
-            .setSequenceNumber(2L)
-            .setOffset(100L);
+        Checkpoint checkpoint = new Checkpoint("", "eh", "cg", "0", 2L, 100L);
 
         Map<String, String> headers = new HashMap<>();
         headers.put("eTag", "etag2");
@@ -175,11 +165,7 @@ public class BlobCheckpointStoreTest {
 
     private PartitionOwnership createPartitionOwnership(String eventHubName, String consumerGroupName,
         String partitionId, String ownerId) {
-        return new PartitionOwnership()
-            .setEventHubName(eventHubName)
-            .setConsumerGroupName(consumerGroupName)
-            .setPartitionId(partitionId)
-            .setOwnerId(ownerId);
+        return new PartitionOwnership("", eventHubName, consumerGroupName, partitionId, ownerId, null, null);
     }
 
     private BlobItem getBlobItem(String owner, String sequenceNumber, String offset, String etag, String blobName) {

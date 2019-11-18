@@ -11,8 +11,7 @@ import com.azure.messaging.eventhubs.models.ProcessorEvent;
 import com.azure.storage.blob.BlobContainerAsyncClient;
 import com.azure.storage.blob.BlobContainerClientBuilder;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-import reactor.core.publisher.Mono;
+import java.util.function.Consumer;
 
 /**
  * Sample for using {@link BlobCheckpointStore} with {@link EventProcessorClient}.
@@ -23,14 +22,12 @@ public class EventProcessorBlobEventProcessorStoreSample {
     private static final String SAS_TOKEN_STRING = "";
     private static final String STORAGE_CONNECTION_STRING = "";
 
-    public static final Function<ProcessorEvent, Mono<Void>> PARTITION_PROCESSOR = partitionEvent -> {
+    public static final Consumer<ProcessorEvent> PARTITION_PROCESSOR = partitionEvent -> {
         System.out.printf("Processing event from partition %s with sequence number %d %n",
             partitionEvent.getPartitionContext().getPartitionId(), partitionEvent.getEventData().getSequenceNumber());
-
         if (partitionEvent.getEventData().getSequenceNumber() % 10 == 0) {
-            return partitionEvent.updateCheckpoint();
+            partitionEvent.updateCheckpoint().subscribe();
         }
-        return Mono.empty();
     };
 
     /**
@@ -53,7 +50,7 @@ public class EventProcessorBlobEventProcessorStoreSample {
             .processEvent(PARTITION_PROCESSOR)
             .checkpointStore(new BlobCheckpointStore(blobContainerAsyncClient));
 
-        EventProcessorClient eventProcessorClient = eventProcessorClientBuilder.buildEventProcessor();
+        EventProcessorClient eventProcessorClient = eventProcessorClientBuilder.buildEventProcessorClient();
         eventProcessorClient.start();
         TimeUnit.MINUTES.sleep(5);
         eventProcessorClient.stop();
