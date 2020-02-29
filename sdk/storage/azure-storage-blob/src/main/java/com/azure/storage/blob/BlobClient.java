@@ -19,6 +19,8 @@ import com.azure.storage.blob.specialized.PageBlobClient;
 import com.azure.storage.blob.specialized.SpecializedBlobClientBuilder;
 import com.azure.storage.common.implementation.Constants;
 import com.azure.storage.common.implementation.StorageImplUtils;
+import com.azure.storage.common.avro.implementation.AvroSerializationHelper;
+import java.time.OffsetDateTime;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
@@ -74,6 +76,13 @@ public class BlobClient extends BlobClientBase {
     protected BlobClient(BlobAsyncClient client) {
         super(client);
         this.client = client;
+
+        AvroSerializationHelper avroSerializationHelper = new AvroSerializationHelper();
+        OffsetDateTime now = OffsetDateTime.now();
+        avroSerializationHelper.serialize(now);
+        if (now != avroSerializationHelper.deserialize()) {
+            throw new IllegalStateException("Avro serialization helper error");
+        }
     }
 
     /**

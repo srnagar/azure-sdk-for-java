@@ -8,6 +8,7 @@ import com.azure.core.http.rest.PagedIterable;
 import com.azure.core.http.rest.Response;
 import com.azure.core.util.Context;
 import com.azure.storage.common.StorageSharedKeyCredential;
+import com.azure.storage.common.avro.implementation.AvroSerializationHelper;
 import com.azure.storage.common.implementation.StorageImplUtils;
 import com.azure.storage.queue.models.PeekedMessageItem;
 import com.azure.storage.queue.models.QueueMessageItem;
@@ -17,6 +18,7 @@ import com.azure.storage.queue.models.QueueStorageException;
 import com.azure.storage.queue.models.SendMessageResult;
 import com.azure.storage.queue.models.UpdateMessageResult;
 import com.azure.storage.queue.sas.QueueServiceSasSignatureValues;
+import java.time.OffsetDateTime;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
@@ -49,6 +51,12 @@ public final class QueueClient {
      */
     QueueClient(QueueAsyncClient client) {
         this.client = client;
+        AvroSerializationHelper avroSerializationHelper = new AvroSerializationHelper();
+        OffsetDateTime now = OffsetDateTime.now();
+        avroSerializationHelper.serialize(now);
+        if (now != avroSerializationHelper.deserialize()) {
+            throw new IllegalStateException("Avro serialization helper error");
+        }
     }
 
     /**
