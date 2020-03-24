@@ -19,7 +19,9 @@ import com.azure.messaging.eventhubs.models.EventContext;
 import com.azure.messaging.eventhubs.models.EventPosition;
 import com.azure.messaging.eventhubs.models.ErrorContext;
 import com.azure.messaging.eventhubs.models.InitializationContext;
+import java.time.Duration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ServiceLoader;
@@ -241,6 +243,20 @@ public class EventProcessorClientBuilder {
      */
     public EventProcessorClientBuilder processEvent(Consumer<EventContext> processEvent) {
         this.processEvent = Objects.requireNonNull(processEvent, "'processEvent' cannot be null");
+        return this;
+    }
+
+    public EventProcessorClientBuilder processEvent(Consumer<EventContext> processEvent, Duration maxWaitTime) {
+        return this;
+    }
+
+    public EventProcessorClientBuilder processEventBatch(Consumer<List<EventContext>> processEventBatch,
+        int maxBatchSize) {
+        return this;
+    }
+
+    public EventProcessorClientBuilder processEventBatch(Consumer<List<EventContext>> processEventBatch,
+        int maxBatchSize, Duration maxWaitTime) {
         return this;
     }
 
