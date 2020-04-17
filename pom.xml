@@ -10,6 +10,7 @@
   <modules>
     <module>eng/jacoco-test-coverage</module>
     <module>eng/code-quality-reports</module>
+    <module>eng/azure-test-watcher</module>
     <module>sdk/appconfiguration</module>
     <module>sdk/authorization</module>
     <module>sdk/batch</module>
