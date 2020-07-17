@@ -19,6 +19,7 @@ public final class OkHttpProxySelector extends ProxySelector {
     private final Proxy.Type proxyType;
     private final SocketAddress proxyAddress;
     private final Pattern nonProxyHostsPattern;
+    private List<Proxy> proxies;
 
     public OkHttpProxySelector(Proxy.Type proxyType, SocketAddress proxyAddress, String nonProxyHosts) {
         this.proxyType = proxyType;
@@ -26,6 +27,7 @@ public final class OkHttpProxySelector extends ProxySelector {
         this.nonProxyHostsPattern = (nonProxyHosts == null)
             ? null
             : Pattern.compile(nonProxyHosts, Pattern.CASE_INSENSITIVE);
+        proxies = Collections.singletonList(new Proxy(proxyType, proxyAddress));
     }
 
     @Override
@@ -35,7 +37,7 @@ public final class OkHttpProxySelector extends ProxySelector {
          * proxy.
          */
         return (nonProxyHostsPattern == null || !nonProxyHostsPattern.matcher(uri.getHost()).matches())
-            ? Collections.singletonList(new Proxy(proxyType, proxyAddress))
+            ? proxies
             : null;
     }
 

@@ -53,7 +53,8 @@ class NettyAsyncHttpClient implements HttpClient {
     private final Pattern nonProxyHostsPattern;
     private final boolean disableBufferCopy;
 
-    final reactor.netty.http.client.HttpClient nettyClient;
+    private final reactor.netty.http.client.HttpClient nettyClient;
+    private final reactor.netty.http.client.HttpClient nettyClientWithProxy;
 
     /**
      * Creates default NettyAsyncHttpClient.
@@ -72,13 +73,23 @@ class NettyAsyncHttpClient implements HttpClient {
      */
     NettyAsyncHttpClient(reactor.netty.http.client.HttpClient nettyClient, EventLoopGroup eventLoopGroup,
         Supplier<ProxyHandler> proxyHandlerSupplier, String nonProxyHosts, boolean disableBufferCopy) {
-        this.nettyClient = nettyClient;
         this.eventLoopGroup = eventLoopGroup;
         this.proxyHandlerSupplier = proxyHandlerSupplier;
         this.nonProxyHostsPattern = (nonProxyHosts == null)
             ? null
             : Pattern.compile(nonProxyHosts, Pattern.CASE_INSENSITIVE);
         this.disableBufferCopy = disableBufferCopy;
+        this.nettyClient = nettyClient
+            .tcpConfiguration(tcpClient -> configureTcpClient(tcpClient, false));
+        this.nettyClientWithProxy = nettyClient
+            .tcpConfiguration(tcpClient -> configureTcpClient(tcpClient, true));
+    }
+
+    reactor.netty.http.client.HttpClient getNettyClient(boolean withProxy) {
+        if (withProxy) {
+            return this.nettyClientWithProxy;
+        }
+        return this.nettyClient;
     }
 
     /**
@@ -89,8 +100,14 @@ class NettyAsyncHttpClient implements HttpClient {
         Objects.requireNonNull(request.getHttpMethod(), "'request.getHttpMethod()' cannot be null.");
         Objects.requireNonNull(request.getUrl(), "'request.getUrl()' cannot be null.");
         Objects.requireNonNull(request.getUrl().getProtocol(), "'request.getUrl().getProtocol()' cannot be null.");
-        return nettyClient
-            .tcpConfiguration(tcpClient -> configureTcpClient(tcpClient, request.getUrl().getHost()))
+        reactor.netty.http.client.HttpClient effectiveNettyClient;
+        if (nonProxyHostsPattern == null || !nonProxyHostsPattern.matcher(request.getUrl().getHost()).matches()) {
+            effectiveNettyClient = nettyClientWithProxy;
+        } else {
+            effectiveNettyClient = nettyClient;
+        }
+
+        return effectiveNettyClient
             .request(HttpMethod.valueOf(request.getHttpMethod().toString()))
             .uri(request.getUrl().toString())
             .send(bodySendDelegate(request))
@@ -101,13 +118,13 @@ class NettyAsyncHttpClient implements HttpClient {
     /*
      * Configures the underlying TcpClient that sends the request.
      */
-    private TcpClient configureTcpClient(TcpClient tcpClient, String host) {
+    private TcpClient configureTcpClient(TcpClient tcpClient, boolean withProxy) {
         if (eventLoopGroup != null) {
             tcpClient = tcpClient.runOn(eventLoopGroup);
         }
 
-        // Validate that the request should be proxied.
-        if (nonProxyHostsPattern == null || !nonProxyHostsPattern.matcher(host).matches()) {
+        if (withProxy) {
+            // Configures the TcpClient with proxy handler.
             ProxyHandler proxyHandler = (proxyHandlerSupplier == null) ? null : proxyHandlerSupplier.get();
             if (proxyHandler != null) {
                 /*

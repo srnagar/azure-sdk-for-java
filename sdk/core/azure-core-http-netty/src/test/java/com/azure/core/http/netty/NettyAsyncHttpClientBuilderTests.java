@@ -245,7 +245,21 @@ public class NettyAsyncHttpClientBuilderTests {
             .port(server.port())
             .build();
 
-        StepVerifier.create(nettyClient.nettyClient.get().uri(DEFAULT_PATH).response())
+        StepVerifier.create(nettyClient.getNettyClient(false).get().uri(DEFAULT_PATH).response())
+            .assertNext(response -> assertEquals(200, response.status().code()))
+            .verifyComplete();
+    }
+
+    /**
+     * Tests when a {@code port} is set that any path-only request will be sent to the port specified.
+     */
+    @Test
+    public void buildPortClientWithProxy() {
+        NettyAsyncHttpClient nettyClient = (NettyAsyncHttpClient) new NettyAsyncHttpClientBuilder()
+            .port(server.port())
+            .build();
+
+        StepVerifier.create(nettyClient.getNettyClient(true).get().uri(DEFAULT_PATH).response())
             .assertNext(response -> assertEquals(200, response.status().code()))
             .verifyComplete();
     }
