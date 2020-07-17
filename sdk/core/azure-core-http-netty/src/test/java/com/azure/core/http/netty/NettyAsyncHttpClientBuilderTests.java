@@ -251,20 +251,6 @@ public class NettyAsyncHttpClientBuilderTests {
     }
 
     /**
-     * Tests when a {@code port} is set that any path-only request will be sent to the port specified.
-     */
-    @Test
-    public void buildPortClientWithProxy() {
-        NettyAsyncHttpClient nettyClient = (NettyAsyncHttpClient) new NettyAsyncHttpClientBuilder()
-            .port(server.port())
-            .build();
-
-        StepVerifier.create(nettyClient.getNettyClient(true).get().uri(DEFAULT_PATH).response())
-            .assertNext(response -> assertEquals(200, response.status().code()))
-            .verifyComplete();
-    }
-
-    /**
      * Tests that a custom {@link io.netty.channel.EventLoopGroup} is properly applied to the Netty client
      * to handle sending and receiving requests and responses.
      */
