@@ -4,7 +4,12 @@
 package com.azure.messaging.eventhubs;
 
 import com.azure.core.util.Context;
+import com.azure.core.util.logging.ClientLogger;
+import com.azure.core.util.serializer.ObjectSerializer;
+import com.azure.core.util.serializer.TypeReference;
+import reactor.core.publisher.Mono;
 
+import java.io.ByteArrayInputStream;
 import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.Arrays;
@@ -22,6 +27,7 @@ import static com.azure.core.amqp.AmqpMessageConstant.OFFSET_ANNOTATION_NAME;
 import static com.azure.core.amqp.AmqpMessageConstant.PARTITION_KEY_ANNOTATION_NAME;
 import static com.azure.core.amqp.AmqpMessageConstant.PUBLISHER_ANNOTATION_NAME;
 import static com.azure.core.amqp.AmqpMessageConstant.SEQUENCE_NUMBER_ANNOTATION_NAME;
+import static com.azure.core.util.FluxUtil.monoError;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
@@ -52,9 +58,11 @@ public class EventData {
      */
     static final Set<String> RESERVED_SYSTEM_PROPERTIES;
 
+    private final ClientLogger logger = new ClientLogger(EventData.class);
     private final Map<String, Object> properties;
     private final byte[] body;
     private final SystemProperties systemProperties;
+    private ObjectSerializer serializer;
     private Context context;
 
     static {
@@ -67,6 +75,7 @@ public class EventData {
 
         RESERVED_SYSTEM_PROPERTIES = Collections.unmodifiableSet(properties);
     }
+
 
     /**
      * Creates an event containing the {@code body}.
@@ -259,6 +268,36 @@ public class EventData {
         Objects.requireNonNull(value, "The 'value' parameter cannot be null.");
         this.context = context.addData(key, value);
 
+        return this;
+    }
+
+
+    public <T> T getDeserializedObject(Class<T> objectType) {
+        return getDeserializedObjectAsync(objectType).block();
+    }
+
+    /**
+     * Deserializes event payload into object.
+     *
+     * @param objectType Class object of type T
+     * @param <T> object type for deserialization
+     * @return deserialized object as type T
+     */
+    public <T> Mono<T> getDeserializedObjectAsync(Class<T> objectType) {
+        if (this.serializer == null) {
+            return monoError(logger,
+                new NullPointerException("No serializer set for deserializing EventData payload."));
+        }
+        if (objectType == null) {
+            return monoError(logger, new IllegalArgumentException("objectType cannot be null."));
+        }
+
+        return serializer.deserializeAsync(new ByteArrayInputStream(getBody()),
+            TypeReference.createInstance(objectType));
+    }
+
+    EventData setSerializer(ObjectSerializer serializer) {
+        this.serializer = serializer;
         return this;
     }
 
