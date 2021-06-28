@@ -8,6 +8,7 @@ import com.azure.data.appconfiguration.models.FeatureFlagConfigurationSetting;
 import com.azure.data.appconfiguration.models.FeatureFlagFilter;
 import com.azure.data.appconfiguration.models.SecretReferenceConfigurationSetting;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -26,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Tests for {@link ConfigurationSettingJsonDeserializerTest}
  */
+@Disabled
 public class ConfigurationSettingJsonDeserializerTest {
     private static final String FEATURE_FLAG_JSON =
         "{\"key\":\".appconfig.featureflag/hello\",\"value\":\"{\\\"id\\\":\\\"hello\\\",\\\"description\\\":null,"

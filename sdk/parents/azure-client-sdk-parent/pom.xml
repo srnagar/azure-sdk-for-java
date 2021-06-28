@@ -656,17 +656,6 @@
     </pluginManagement>
   </build>
 
-  <dependencies>
-    <dependency>
-      <!-- must be on the classpath -->
-      <groupId>org.jacoco</groupId>
-      <artifactId>org.jacoco.agent</artifactId>
-      <classifier>runtime</classifier>
-      <version>0.8.5</version> <!-- {x-version-update;org.jacoco:org.jacoco.agent;external_dependency} -->
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
-
   <reporting>
     <plugins>
       <plugin>

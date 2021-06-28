@@ -20,6 +20,7 @@ import com.azure.core.util.Configuration;
 import com.azure.core.util.Header;
 import com.azure.data.appconfiguration.implementation.ClientConstants;
 import com.azure.data.appconfiguration.models.ConfigurationSetting;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -128,6 +129,7 @@ public class ConfigurationClientBuilderTest extends TestBase {
         assertThrows(RuntimeException.class, () -> client.setConfigurationSetting(key, null, value));
     }
 
+    @Disabled
     @ParameterizedTest(name = DISPLAY_NAME_WITH_ARGUMENTS)
     @MethodSource("com.azure.data.appconfiguration.TestHelper#getTestParameters")
     public void nullServiceVersion(HttpClient httpClient) {

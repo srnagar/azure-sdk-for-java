@@ -52,6 +52,8 @@ public final class SettingFields extends ExpandableStringEnum<SettingFields> {
      * @return SettingFields as a lowercase string in the US locale.
      */
     public static String toStringMapper(SettingFields field) {
+        System.out.println("Field is " + field);
+        System.out.println("Field toString is " + field.toString());
         return field.toString().toLowerCase(Locale.US);
     }
     /**

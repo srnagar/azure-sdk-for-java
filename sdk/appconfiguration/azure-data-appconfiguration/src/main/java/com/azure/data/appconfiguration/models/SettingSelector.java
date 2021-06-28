@@ -9,6 +9,8 @@ import com.azure.data.appconfiguration.ConfigurationAsyncClient;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A set of options for selecting configuration settings from App Configuration service.
@@ -143,6 +145,16 @@ public class SettingSelector {
      */
     public SettingSelector setFields(SettingFields... fields) {
         this.fields = fields;
+        System.out.println("Setter Printing fields in toString " + this.fields);
+        Arrays.stream(this.fields).forEach(field -> System.out.println("Setter F " + field));
+        return this;
+    }
+
+    public SettingSelector setFields(List<SettingFields> fields) {
+        this.fields = fields.toArray(new SettingFields[0]);
+
+        System.out.println("Setter list Printing fields in toString " + this.fields);
+        Arrays.stream(this.fields).forEach(field -> System.out.println("Setter list F " + field));
         return this;
     }
 
@@ -152,6 +164,8 @@ public class SettingSelector {
         if (CoreUtils.isNullOrEmpty(this.fields)) {
             fields = "ALL_FIELDS";
         } else {
+            System.out.println("Printing fields in toString " + this.fields);
+            Arrays.stream(this.fields).forEach(field -> System.out.println("F " + field));
             fields = CoreUtils.arrayToString(this.fields, SettingFields::toStringMapper);
         }
 
