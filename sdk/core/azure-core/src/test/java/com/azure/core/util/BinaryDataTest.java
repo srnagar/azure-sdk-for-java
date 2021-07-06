@@ -96,7 +96,7 @@ public class BinaryDataTest {
         final byte[] expected = "Doe".getBytes(StandardCharsets.UTF_8);
 
         // Act
-        final BinaryData data = new BinaryData(expected);
+        final BinaryData data = BinaryData.fromBytes(expected);
 
         // Assert
         assertArrayEquals(expected, data.toBytes());
@@ -148,27 +148,21 @@ public class BinaryDataTest {
 
         // Act
         BinaryData data = BinaryData.fromStream(new ByteArrayInputStream(expected));
-        final byte[] actual = new byte[expected.length];
-        (data.toStream()).read(actual, 0, expected.length);
 
         // Assert
         assertArrayEquals(expected, data.toBytes());
-        assertArrayEquals(expected, actual);
     }
 
     @Test
     public void createFromEmptyStream() throws IOException {
         // Arrange
         final byte[] expected = "".getBytes();
-        final byte[] actual = new byte[expected.length];
 
         // Act
         BinaryData data = BinaryData.fromStream(new ByteArrayInputStream(expected));
-        data.toStream().read(actual, 0, expected.length);
 
         // Assert
         assertArrayEquals(expected, data.toBytes());
-        assertArrayEquals(expected, actual);
     }
 
     @Test

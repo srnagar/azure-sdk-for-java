@@ -3,6 +3,7 @@
 
 package com.azure.storage.blob.perf;
 
+import com.azure.core.util.BinaryData;
 import com.azure.perf.test.core.PerfStressOptions;
 import com.azure.perf.test.core.RepeatingInputStream;
 import com.azure.storage.blob.perf.core.BlobTestBase;
@@ -33,7 +34,6 @@ public class UploadBlobTest extends BlobTestBase<PerfStressOptions> {
 
     @Override
     public Mono<Void> runAsync() {
-        return blobAsyncClient.upload(byteBufferFlux, null, true)
-            .then();
+        return BinaryData.fromFlux(byteBufferFlux, options.getSize()).flatMap(blobAsyncClient::uploadProtocol).then();
     }
 }

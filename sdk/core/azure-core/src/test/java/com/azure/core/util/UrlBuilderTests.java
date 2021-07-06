@@ -789,4 +789,15 @@ public class UrlBuilderTests {
         // validate the size of the cache is not greater than 10000
         assertTrue(UrlBuilder.getParsedUrls().size() <= 10000);
     }
+
+    @Test
+    public void multipleQueryParams() {
+        UrlBuilder urlBuilder = new UrlBuilder()
+                .setQueryParameter("a", "val1")
+                .setQueryParameter("a", "val2")
+                .setScheme("https")
+                .setHost("www.example.com")
+                .setPath("index.html");
+        System.out.println(urlBuilder.toString() + " " + urlBuilder.getQuery());
+    }
 }
