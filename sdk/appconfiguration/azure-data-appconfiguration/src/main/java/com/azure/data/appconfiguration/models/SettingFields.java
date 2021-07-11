@@ -64,4 +64,8 @@ public final class SettingFields extends ExpandableStringEnum<SettingFields> {
     public static SettingFields fromString(String name) {
         return fromString(name, SettingFields.class);
     }
+
+    public SettingFields() {
+        // testing graal
+    }
 }

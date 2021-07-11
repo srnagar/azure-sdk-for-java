@@ -227,4 +227,8 @@ public class ConfigurationClientBuilderTest extends TestBase {
                 "Invalid namespace name: %s", namespace), exception);
         }
     }
+
+    public ConfigurationClientBuilderTest() {
+        // for graal
+    }
 }
