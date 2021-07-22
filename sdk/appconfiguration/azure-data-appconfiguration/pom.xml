@@ -146,21 +146,6 @@
               <imageName>azure-data-appconfiguration</imageName>
               <buildArgs>--no-fallback</buildArgs>
               <mainClass>com.azure.data.appconfiguration.implementation.ClientConstants</mainClass>
-              <buildArgs>
-                --no-server
-                --no-fallback
-                --verbose
-                --report-unsupported-elements-at-runtime
-                -H:+PrintAnalysisCallTree
-                -H:ReflectionConfigurationFiles=conf/reflect-config.json
-                -H:DynamicProxyConfigurationFiles=conf/proxy-config.json
-                -H:+JNI -H:JNIConfigurationFiles=conf/jni-config.json
-                -H:ResourceConfigurationFiles=conf/resource-config.json
-                -H:+ReportExceptionStackTraces -H:Log=registerResource
-                --initialize-at-build-time
-                --initialize-at-run-time=com.sun.jna
-                --allow-incomplete-classpath
-              </buildArgs>
             </configuration>
             <executions>
               <execution>
