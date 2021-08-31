@@ -25,6 +25,7 @@ import io.opentelemetry.sdk.trace.data.LinkData;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
 import reactor.util.context.Context;
+import reactor.util.context.ContextView;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -128,8 +129,11 @@ public final class AzureMonitorTraceExporter implements SpanExporter {
                 export(span, telemetryItems);
             }
             client.export(telemetryItems)
-                .subscriberContext(Context.of(Tracer.DISABLE_TRACING_KEY, true))
-                .subscribe(ignored -> { }, error -> completableResultCode.fail(), completableResultCode::succeed);
+                .contextWrite(context -> context.put(Tracer.DISABLE_TRACING_KEY, true))
+                .subscribe(ignored -> { }, error -> {
+                    System.out.println("ERROR exporting " + error);
+                    completableResultCode.fail();
+                }, completableResultCode::succeed);
             return completableResultCode;
         } catch (Throwable t) {
             LOGGER.error(t.getMessage(), t);

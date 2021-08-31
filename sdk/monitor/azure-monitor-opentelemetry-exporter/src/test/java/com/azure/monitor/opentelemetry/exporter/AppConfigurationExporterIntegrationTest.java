@@ -5,6 +5,7 @@ package com.azure.monitor.opentelemetry.exporter;
 
 import com.azure.core.http.HttpPipelineCallContext;
 import com.azure.core.http.HttpPipelineNextPolicy;
+import com.azure.core.http.HttpPipelinePosition;
 import com.azure.core.http.HttpResponse;
 import com.azure.core.http.policy.HttpPipelinePolicy;
 import com.azure.core.util.Context;
@@ -43,6 +44,7 @@ public class AppConfigurationExporterIntegrationTest extends AzureMonitorTraceEx
             // Thread bound (sync) calls will automatically pick up the parent span and you don't need to pass it explicitly.
             ConfigurationSetting configurationSetting = client.setConfigurationSetting("hello", "text", "World");
         } finally {
+            System.out.println("CLOSING");
             span.end();
             scope.close();
         }
@@ -106,11 +108,17 @@ public class AppConfigurationExporterIntegrationTest extends AzureMonitorTraceEx
             Mono<String> asyncString = FluxUtil.collectBytesInByteBufferStream(context.getHttpRequest().getBody())
                     .map(bytes -> new String(bytes, StandardCharsets.UTF_8));
             asyncString.subscribe(value -> {
+                System.out.println("VALUE IS " + value);
                 if (value.contains(expectedSpanName)) {
                     countDown.countDown();
                 }
             });
             return next.process();
+        }
+
+        @Override
+        public HttpPipelinePosition getPipelinePosition() {
+            return HttpPipelinePosition.PER_CALL;
         }
     }
 }

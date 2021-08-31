@@ -219,12 +219,12 @@ public final class ApplicationInsightsClientImplBuilder {
         String applicationId = CoreUtils.getApplicationId(clientOptions, httpLogOptions);
 
         policies.add(new UserAgentPolicy(applicationId, clientName, clientVersion, buildConfiguration));
-        policies.add(new AzureMonitorRedirectPolicy());
-        HttpPolicyProviders.addBeforeRetryPolicies(policies);
+        // HttpPolicyProviders.addBeforeRetryPolicies(policies);
         policies.add(retryPolicy == null ? new RetryPolicy() : retryPolicy);
+        policies.add(new AzureMonitorRedirectPolicy());
         policies.add(new CookiePolicy());
         policies.addAll(this.pipelinePolicies);
-        HttpPolicyProviders.addAfterRetryPolicies(policies);
+        // HttpPolicyProviders.addAfterRetryPolicies(policies);
         policies.add(new HttpLoggingPolicy(httpLogOptions));
         HttpPipeline httpPipeline =
                 new HttpPipelineBuilder()

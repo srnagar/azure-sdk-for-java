@@ -31,18 +31,16 @@ import java.util.UUID;
 public class MonitorExporterClientTestBase extends TestBase {
 
     AzureMonitorExporterBuilder getClientBuilder() {
-        HttpClient httpClient;
-        if (getTestMode() == TestMode.RECORD || getTestMode() == TestMode.LIVE) {
-            httpClient = HttpClient.createDefault();
+        AzureMonitorExporterBuilder builder = new AzureMonitorExporterBuilder();
+        if (getTestMode() == TestMode.RECORD){
+            builder.addPolicy(interceptorManager.getRecordPolicy());
+            builder.httpClient(HttpClient.createDefault());
+        } else if(getTestMode() == TestMode.LIVE) {
+            builder.httpClient(HttpClient.createDefault());
         } else {
-            httpClient = interceptorManager.getPlaybackClient();
+            builder.httpClient(interceptorManager.getPlaybackClient());
         }
-
-        HttpPipeline httpPipeline = new HttpPipelineBuilder()
-            .httpClient(httpClient)
-            .policies(interceptorManager.getRecordPolicy()).build();
-
-        return new AzureMonitorExporterBuilder().pipeline(httpPipeline);
+        return builder;
     }
 
     AzureMonitorExporterBuilder getClientBuilderWithAuthentication() {

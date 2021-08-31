@@ -54,10 +54,14 @@ public class AzureMonitorTraceExporterTest extends MonitorExporterClientTestBase
 
     @Test
     public void testExportRequestDataWithAuthentication() {
+        String connectionStringTemplate = "InstrumentationKey=ikey;IngestionEndpoint=https://testendpoint.com";
+        String connectionString = Configuration.getGlobalConfiguration()
+                .get("APPLICATIONINSIGHTS_CONNECTION_STRING", connectionStringTemplate);
         AzureMonitorTraceExporter azureMonitorTraceExporter = getClientBuilderWithAuthentication()
-            .connectionString("InstrumentationKey=ikey;IngestionEndpoint=https://testendpoint.com")
+            .connectionString(connectionString)
             .buildTraceExporter();
         CompletableResultCode export = azureMonitorTraceExporter.export(Collections.singleton(new RequestSpanData()));
+        export.join(30, TimeUnit.SECONDS);
         Assertions.assertTrue(export.isDone());
         Assertions.assertTrue(export.isSuccess());
     }

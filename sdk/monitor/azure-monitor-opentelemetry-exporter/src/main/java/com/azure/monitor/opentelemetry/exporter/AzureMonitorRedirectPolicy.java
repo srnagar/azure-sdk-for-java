@@ -19,6 +19,7 @@ import java.net.HttpURLConnection;
 public final class AzureMonitorRedirectPolicy implements HttpPipelinePolicy {
 
     private static final int PERMANENT_REDIRECT_STATUS_CODE = 308;
+    private static final int TEMPORARY_REDIRECT_STATUS_CODE = 307;
     // Based on Stamp specific redirects design doc
     private static final int MAX_REDIRECT_RETRIES = 10;
     private final ClientLogger logger = new ClientLogger(AzureMonitorRedirectPolicy.class);
@@ -46,6 +47,7 @@ public final class AzureMonitorRedirectPolicy implements HttpPipelinePolicy {
             .flatMap(httpResponse -> {
                 if (shouldRetryWithRedirect(httpResponse.getStatusCode(), retryCount)) {
                     String responseLocation = httpResponse.getHeaderValue("Location");
+                    logger.info("Redirecting request to " + responseLocation);
                     if (responseLocation != null) {
                         this.redirectedEndpointUrl = responseLocation;
                         return attemptRetry(context, next, originalHttpRequest, retryCount + 1);
@@ -70,6 +72,7 @@ public final class AzureMonitorRedirectPolicy implements HttpPipelinePolicy {
         }
         return statusCode == HttpURLConnection.HTTP_MOVED_TEMP
                 || statusCode == HttpURLConnection.HTTP_MOVED_PERM
+                || statusCode == TEMPORARY_REDIRECT_STATUS_CODE
                 || statusCode == PERMANENT_REDIRECT_STATUS_CODE;
     }
 
