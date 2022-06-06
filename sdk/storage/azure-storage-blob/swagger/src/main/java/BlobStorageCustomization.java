@@ -55,7 +55,7 @@ public class BlobStorageCustomization extends Customization {
         customization.getRawEditor().removeFile(pageListFileName);
         customization.getRawEditor().addFile(pageListFileName, updatedFileContent);
 
-        models.getClass("BlobCopySourceTags").rename("BlobCopySourceTagsMode");
+        // models.getClass("BlobCopySourceTags").rename("BlobCopySourceTagsMode");
 
 
         ClassCustomization blobHttpHeaders = models.getClass("BlobHttpHeaders");
