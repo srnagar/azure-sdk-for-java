@@ -20,6 +20,7 @@ import com.azure.monitor.query.implementation.logs.models.BatchQueryResponse;
 import com.azure.monitor.query.implementation.logs.models.BatchQueryResults;
 import com.azure.monitor.query.implementation.logs.models.BatchRequest;
 import com.azure.monitor.query.implementation.logs.models.BatchResponse;
+import com.azure.monitor.query.implementation.logs.models.Column;
 import com.azure.monitor.query.implementation.logs.models.ErrorInfo;
 import com.azure.monitor.query.implementation.logs.models.ErrorResponseException;
 import com.azure.monitor.query.implementation.logs.models.LogsQueryHelper;
@@ -63,7 +64,7 @@ import static com.azure.core.util.FluxUtil.withContext;
 public final class LogsQueryAsyncClient {
 
     private static final String AZURE_RESPONSE_TIMEOUT = "azure-response-timeout";
-    private static final int CLIENT_TIMEOUT_BUFFER = 5;
+    private static final int CLIENT_TIMEOUT_BUFFER = 100;
     private final AzureLogAnalyticsImpl innerClient;
 
     /**
@@ -382,6 +383,9 @@ public final class LogsQueryAsyncClient {
                 LogsTable logsTable = new LogsTable(tableCells, tableRows, tableColumns);
                 tables.add(logsTable);
                 List<List<Object>> rows = table.getRows();
+                for (Column column : table.getColumns()) {
+                    tableColumns.add(new LogsTableColumn(column.getName(), column.getType()));
+                }
 
                 for (int i = 0; i < rows.size(); i++) {
                     List<Object> row = rows.get(i);

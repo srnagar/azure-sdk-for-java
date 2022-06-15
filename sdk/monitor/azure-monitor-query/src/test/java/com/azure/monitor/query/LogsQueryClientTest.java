@@ -21,7 +21,9 @@ import com.azure.monitor.query.models.LogsBatchQueryResultCollection;
 import com.azure.monitor.query.models.LogsQueryOptions;
 import com.azure.monitor.query.models.LogsQueryResult;
 import com.azure.monitor.query.models.LogsQueryResultStatus;
+import com.azure.monitor.query.models.LogsTableColumn;
 import com.azure.monitor.query.models.QueryTimeInterval;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,8 +38,10 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeoutException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -264,25 +268,37 @@ public class LogsQueryClientTest extends TestBase {
         // The server does not always stop processing the request and return a 504 before the client times out
         // so, retry until a 504 response is returned
         Random random = new Random();
-        while (true) {
+
+        // attempt 10 times to get the timeout response
+        int attemptCount = 0;
+        boolean serverTimedOut = false;
+        while (attemptCount < 10) {
+            attemptCount++;
             // add some random number to circumvent cached response from server
             long count = 1000000000000L + random.nextInt(10000);
             try {
                 // this query should take more than 5 seconds usually, but the server may have cached the
                 // response and may return before 5 seconds. So, retry with another query (different count value)
-                client.queryWorkspaceWithResponse(WORKSPACE_ID, "range x from 1 to " + count + " step 1 | count", null,
+                String query = "range x from 1 to " + count + " step 1 "
+                        + "| join kind=fullouter (range y from ago(5h) to now() step 1m"
+                        + "| extend x = datetime_part(\"Millisecond\", y) "
+                        + "| project x) on x";
+
+                client.queryWorkspaceWithResponse(WORKSPACE_ID, query, null,
                         new LogsQueryOptions()
                                 .setServerTimeout(Duration.ofSeconds(5)),
-                        Context.NONE);
+                        Context.NONE).getValue();
             } catch (Exception exception) {
                 if (exception instanceof HttpResponseException) {
                     HttpResponseException logsQueryException = (HttpResponseException) exception;
                     if (logsQueryException.getResponse().getStatusCode() == 504) {
+                        serverTimedOut = true;
                         break;
                     }
                 }
             }
         }
+        assertFalse(serverTimedOut, "Did not observe server timeout after " + attemptCount + " attempts");
     }
 
     @Test
