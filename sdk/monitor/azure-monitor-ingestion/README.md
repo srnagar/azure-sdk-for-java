@@ -106,6 +106,43 @@ Azure SDKs for Java offer a consistent logging story to help aid in troubleshoot
 their resolution. The logs produced will capture the flow of an application before reaching the terminal state to help
 locate the root issue. View the [logging][logging] wiki for guidance about enabling logging.
 
+### Enable HTTP request/response logging
+
+Reviewing the HTTP request sent or response received over the wire to/from the Azure Monitor service can be useful in
+troubleshooting issues. To enable logging the HTTP request and response payload, the LogsQueryClient and the
+MetricsQueryClient can be configured as shown below:
+
+```java readme-sample-createLogsIngestionClient
+DefaultAzureCredential tokenCredential = new DefaultAzureCredentialBuilder().build();
+
+LogsIngestionClient client = new LogsIngestionClientBuilder()
+        .endpoint("<data-collection-endpoint>")
+        .credential(tokenCredential)
+        .httpLogOptions(new HttpLogOptions().setLogLevel(HttpLogDetailLevel.BODY_AND_HEADERS))
+        .buildClient();
+```
+
+Alternatively, you can configure logging HTTP requests and responses for your entire application by setting the
+following environment variable. Note that this change will enable logging for every Azure client that supports logging
+HTTP request/response.
+
+Environment variable name: `AZURE_HTTP_LOG_DETAIL_LEVEL`
+
+| Value            | Logging level                                                        |
+|------------------|----------------------------------------------------------------------|
+| none             | HTTP request/response logging is disabled                            |
+| basic            | Logs only URLs, HTTP methods, and time to finish the request.        |
+| headers          | Logs everything in BASIC, plus all the request and response headers. |
+| body             | Logs everything in BASIC, plus all the request and response body.    |
+| body_and_headers | Logs everything in HEADERS and BODY.                                 |
+
+**NOTE**: When logging the body of request and response, please ensure that they do not contain confidential
+information. When logging headers, the client library has a default set of headers that are considered safe to log
+but this set can be updated by updating the log options in the builder as shown below:
+
+```java
+clientBuilder.httpLogOptions(new HttpLogOptions().addAllowedHeaderName("safe-to-log-header-name"))
+```
 ## Next steps
 More samples can be found [here][samples].
 
