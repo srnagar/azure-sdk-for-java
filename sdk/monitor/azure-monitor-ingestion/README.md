@@ -109,8 +109,8 @@ locate the root issue. View the [logging][logging] wiki for guidance about enabl
 ### Enable HTTP request/response logging
 
 Reviewing the HTTP request sent or response received over the wire to/from the Azure Monitor service can be useful in
-troubleshooting issues. To enable logging the HTTP request and response payload, the LogsQueryClient and the
-MetricsQueryClient can be configured as shown below:
+troubleshooting issues. To enable logging the HTTP request and response payload, the LogsIngestionClient can be 
+configured as shown below:
 
 ```java readme-sample-createLogsIngestionClient
 DefaultAzureCredential tokenCredential = new DefaultAzureCredentialBuilder().build();
