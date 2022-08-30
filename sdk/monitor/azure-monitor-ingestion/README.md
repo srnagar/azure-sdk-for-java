@@ -97,47 +97,6 @@ workspace. The target table must exist before you can send data to it. The follo
 - [Syslog](https://docs.microsoft.com/azure/azure-monitor/reference/tables/syslog)
 - [WindowsEvents](https://docs.microsoft.com/azure/azure-monitor/reference/tables/windowsevent)
 
-## Examples
-
-- [Upload custom logs](#upload-custom-logs)
-- [Upload custom logs with max concurrency](#upload-custom-logs-with-max-concurrency)
-
-### Upload custom logs
-
-```java readme-sample-uploadLogs
-DefaultAzureCredential tokenCredential = new DefaultAzureCredentialBuilder().build();
-
-LogsIngestionClient client = new LogsIngestionClientBuilder()
-        .endpoint("<data-collection-endpoint")
-        .credential(tokenCredential)
-        .buildClient();
-
-List<Object> logs = getLogs();
-UploadLogsResult result = client.upload("<data-collection-rule-id>", "<stream-name>", logs);
-System.out.println("Logs upload result status " + result.getStatus());
-```
-
-### Upload custom logs with max concurrency
-
-If the in input logs collection is too large, the client will split the input into multiple smaller requests. These 
-requests are sent serially, by default, but by configuring the max concurrency in `UploadLogsOptions`, these requests
-can be concurrently sent to the service as shown in the example below.
-
-```java readme-sample-uploadLogsWithMaxConcurrency
-DefaultAzureCredential tokenCredential = new DefaultAzureCredentialBuilder().build();
-
-LogsIngestionClient client = new LogsIngestionClientBuilder()
-        .endpoint("<data-collection-endpoint")
-        .credential(tokenCredential)
-        .buildClient();
-
-List<Object> logs = getLogs();
-UploadLogsOptions uploadLogsOptions = new UploadLogsOptions()
-        .setMaxConcurrency(3);
-UploadLogsResult result = client.upload("<data-collection-rule-id>", "<stream-name>", logs, uploadLogsOptions,
-        Context.NONE);
-System.out.println("Logs upload result status " + result.getStatus());
-```
 
 ## Troubleshooting
 
