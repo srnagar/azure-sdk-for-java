@@ -79,6 +79,7 @@ public class KeyClientImpl {
     private final ClientLogger logger = new ClientLogger(KeyClientImpl.class);
     private final HttpPipeline pipeline;
     private final KeyServiceVersion keyServiceVersion;
+    private final Duration pollInterval;
 
     /**
      * Creates a {@link KeyClientImpl} that uses an {@link HttpPipeline} to service requests.
@@ -88,6 +89,10 @@ public class KeyClientImpl {
      * @param keyServiceVersion {@link KeyServiceVersion} of the service to be used when making requests.
      */
     public KeyClientImpl(String vaultUrl, HttpPipeline pipeline, KeyServiceVersion keyServiceVersion) {
+        this(vaultUrl, pipeline, keyServiceVersion, DEFAULT_POLLING_INTERVAL);
+    }
+
+    public KeyClientImpl(String vaultUrl, HttpPipeline pipeline, KeyServiceVersion keyServiceVersion, Duration defaultPollInterval) {
         Objects.requireNonNull(vaultUrl,
             KeyVaultErrorCodeStrings.getErrorString(KeyVaultErrorCodeStrings.VAULT_END_POINT_REQUIRED));
 
@@ -95,6 +100,7 @@ public class KeyClientImpl {
         this.service = RestProxy.create(KeyService.class, pipeline);
         this.pipeline = pipeline;
         this.keyServiceVersion = keyServiceVersion;
+        this.pollInterval = defaultPollInterval;
     }
 
     /**
@@ -121,7 +127,7 @@ public class KeyClientImpl {
      * @return The default polling interval for long running operations
      */
     public Duration getDefaultPollingInterval() {
-        return DEFAULT_POLLING_INTERVAL;
+        return this.pollInterval;
     }
 
     /**

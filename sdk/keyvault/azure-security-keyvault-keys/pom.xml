@@ -57,6 +57,8 @@
       --add-opens com.azure.security.keyvault.keys/com.azure.security.keyvault.keys.implementation=ALL-UNNAMED
       --add-opens com.azure.security.keyvault.keys/com.azure.security.keyvault.keys.models=ALL-UNNAMED
     </javaModulesSurefireArgLine>
+    <graalvm.disable>false</graalvm.disable>
+    <nativeImage.buildArgs>--initialize-at-build-time=com.azure.security.keyvault.keys.cryptography.TestHelper</nativeImage.buildArgs>
   </properties>
 
   <dependencies>

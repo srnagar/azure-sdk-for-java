@@ -50,8 +50,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 
 public class KeyAsyncClientTest extends KeyClientTestBase {
     protected KeyAsyncClient keyAsyncClient;
@@ -68,11 +66,7 @@ public class KeyAsyncClientTest extends KeyClientTestBase {
     protected void createKeyAsyncClient(HttpClient httpClient, KeyServiceVersion serviceVersion, String testTenantId) {
         HttpPipeline httpPipeline = getHttpPipeline(buildAsyncAssertingClient(httpClient == null
             ? interceptorManager.getPlaybackClient() : httpClient), testTenantId);
-        KeyClientImpl implClient = spy(new KeyClientImpl(getEndpoint(), httpPipeline, serviceVersion));
-
-        if (interceptorManager.isPlaybackMode()) {
-            when(implClient.getDefaultPollingInterval()).thenReturn(Duration.ofMillis(10));
-        }
+        KeyClientImpl implClient = new KeyClientImpl(getEndpoint(), httpPipeline, serviceVersion, Duration.ofMillis(10));
 
         keyAsyncClient = new KeyAsyncClient(implClient);
     }
