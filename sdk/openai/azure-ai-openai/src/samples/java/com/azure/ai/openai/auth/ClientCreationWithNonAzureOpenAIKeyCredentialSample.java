@@ -7,7 +7,8 @@ import com.azure.ai.openai.OpenAIClient;
 import com.azure.ai.openai.OpenAIClientBuilder;
 import com.azure.ai.openai.models.Completions;
 import com.azure.ai.openai.models.CompletionsOptions;
-import com.azure.ai.openai.models.NonAzureOpenAIKeyCredential;
+import com.azure.core.credential.AzureKeyCredential;
+import com.azure.core.util.Configuration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,16 +23,16 @@ public class ClientCreationWithNonAzureOpenAIKeyCredentialSample {
      * @param args Unused. Arguments to the program.
      */
     public static void main(String[] args) {
-        String apiKey = "{non-azure-open-ai-api-key}";
+        String apiKey = Configuration.getGlobalConfiguration().get("apiKey");
 
         OpenAIClientBuilder builder = new OpenAIClientBuilder()
-            .credential(new NonAzureOpenAIKeyCredential(apiKey));
+            .credential(new AzureKeyCredential(apiKey));
 
         OpenAIClient client = builder.buildClient();
 
         List<String> prompt = new ArrayList<>();
         prompt.add("Why did the eagles not carry Frodo Baggins to Mordor?");
-        String deploymentOrModelId = "{azure-open-ai-deployment-model-id}";
+        String deploymentOrModelId = "gpt-3.5-turbo";
         Completions completions = client.getCompletions(deploymentOrModelId, new CompletionsOptions(prompt));
         System.out.printf("Model ID=%s is created at %d.%n", completions.getId(), completions.getCreated());
     }

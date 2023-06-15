@@ -4,7 +4,6 @@
 package com.azure.ai.openai;
 
 import com.azure.ai.openai.implementation.CompletionsUtils;
-import com.azure.ai.openai.implementation.NonAzureOpenAIClientImpl;
 import com.azure.ai.openai.implementation.OpenAIClientImpl;
 import com.azure.ai.openai.implementation.OpenAIServerSentEvents;
 import com.azure.ai.openai.models.ChatCompletions;
@@ -25,8 +24,9 @@ import com.azure.core.http.rest.RequestOptions;
 import com.azure.core.http.rest.Response;
 import com.azure.core.util.BinaryData;
 import com.azure.core.util.IterableStream;
-import java.nio.ByteBuffer;
 import reactor.core.publisher.Flux;
+
+import java.nio.ByteBuffer;
 
 /** Initializes a new instance of the synchronous OpenAIClient type. */
 @ServiceClient(builder = OpenAIClientBuilder.class)
@@ -82,10 +82,9 @@ public final class OpenAIClient {
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Response<BinaryData> getEmbeddingsWithResponse(
             String deploymentId, BinaryData embeddingsOptions, RequestOptions requestOptions) {
-        return openAIServiceClient != null
-                ? openAIServiceClient.getEmbeddingsWithResponse(deploymentId, embeddingsOptions, requestOptions)
-                : serviceClient.getEmbeddingsWithResponse(deploymentId, embeddingsOptions, requestOptions);
+        return serviceClient.getEmbeddingsWithResponse(deploymentId, embeddingsOptions, requestOptions);
     }
+
 
     /**
      * Gets completions for the provided input prompts. Completions support a wide variety of tasks and generate text
@@ -158,21 +157,20 @@ public final class OpenAIClient {
      *
      * @param deploymentId deployment id of the deployed model.
      * @param completionsOptions The configuration information for a completions request. Completions support a wide
-     *     variety of tasks and generate text that continues from or "completes" provided prompt data.
+     * variety of tasks and generate text that continues from or "completes" provided prompt data.
      * @param requestOptions The options to configure the HTTP request before HTTP client sends it.
+     * @return completions for the provided input prompts. Completions support a wide variety of tasks and generate text
+     * that continues from or "completes" provided prompt data along with {@link Response}.
      * @throws HttpResponseException thrown if the request is rejected by server.
      * @throws ClientAuthenticationException thrown if the request is rejected by server on status code 401.
      * @throws ResourceNotFoundException thrown if the request is rejected by server on status code 404.
      * @throws ResourceModifiedException thrown if the request is rejected by server on status code 409.
-     * @return completions for the provided input prompts. Completions support a wide variety of tasks and generate text
-     *     that continues from or "completes" provided prompt data along with {@link Response}.
      */
+    @Generated
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Response<BinaryData> getCompletionsWithResponse(
-            String deploymentId, BinaryData completionsOptions, RequestOptions requestOptions) {
-        return openAIServiceClient != null
-                ? openAIServiceClient.getCompletionsWithResponse(deploymentId, completionsOptions, requestOptions)
-                : serviceClient.getCompletionsWithResponse(deploymentId, completionsOptions, requestOptions);
+        String deploymentId, BinaryData completionsOptions, RequestOptions requestOptions) {
+        return serviceClient.getCompletionsWithResponse(deploymentId, completionsOptions, requestOptions);
     }
 
     /**
@@ -237,22 +235,19 @@ public final class OpenAIClient {
      *
      * @param deploymentId deployment id of the deployed model.
      * @param chatCompletionsOptions The configuration information for a chat completions request. Completions support a
-     *     wide variety of tasks and generate text that continues from or "completes" provided prompt data.
+     * wide variety of tasks and generate text that continues from or "completes" provided prompt data.
      * @param requestOptions The options to configure the HTTP request before HTTP client sends it.
+     * @return chat completions for the provided chat messages. Completions support a wide variety of tasks and generate
+     * text that continues from or "completes" provided prompt data along with {@link Response}.
      * @throws HttpResponseException thrown if the request is rejected by server.
      * @throws ClientAuthenticationException thrown if the request is rejected by server on status code 401.
      * @throws ResourceNotFoundException thrown if the request is rejected by server on status code 404.
      * @throws ResourceModifiedException thrown if the request is rejected by server on status code 409.
-     * @return chat completions for the provided chat messages. Completions support a wide variety of tasks and generate
-     *     text that continues from or "completes" provided prompt data along with {@link Response}.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Response<BinaryData> getChatCompletionsWithResponse(
-            String deploymentId, BinaryData chatCompletionsOptions, RequestOptions requestOptions) {
-        return openAIServiceClient != null
-                ? openAIServiceClient.getChatCompletionsWithResponse(
-                        deploymentId, chatCompletionsOptions, requestOptions)
-                : serviceClient.getChatCompletionsWithResponse(deploymentId, chatCompletionsOptions, requestOptions);
+        String deploymentId, BinaryData chatCompletionsOptions, RequestOptions requestOptions) {
+        return serviceClient.getChatCompletionsWithResponse(deploymentId, chatCompletionsOptions, requestOptions);
     }
 
     /**
@@ -417,8 +412,6 @@ public final class OpenAIClient {
 
     @Generated private final OpenAIClientImpl serviceClient;
 
-    private final NonAzureOpenAIClientImpl openAIServiceClient;
-
     /**
      * Initializes an instance of OpenAIClient class.
      *
@@ -426,16 +419,5 @@ public final class OpenAIClient {
      */
     OpenAIClient(OpenAIClientImpl serviceClient) {
         this.serviceClient = serviceClient;
-        openAIServiceClient = null;
-    }
-
-    /**
-     * Initializes an instance of OpenAIClient class for NonAzure Implementation.
-     *
-     * @param serviceClient the service client implementation.
-     */
-    OpenAIClient(NonAzureOpenAIClientImpl serviceClient) {
-        this.serviceClient = null;
-        openAIServiceClient = serviceClient;
     }
 }

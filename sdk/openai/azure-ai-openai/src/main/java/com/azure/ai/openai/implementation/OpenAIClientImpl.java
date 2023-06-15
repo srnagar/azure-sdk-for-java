@@ -32,9 +32,17 @@ import com.azure.core.http.rest.RestProxy;
 import com.azure.core.util.BinaryData;
 import com.azure.core.util.Context;
 import com.azure.core.util.FluxUtil;
+import com.azure.core.util.UrlBuilder;
 import com.azure.core.util.serializer.JacksonAdapter;
 import com.azure.core.util.serializer.SerializerAdapter;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import reactor.core.publisher.Mono;
+
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 /** Initializes a new instance of the OpenAIClient type. */
 public final class OpenAIClientImpl {
@@ -327,6 +335,7 @@ public final class OpenAIClientImpl {
     public Mono<Response<BinaryData>> getEmbeddingsWithResponseAsync(
             String deploymentId, BinaryData embeddingsOptions, RequestOptions requestOptions) {
         final String accept = "application/json";
+        updateAlternateRoute(requestOptions);
         return FluxUtil.withContext(
                 context ->
                         service.getEmbeddings(
@@ -390,6 +399,7 @@ public final class OpenAIClientImpl {
     public Response<BinaryData> getEmbeddingsWithResponse(
             String deploymentId, BinaryData embeddingsOptions, RequestOptions requestOptions) {
         final String accept = "application/json";
+        updateAlternateRoute(requestOptions);
         return service.getEmbeddingsSync(
                 this.getEndpoint(),
                 this.getServiceVersion().getVersion(),
@@ -485,6 +495,7 @@ public final class OpenAIClientImpl {
     public Mono<Response<BinaryData>> getCompletionsWithResponseAsync(
             String deploymentId, BinaryData completionsOptions, RequestOptions requestOptions) {
         final String accept = "application/json";
+        updateAlternateRoute(requestOptions);
         return FluxUtil.withContext(
                 context ->
                         service.getCompletions(
@@ -581,6 +592,7 @@ public final class OpenAIClientImpl {
     public Response<BinaryData> getCompletionsWithResponse(
             String deploymentId, BinaryData completionsOptions, RequestOptions requestOptions) {
         final String accept = "application/json";
+        updateAlternateRoute(requestOptions);
         return service.getCompletionsSync(
                 this.getEndpoint(),
                 this.getServiceVersion().getVersion(),
@@ -664,6 +676,7 @@ public final class OpenAIClientImpl {
     public Mono<Response<BinaryData>> getChatCompletionsWithResponseAsync(
             String deploymentId, BinaryData chatCompletionsOptions, RequestOptions requestOptions) {
         final String accept = "application/json";
+        updateAlternateRoute(requestOptions);
         return FluxUtil.withContext(
                 context ->
                         service.getChatCompletions(
@@ -748,6 +761,7 @@ public final class OpenAIClientImpl {
     public Response<BinaryData> getChatCompletionsWithResponse(
             String deploymentId, BinaryData chatCompletionsOptions, RequestOptions requestOptions) {
         final String accept = "application/json";
+        updateAlternateRoute(requestOptions);
         return service.getChatCompletionsSync(
                 this.getEndpoint(),
                 this.getServiceVersion().getVersion(),
@@ -756,5 +770,54 @@ public final class OpenAIClientImpl {
                 chatCompletionsOptions,
                 requestOptions,
                 Context.NONE);
+    }
+
+    private void updateAlternateRoute(RequestOptions requestOptions) {
+        if (this.getEndpoint().startsWith("https://api.openai.com")) { // check to find out if we are calling OpenAI or Azure OpenAI
+            requestOptions.addRequestCallback(request -> {
+                URL url = request.getUrl();
+                String openAIVersion = getOpenAIVersion(url);
+                String modelId = getDeploymentIdFromPath(url.getPath()); // deployment id will be used as model id in OpenAI
+                ObjectMapper objectMapper = new ObjectMapper();
+                try {
+                    JsonNode jsonNode = objectMapper.readTree(request.getBodyAsBinaryData().toString());
+                    if (jsonNode instanceof ObjectNode) {
+                        ObjectNode objectNode = (ObjectNode) jsonNode;
+                        objectNode.put("model", modelId);
+                        request.setBody(BinaryData.fromBytes(objectNode.toString().getBytes(StandardCharsets.UTF_8)));
+                    }
+                    String updatedUrl = getOpenAIUrl(url, openAIVersion, modelId);
+                    request.setUrl(updatedUrl);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
+    }
+
+    private static String getOpenAIVersion(URL url) {
+        String query = url.getQuery();
+        int beginIndex = query.indexOf("api-version") + 12;
+        int endIndex = query.indexOf("&", beginIndex);
+        String version = query.substring(beginIndex, endIndex == -1 ? query.length() : endIndex);
+
+        String openAIVersion = "";
+        if (!version.isEmpty()) { // check the Azure OpenAI version ranges here to map to the version of OpenAI
+            openAIVersion = "v1";
+        }
+        return openAIVersion;
+    }
+
+    private String getOpenAIUrl(URL url, String openAIVersion, String deploymentId) {
+        UrlBuilder parse = UrlBuilder.parse(url);
+        String path = url.getPath().replace("/openai/deployments/" + deploymentId, "");
+        parse.setPath(openAIVersion + path);
+        UrlBuilder urlBuilder = parse.clearQuery();
+        return urlBuilder.toString();
+    }
+
+    private String getDeploymentIdFromPath(String path) {
+        int deploymentsIndex = path.indexOf("deployments") + 12;
+        return path.substring(deploymentsIndex, path.indexOf("/", deploymentsIndex));
     }
 }

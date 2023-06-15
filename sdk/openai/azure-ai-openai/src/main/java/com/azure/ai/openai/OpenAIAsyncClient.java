@@ -4,7 +4,6 @@
 package com.azure.ai.openai;
 
 import com.azure.ai.openai.implementation.CompletionsUtils;
-import com.azure.ai.openai.implementation.NonAzureOpenAIClientImpl;
 import com.azure.ai.openai.implementation.OpenAIClientImpl;
 import com.azure.ai.openai.implementation.OpenAIServerSentEvents;
 import com.azure.ai.openai.models.ChatCompletions;
@@ -83,9 +82,7 @@ public final class OpenAIAsyncClient {
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Mono<Response<BinaryData>> getEmbeddingsWithResponse(
             String deploymentId, BinaryData embeddingsOptions, RequestOptions requestOptions) {
-        return openAIServiceClient != null
-                ? openAIServiceClient.getEmbeddingsWithResponseAsync(deploymentId, embeddingsOptions, requestOptions)
-                : serviceClient.getEmbeddingsWithResponseAsync(deploymentId, embeddingsOptions, requestOptions);
+        return serviceClient.getEmbeddingsWithResponseAsync(deploymentId, embeddingsOptions, requestOptions);
     }
 
     /**
@@ -172,9 +169,7 @@ public final class OpenAIAsyncClient {
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Mono<Response<BinaryData>> getCompletionsWithResponse(
             String deploymentId, BinaryData completionsOptions, RequestOptions requestOptions) {
-        return openAIServiceClient != null
-                ? openAIServiceClient.getCompletionsWithResponseAsync(deploymentId, completionsOptions, requestOptions)
-                : serviceClient.getCompletionsWithResponseAsync(deploymentId, completionsOptions, requestOptions);
+        return serviceClient.getCompletionsWithResponseAsync(deploymentId, completionsOptions, requestOptions);
     }
 
     /**
@@ -252,10 +247,7 @@ public final class OpenAIAsyncClient {
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Mono<Response<BinaryData>> getChatCompletionsWithResponse(
             String deploymentId, BinaryData chatCompletionsOptions, RequestOptions requestOptions) {
-        return openAIServiceClient != null
-                ? openAIServiceClient.getChatCompletionsWithResponseAsync(
-                        deploymentId, chatCompletionsOptions, requestOptions)
-                : serviceClient.getChatCompletionsWithResponseAsync(
+        return serviceClient.getChatCompletionsWithResponseAsync(
                         deploymentId, chatCompletionsOptions, requestOptions);
     }
 
@@ -421,8 +413,6 @@ public final class OpenAIAsyncClient {
 
     @Generated private final OpenAIClientImpl serviceClient;
 
-    private final NonAzureOpenAIClientImpl openAIServiceClient;
-
     /**
      * Initializes an instance of OpenAIAsyncClient class by using "Azure" OpenAI service implementation. Azure OpenAI
      * and Non-Azure OpenAI service implementations are mutually exclusive. Both service client implementation cannot
@@ -432,18 +422,5 @@ public final class OpenAIAsyncClient {
      */
     OpenAIAsyncClient(OpenAIClientImpl serviceClient) {
         this.serviceClient = serviceClient;
-        openAIServiceClient = null;
-    }
-
-    /**
-     * Initializes an instance of OpenAIAsyncClient class by using "Non-Azure" OpenAI service implementation. Azure
-     * OpenAI and Non-Azure OpenAI service implementations are mutually exclusive. Both service client implementation
-     * cannot coexist because `OpenAIClient` operates either way in a mutually exclusive way.
-     *
-     * @param serviceClient the service client implementation for Non-Azure OpenAI service client.
-     */
-    OpenAIAsyncClient(NonAzureOpenAIClientImpl serviceClient) {
-        this.serviceClient = null;
-        openAIServiceClient = serviceClient;
     }
 }
