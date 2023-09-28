@@ -8,6 +8,7 @@ import com.azure.identity.DefaultAzureCredentialBuilder;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
+import java.util.UUID;
 
 public class LoadTestingClientTest {
     @Test
@@ -27,7 +28,7 @@ public class LoadTestingClientTest {
                     .setVirtualUsers(50)
                     .setRampUpTime(null)
                     .setDuration(60)));
-        asyncClient.createTestWithResponse("createTestId", testBody).block();
+        asyncClient.createTestWithResponse(UUID.randomUUID().toString(), testBody).block();
 
     }
 
