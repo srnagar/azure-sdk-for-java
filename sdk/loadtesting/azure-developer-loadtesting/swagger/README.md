@@ -3,7 +3,8 @@
 ```yaml
 require: https://github.com/Azure/azure-rest-api-specs/blob/3e27c70e7c02c07b458bc0e94716c3d82d3fdd19/specification/loadtestservice/data-plane/readme.md
 java: true
-data-plane: true
+use: '@autorest/java@4.1.21'
+stream-style-serialization: true
 title: LoadTestingClient
 package-version: 1.0.0
 security: AADToken
@@ -12,7 +13,8 @@ artifact-id: azure-developer-loadtesting
 namespace: com.azure.developer.loadtesting
 generate-builder-per-client: true
 partial-update: true
-output-folder: $(azure-sdk-for-java-folder)/sdk/loadtesting/azure-developer-loadtesting
+generate-sync-async-clients: true
+output-folder: ../
 service-versions:
 - '2022-11-01'
 directive:
