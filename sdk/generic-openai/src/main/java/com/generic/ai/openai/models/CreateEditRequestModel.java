@@ -26,8 +26,10 @@ public final class CreateEditRequestModel implements ExpandableStringEnum<Create
     @Metadata(generated = true)
     public static final CreateEditRequestModel CODE_DAVINCI_EDIT001 = fromString("code-davinci-edit-001");
 
+    private final String name;
+
     private CreateEditRequestModel(String name) {
-        VALUES.put(name, this);
+        this.name = name;
     }
 
     /**
@@ -56,5 +58,10 @@ public final class CreateEditRequestModel implements ExpandableStringEnum<Create
     @Metadata(generated = true)
     public static Collection<CreateEditRequestModel> values() {
         return VALUES.values();
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

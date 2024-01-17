@@ -32,8 +32,10 @@ public final class CreateFineTuningJobRequestModel implements ExpandableStringEn
     @Metadata(generated = true)
     public static final CreateFineTuningJobRequestModel GPT3_5_TURBO = fromString("gpt-3.5-turbo");
 
+    private final String name;
+
     private CreateFineTuningJobRequestModel(String name) {
-        VALUES.put(name, this);
+        this.name = name;
     }
 
     /**
@@ -62,5 +64,10 @@ public final class CreateFineTuningJobRequestModel implements ExpandableStringEn
     @Metadata(generated = true)
     public static Collection<CreateFineTuningJobRequestModel> values() {
         return VALUES.values();
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

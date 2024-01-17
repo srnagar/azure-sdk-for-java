@@ -20,8 +20,10 @@ public final class CreateTranslationRequestModel implements ExpandableStringEnum
     @Metadata(generated = true)
     public static final CreateTranslationRequestModel WHISPER1 = fromString("whisper-1");
 
+    private final String name;
+
     private CreateTranslationRequestModel(String name) {
-        VALUES.put(name, this);
+        this.name = name;
     }
 
     /**
@@ -50,5 +52,10 @@ public final class CreateTranslationRequestModel implements ExpandableStringEnum
     @Metadata(generated = true)
     public static Collection<CreateTranslationRequestModel> values() {
         return VALUES.values();
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

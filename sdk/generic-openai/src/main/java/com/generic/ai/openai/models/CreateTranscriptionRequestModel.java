@@ -20,8 +20,10 @@ public final class CreateTranscriptionRequestModel implements ExpandableStringEn
     @Metadata(generated = true)
     public static final CreateTranscriptionRequestModel WHISPER1 = fromString("whisper-1");
 
+    private final String name;
+
     private CreateTranscriptionRequestModel(String name) {
-        VALUES.put(name, this);
+        this.name = name;
     }
 
     /**
@@ -50,5 +52,10 @@ public final class CreateTranscriptionRequestModel implements ExpandableStringEn
     @Metadata(generated = true)
     public static Collection<CreateTranscriptionRequestModel> values() {
         return VALUES.values();
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

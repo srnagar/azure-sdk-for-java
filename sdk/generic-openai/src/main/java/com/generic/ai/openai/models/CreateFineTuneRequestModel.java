@@ -38,8 +38,10 @@ public final class CreateFineTuneRequestModel implements ExpandableStringEnum<Cr
     @Metadata(generated = true)
     public static final CreateFineTuneRequestModel DAVINCI = fromString("davinci");
 
+    private final String name;
+
     private CreateFineTuneRequestModel(String name) {
-        VALUES.put(name, this);
+        this.name = name;
     }
 
     /**
@@ -68,5 +70,10 @@ public final class CreateFineTuneRequestModel implements ExpandableStringEnum<Cr
     @Metadata(generated = true)
     public static Collection<CreateFineTuneRequestModel> values() {
         return VALUES.values();
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

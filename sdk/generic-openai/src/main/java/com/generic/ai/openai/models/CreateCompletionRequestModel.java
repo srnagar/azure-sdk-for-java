@@ -68,8 +68,10 @@ public final class CreateCompletionRequestModel implements ExpandableStringEnum<
     @Metadata(generated = true)
     public static final CreateCompletionRequestModel TEXT_ADA001 = fromString("text-ada-001");
 
+    private final String name;
+
     private CreateCompletionRequestModel(String name) {
-        VALUES.put(name, this);
+        this.name = name;
     }
 
     /**
@@ -98,5 +100,10 @@ public final class CreateCompletionRequestModel implements ExpandableStringEnum<
     @Metadata(generated = true)
     public static Collection<CreateCompletionRequestModel> values() {
         return VALUES.values();
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

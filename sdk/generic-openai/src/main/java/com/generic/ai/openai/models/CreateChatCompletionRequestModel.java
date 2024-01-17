@@ -80,8 +80,10 @@ public final class CreateChatCompletionRequestModel implements ExpandableStringE
     @Metadata(generated = true)
     public static final CreateChatCompletionRequestModel GPT3_5_TURBO16_K0613 = fromString("gpt-3.5-turbo-16k-0613");
 
+    private final String name;
+
     private CreateChatCompletionRequestModel(String name) {
-        VALUES.put(name, this);
+        this.name = name;
     }
 
     /**
@@ -110,5 +112,10 @@ public final class CreateChatCompletionRequestModel implements ExpandableStringE
     @Metadata(generated = true)
     public static Collection<CreateChatCompletionRequestModel> values() {
         return VALUES.values();
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

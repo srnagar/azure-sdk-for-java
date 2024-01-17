@@ -20,8 +20,10 @@ public final class CreateEmbeddingRequestModel implements ExpandableStringEnum<C
     @Metadata(generated = true)
     public static final CreateEmbeddingRequestModel TEXT_EMBEDDING_ADA002 = fromString("text-embedding-ada-002");
 
+    private final String name;
+
     private CreateEmbeddingRequestModel(String name) {
-        VALUES.put(name, this);
+        this.name = name;
     }
 
     /**
@@ -50,5 +52,10 @@ public final class CreateEmbeddingRequestModel implements ExpandableStringEnum<C
     @Metadata(generated = true)
     public static Collection<CreateEmbeddingRequestModel> values() {
         return VALUES.values();
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

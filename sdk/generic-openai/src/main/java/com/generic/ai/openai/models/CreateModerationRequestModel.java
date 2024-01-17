@@ -26,8 +26,10 @@ public final class CreateModerationRequestModel implements ExpandableStringEnum<
     @Metadata(generated = true)
     public static final CreateModerationRequestModel TEXT_MODERATION_STABLE = fromString("text-moderation-stable");
 
+    private final String name;
+
     private CreateModerationRequestModel(String name) {
-        VALUES.put(name, this);
+        this.name = name;
     }
 
     /**
@@ -56,5 +58,10 @@ public final class CreateModerationRequestModel implements ExpandableStringEnum<
     @Metadata(generated = true)
     public static Collection<CreateModerationRequestModel> values() {
         return VALUES.values();
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }
