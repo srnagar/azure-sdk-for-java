@@ -18,6 +18,8 @@ import io.clientcore.core.http.pipeline.HttpRedirectOptions;
 import io.clientcore.core.http.pipeline.HttpRedirectPolicy;
 import io.clientcore.core.http.pipeline.HttpRetryOptions;
 import io.clientcore.core.http.pipeline.HttpRetryPolicy;
+import io.clientcore.core.instrumentation.Instrumentation;
+import io.clientcore.core.instrumentation.LibraryInstrumentationOptions;
 import io.clientcore.core.traits.ConfigurationTrait;
 import io.clientcore.core.traits.HttpTrait;
 import io.clientcore.core.traits.ProxyTrait;
@@ -31,7 +33,7 @@ import java.util.Objects;
  */
 @ServiceClientBuilder(
     serviceClients = {
-        StorageServiceClient.class,
+        ServiceClient.class,
         ContainerClient.class,
         BlobClient.class,
         PageBlobClient.class,
@@ -44,6 +46,10 @@ public final class AzureBlobStorageBuilder implements HttpTrait<AzureBlobStorage
 
     @Metadata(generated = true)
     private static final String SDK_VERSION = "version";
+
+    @Metadata(generated = true)
+    private static final LibraryInstrumentationOptions LIBRARY_INSTRUMENTATION_OPTIONS
+        = new LibraryInstrumentationOptions("");
 
     @Metadata(generated = true)
     private final List<HttpPipelinePolicy> pipelinePolicies;
@@ -187,7 +193,7 @@ public final class AzureBlobStorageBuilder implements HttpTrait<AzureBlobStorage
 
     /**
      * Sets The URL of the service account, container, or blob that is the target of the desired operation.
-     *
+     * 
      * @param url the url value.
      * @return the AzureBlobStorageBuilder.
      */
@@ -205,7 +211,7 @@ public final class AzureBlobStorageBuilder implements HttpTrait<AzureBlobStorage
 
     /**
      * Sets Specifies the version of the operation to use for this request.
-     *
+     * 
      * @param version the version value.
      * @return the AzureBlobStorageBuilder.
      */
@@ -217,7 +223,7 @@ public final class AzureBlobStorageBuilder implements HttpTrait<AzureBlobStorage
 
     /**
      * Builds an instance of AzureBlobStorageImpl with the provided parameters.
-     *
+     * 
      * @return an instance of AzureBlobStorageImpl.
      */
     @Metadata(generated = true)
@@ -255,61 +261,91 @@ public final class AzureBlobStorageBuilder implements HttpTrait<AzureBlobStorage
 
     /**
      * Builds an instance of ServiceClient class.
-     *
+     * 
      * @return an instance of ServiceClient.
      */
     @Metadata(generated = true)
-    public StorageServiceClient buildServiceClient() {
-        return new StorageServiceClient(buildInnerClient().getServices());
+    public ServiceClient buildServiceClient() {
+        HttpInstrumentationOptions localHttpInstrumentationOptions = this.httpInstrumentationOptions == null
+            ? new HttpInstrumentationOptions()
+            : this.httpInstrumentationOptions;
+        Instrumentation instrumentation
+            = Instrumentation.create(localHttpInstrumentationOptions, LIBRARY_INSTRUMENTATION_OPTIONS, this.endpoint);
+        return new ServiceClient(buildInnerClient().getServices(), instrumentation);
     }
 
     /**
      * Builds an instance of ContainerClient class.
-     *
+     * 
      * @return an instance of ContainerClient.
      */
     @Metadata(generated = true)
     public ContainerClient buildContainerClient() {
-        return new ContainerClient(buildInnerClient().getContainers());
+        HttpInstrumentationOptions localHttpInstrumentationOptions = this.httpInstrumentationOptions == null
+            ? new HttpInstrumentationOptions()
+            : this.httpInstrumentationOptions;
+        Instrumentation instrumentation
+            = Instrumentation.create(localHttpInstrumentationOptions, LIBRARY_INSTRUMENTATION_OPTIONS, this.endpoint);
+        return new ContainerClient(buildInnerClient().getContainers(), instrumentation);
     }
 
     /**
      * Builds an instance of BlobClient class.
-     *
+     * 
      * @return an instance of BlobClient.
      */
     @Metadata(generated = true)
     public BlobClient buildBlobClient() {
-        return new BlobClient(buildInnerClient().getBlobs());
+        HttpInstrumentationOptions localHttpInstrumentationOptions = this.httpInstrumentationOptions == null
+            ? new HttpInstrumentationOptions()
+            : this.httpInstrumentationOptions;
+        Instrumentation instrumentation
+            = Instrumentation.create(localHttpInstrumentationOptions, LIBRARY_INSTRUMENTATION_OPTIONS, this.endpoint);
+        return new BlobClient(buildInnerClient().getBlobs(), instrumentation);
     }
 
     /**
      * Builds an instance of PageBlobClient class.
-     *
+     * 
      * @return an instance of PageBlobClient.
      */
     @Metadata(generated = true)
     public PageBlobClient buildPageBlobClient() {
-        return new PageBlobClient(buildInnerClient().getPageBlobs());
+        HttpInstrumentationOptions localHttpInstrumentationOptions = this.httpInstrumentationOptions == null
+            ? new HttpInstrumentationOptions()
+            : this.httpInstrumentationOptions;
+        Instrumentation instrumentation
+            = Instrumentation.create(localHttpInstrumentationOptions, LIBRARY_INSTRUMENTATION_OPTIONS, this.endpoint);
+        return new PageBlobClient(buildInnerClient().getPageBlobs(), instrumentation);
     }
 
     /**
      * Builds an instance of AppendBlobClient class.
-     *
+     * 
      * @return an instance of AppendBlobClient.
      */
     @Metadata(generated = true)
     public AppendBlobClient buildAppendBlobClient() {
-        return new AppendBlobClient(buildInnerClient().getAppendBlobs());
+        HttpInstrumentationOptions localHttpInstrumentationOptions = this.httpInstrumentationOptions == null
+            ? new HttpInstrumentationOptions()
+            : this.httpInstrumentationOptions;
+        Instrumentation instrumentation
+            = Instrumentation.create(localHttpInstrumentationOptions, LIBRARY_INSTRUMENTATION_OPTIONS, this.endpoint);
+        return new AppendBlobClient(buildInnerClient().getAppendBlobs(), instrumentation);
     }
 
     /**
      * Builds an instance of BlockBlobClient class.
-     *
+     * 
      * @return an instance of BlockBlobClient.
      */
     @Metadata(generated = true)
     public BlockBlobClient buildBlockBlobClient() {
-        return new BlockBlobClient(buildInnerClient().getBlockBlobs());
+        HttpInstrumentationOptions localHttpInstrumentationOptions = this.httpInstrumentationOptions == null
+            ? new HttpInstrumentationOptions()
+            : this.httpInstrumentationOptions;
+        Instrumentation instrumentation
+            = Instrumentation.create(localHttpInstrumentationOptions, LIBRARY_INSTRUMENTATION_OPTIONS, this.endpoint);
+        return new BlockBlobClient(buildInnerClient().getBlockBlobs(), instrumentation);
     }
 }

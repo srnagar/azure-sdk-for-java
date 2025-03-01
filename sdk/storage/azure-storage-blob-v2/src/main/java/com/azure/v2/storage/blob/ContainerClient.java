@@ -19,6 +19,7 @@ import io.clientcore.core.annotations.Metadata;
 import io.clientcore.core.annotations.ServiceClient;
 import io.clientcore.core.http.models.RequestOptions;
 import io.clientcore.core.http.models.Response;
+import io.clientcore.core.instrumentation.Instrumentation;
 import io.clientcore.core.models.binarydata.BinaryData;
 import java.io.InputStream;
 import java.time.OffsetDateTime;
@@ -33,14 +34,18 @@ public final class ContainerClient {
     @Metadata(generated = true)
     private final ContainersImpl serviceClient;
 
+    private final Instrumentation instrumentation;
+
     /**
      * Initializes an instance of ContainerClient class.
      * 
      * @param serviceClient the service client implementation.
+     * @param instrumentation the instrumentation instance.
      */
     @Metadata(generated = true)
-    ContainerClient(ContainersImpl serviceClient) {
+    ContainerClient(ContainersImpl serviceClient, Instrumentation instrumentation) {
         this.serviceClient = serviceClient;
+        this.instrumentation = instrumentation;
     }
 
     /**
@@ -71,8 +76,9 @@ public final class ContainerClient {
     public Response<Void> createWithResponse(String containerName, Integer timeout, Map<String, String> metadata,
         PublicAccessType access, String requestId, BlobContainerEncryptionScope blobContainerEncryptionScope,
         RequestOptions requestOptions) {
-        return this.serviceClient.createWithResponse(containerName, timeout, metadata, access, requestId,
-            blobContainerEncryptionScope, requestOptions);
+        return this.instrumentation.instrument("Container_Create", requestOptions,
+            updatedOptions -> this.serviceClient.createWithResponse(containerName, timeout, metadata, access, requestId,
+                blobContainerEncryptionScope, updatedOptions));
     }
 
     /**
@@ -100,7 +106,8 @@ public final class ContainerClient {
     @Metadata(generated = true)
     public void create(String containerName, Integer timeout, Map<String, String> metadata, PublicAccessType access,
         String requestId, BlobContainerEncryptionScope blobContainerEncryptionScope) {
-        this.serviceClient.create(containerName, timeout, metadata, access, requestId, blobContainerEncryptionScope);
+        this.instrumentation.instrument("Container_Create", null, updatedOptions -> this.serviceClient
+            .create(containerName, timeout, metadata, access, requestId, blobContainerEncryptionScope));
     }
 
     /**
@@ -123,7 +130,9 @@ public final class ContainerClient {
     @Metadata(generated = true)
     public Response<Void> getPropertiesWithResponse(String containerName, Integer timeout, String leaseId,
         String requestId, RequestOptions requestOptions) {
-        return this.serviceClient.getPropertiesWithResponse(containerName, timeout, leaseId, requestId, requestOptions);
+        return this.instrumentation.instrument("Container_GetProperties", requestOptions,
+            updatedOptions -> this.serviceClient.getPropertiesWithResponse(containerName, timeout, leaseId, requestId,
+                updatedOptions));
     }
 
     /**
@@ -143,7 +152,8 @@ public final class ContainerClient {
      */
     @Metadata(generated = true)
     public void getProperties(String containerName, Integer timeout, String leaseId, String requestId) {
-        this.serviceClient.getProperties(containerName, timeout, leaseId, requestId);
+        this.instrumentation.instrument("Container_GetProperties", null,
+            updatedOptions -> this.serviceClient.getProperties(containerName, timeout, leaseId, requestId));
     }
 
     /**
@@ -171,8 +181,9 @@ public final class ContainerClient {
     public Response<Void> deleteWithResponse(String containerName, Integer timeout, String leaseId,
         OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String requestId,
         RequestOptions requestOptions) {
-        return this.serviceClient.deleteWithResponse(containerName, timeout, leaseId, ifModifiedSince,
-            ifUnmodifiedSince, requestId, requestOptions);
+        return this.instrumentation.instrument("Container_Delete", requestOptions,
+            updatedOptions -> this.serviceClient.deleteWithResponse(containerName, timeout, leaseId, ifModifiedSince,
+                ifUnmodifiedSince, requestId, updatedOptions));
     }
 
     /**
@@ -197,7 +208,8 @@ public final class ContainerClient {
     @Metadata(generated = true)
     public void delete(String containerName, Integer timeout, String leaseId, OffsetDateTime ifModifiedSince,
         OffsetDateTime ifUnmodifiedSince, String requestId) {
-        this.serviceClient.delete(containerName, timeout, leaseId, ifModifiedSince, ifUnmodifiedSince, requestId);
+        this.instrumentation.instrument("Container_Delete", null, updatedOptions -> this.serviceClient
+            .delete(containerName, timeout, leaseId, ifModifiedSince, ifUnmodifiedSince, requestId));
     }
 
     /**
@@ -227,8 +239,9 @@ public final class ContainerClient {
     @Metadata(generated = true)
     public Response<Void> setMetadataWithResponse(String containerName, Integer timeout, String leaseId,
         Map<String, String> metadata, OffsetDateTime ifModifiedSince, String requestId, RequestOptions requestOptions) {
-        return this.serviceClient.setMetadataWithResponse(containerName, timeout, leaseId, metadata, ifModifiedSince,
-            requestId, requestOptions);
+        return this.instrumentation.instrument("Container_SetMetadata", requestOptions,
+            updatedOptions -> this.serviceClient.setMetadataWithResponse(containerName, timeout, leaseId, metadata,
+                ifModifiedSince, requestId, updatedOptions));
     }
 
     /**
@@ -256,7 +269,8 @@ public final class ContainerClient {
     @Metadata(generated = true)
     public void setMetadata(String containerName, Integer timeout, String leaseId, Map<String, String> metadata,
         OffsetDateTime ifModifiedSince, String requestId) {
-        this.serviceClient.setMetadata(containerName, timeout, leaseId, metadata, ifModifiedSince, requestId);
+        this.instrumentation.instrument("Container_SetMetadata", null, updatedOptions -> this.serviceClient
+            .setMetadata(containerName, timeout, leaseId, metadata, ifModifiedSince, requestId));
     }
 
     /**
@@ -279,8 +293,9 @@ public final class ContainerClient {
     @Metadata(generated = true)
     public Response<BlobSignedIdentifierWrapper> getAccessPolicyWithResponse(String containerName, Integer timeout,
         String leaseId, String requestId, RequestOptions requestOptions) {
-        return this.serviceClient.getAccessPolicyWithResponse(containerName, timeout, leaseId, requestId,
-            requestOptions);
+        return this.instrumentation.instrument("Container_GetAccessPolicy", requestOptions,
+            updatedOptions -> this.serviceClient.getAccessPolicyWithResponse(containerName, timeout, leaseId, requestId,
+                updatedOptions));
     }
 
     /**
@@ -302,7 +317,8 @@ public final class ContainerClient {
     @Metadata(generated = true)
     public BlobSignedIdentifierWrapper getAccessPolicy(String containerName, Integer timeout, String leaseId,
         String requestId) {
-        return this.serviceClient.getAccessPolicy(containerName, timeout, leaseId, requestId);
+        return this.instrumentation.instrument("Container_GetAccessPolicy", null,
+            updatedOptions -> this.serviceClient.getAccessPolicy(containerName, timeout, leaseId, requestId));
     }
 
     /**
@@ -332,8 +348,9 @@ public final class ContainerClient {
     public Response<Void> setAccessPolicyWithResponse(String containerName, Integer timeout, String leaseId,
         PublicAccessType access, OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String requestId,
         List<BlobSignedIdentifier> containerAcl, RequestOptions requestOptions) {
-        return this.serviceClient.setAccessPolicyWithResponse(containerName, timeout, leaseId, access, ifModifiedSince,
-            ifUnmodifiedSince, requestId, containerAcl, requestOptions);
+        return this.instrumentation.instrument("Container_SetAccessPolicy", requestOptions,
+            updatedOptions -> this.serviceClient.setAccessPolicyWithResponse(containerName, timeout, leaseId, access,
+                ifModifiedSince, ifUnmodifiedSince, requestId, containerAcl, updatedOptions));
     }
 
     /**
@@ -361,8 +378,9 @@ public final class ContainerClient {
     public void setAccessPolicy(String containerName, Integer timeout, String leaseId, PublicAccessType access,
         OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String requestId,
         List<BlobSignedIdentifier> containerAcl) {
-        this.serviceClient.setAccessPolicy(containerName, timeout, leaseId, access, ifModifiedSince, ifUnmodifiedSince,
-            requestId, containerAcl);
+        this.instrumentation.instrument("Container_SetAccessPolicy", null,
+            updatedOptions -> this.serviceClient.setAccessPolicy(containerName, timeout, leaseId, access,
+                ifModifiedSince, ifUnmodifiedSince, requestId, containerAcl));
     }
 
     /**
@@ -387,8 +405,9 @@ public final class ContainerClient {
     @Metadata(generated = true)
     public Response<Void> restoreWithResponse(String containerName, Integer timeout, String requestId,
         String deletedContainerName, String deletedContainerVersion, RequestOptions requestOptions) {
-        return this.serviceClient.restoreWithResponse(containerName, timeout, requestId, deletedContainerName,
-            deletedContainerVersion, requestOptions);
+        return this.instrumentation.instrument("Container_Restore", requestOptions,
+            updatedOptions -> this.serviceClient.restoreWithResponse(containerName, timeout, requestId,
+                deletedContainerName, deletedContainerVersion, updatedOptions));
     }
 
     /**
@@ -411,7 +430,8 @@ public final class ContainerClient {
     @Metadata(generated = true)
     public void restore(String containerName, Integer timeout, String requestId, String deletedContainerName,
         String deletedContainerVersion) {
-        this.serviceClient.restore(containerName, timeout, requestId, deletedContainerName, deletedContainerVersion);
+        this.instrumentation.instrument("Container_Restore", null, updatedOptions -> this.serviceClient
+            .restore(containerName, timeout, requestId, deletedContainerName, deletedContainerVersion));
     }
 
     /**
@@ -435,8 +455,8 @@ public final class ContainerClient {
     @Metadata(generated = true)
     public Response<Void> renameWithResponse(String containerName, String sourceContainerName, Integer timeout,
         String requestId, String sourceLeaseId, RequestOptions requestOptions) {
-        return this.serviceClient.renameWithResponse(containerName, sourceContainerName, timeout, requestId,
-            sourceLeaseId, requestOptions);
+        return this.instrumentation.instrument("Container_Rename", requestOptions, updatedOptions -> this.serviceClient
+            .renameWithResponse(containerName, sourceContainerName, timeout, requestId, sourceLeaseId, updatedOptions));
     }
 
     /**
@@ -458,7 +478,8 @@ public final class ContainerClient {
     @Metadata(generated = true)
     public void rename(String containerName, String sourceContainerName, Integer timeout, String requestId,
         String sourceLeaseId) {
-        this.serviceClient.rename(containerName, sourceContainerName, timeout, requestId, sourceLeaseId);
+        this.instrumentation.instrument("Container_Rename", null, updatedOptions -> this.serviceClient
+            .rename(containerName, sourceContainerName, timeout, requestId, sourceLeaseId));
     }
 
     /**
@@ -484,8 +505,9 @@ public final class ContainerClient {
     public Response<InputStream> submitBatchWithResponse(String containerName, long contentLength,
         String multipartContentType, BinaryData body, Integer timeout, String requestId,
         RequestOptions requestOptions) {
-        return this.serviceClient.submitBatchWithResponse(containerName, contentLength, multipartContentType, body,
-            timeout, requestId, requestOptions);
+        return this.instrumentation.instrument("Container_SubmitBatch", requestOptions,
+            updatedOptions -> this.serviceClient.submitBatchWithResponse(containerName, contentLength,
+                multipartContentType, body, timeout, requestId, updatedOptions));
     }
 
     /**
@@ -509,8 +531,8 @@ public final class ContainerClient {
     @Metadata(generated = true)
     public InputStream submitBatch(String containerName, long contentLength, String multipartContentType,
         BinaryData body, Integer timeout, String requestId) {
-        return this.serviceClient.submitBatch(containerName, contentLength, multipartContentType, body, timeout,
-            requestId);
+        return this.instrumentation.instrument("Container_SubmitBatch", null, updatedOptions -> this.serviceClient
+            .submitBatch(containerName, contentLength, multipartContentType, body, timeout, requestId));
     }
 
     /**
@@ -545,8 +567,9 @@ public final class ContainerClient {
     public Response<FilterBlobSegment> filterBlobsWithResponse(String containerName, Integer timeout, String requestId,
         String where, String marker, Integer maxresults, List<FilterBlobsIncludeItem> include,
         RequestOptions requestOptions) {
-        return this.serviceClient.filterBlobsWithResponse(containerName, timeout, requestId, where, marker, maxresults,
-            include, requestOptions);
+        return this.instrumentation.instrument("Container_FilterBlobs", requestOptions,
+            updatedOptions -> this.serviceClient.filterBlobsWithResponse(containerName, timeout, requestId, where,
+                marker, maxresults, include, updatedOptions));
     }
 
     /**
@@ -579,7 +602,8 @@ public final class ContainerClient {
     @Metadata(generated = true)
     public FilterBlobSegment filterBlobs(String containerName, Integer timeout, String requestId, String where,
         String marker, Integer maxresults, List<FilterBlobsIncludeItem> include) {
-        return this.serviceClient.filterBlobs(containerName, timeout, requestId, where, marker, maxresults, include);
+        return this.instrumentation.instrument("Container_FilterBlobs", null, updatedOptions -> this.serviceClient
+            .filterBlobs(containerName, timeout, requestId, where, marker, maxresults, include));
     }
 
     /**
@@ -612,8 +636,9 @@ public final class ContainerClient {
     public Response<Void> acquireLeaseWithResponse(String containerName, Integer timeout, Integer duration,
         String proposedLeaseId, OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String requestId,
         RequestOptions requestOptions) {
-        return this.serviceClient.acquireLeaseWithResponse(containerName, timeout, duration, proposedLeaseId,
-            ifModifiedSince, ifUnmodifiedSince, requestId, requestOptions);
+        return this.instrumentation.instrument("Container_AcquireLease", requestOptions,
+            updatedOptions -> this.serviceClient.acquireLeaseWithResponse(containerName, timeout, duration,
+                proposedLeaseId, ifModifiedSince, ifUnmodifiedSince, requestId, updatedOptions));
     }
 
     /**
@@ -643,8 +668,9 @@ public final class ContainerClient {
     @Metadata(generated = true)
     public void acquireLease(String containerName, Integer timeout, Integer duration, String proposedLeaseId,
         OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String requestId) {
-        this.serviceClient.acquireLease(containerName, timeout, duration, proposedLeaseId, ifModifiedSince,
-            ifUnmodifiedSince, requestId);
+        this.instrumentation.instrument("Container_AcquireLease", null,
+            updatedOptions -> this.serviceClient.acquireLease(containerName, timeout, duration, proposedLeaseId,
+                ifModifiedSince, ifUnmodifiedSince, requestId));
     }
 
     /**
@@ -672,8 +698,9 @@ public final class ContainerClient {
     public Response<Void> releaseLeaseWithResponse(String containerName, String leaseId, Integer timeout,
         OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String requestId,
         RequestOptions requestOptions) {
-        return this.serviceClient.releaseLeaseWithResponse(containerName, leaseId, timeout, ifModifiedSince,
-            ifUnmodifiedSince, requestId, requestOptions);
+        return this.instrumentation.instrument("Container_ReleaseLease", requestOptions,
+            updatedOptions -> this.serviceClient.releaseLeaseWithResponse(containerName, leaseId, timeout,
+                ifModifiedSince, ifUnmodifiedSince, requestId, updatedOptions));
     }
 
     /**
@@ -698,7 +725,8 @@ public final class ContainerClient {
     @Metadata(generated = true)
     public void releaseLease(String containerName, String leaseId, Integer timeout, OffsetDateTime ifModifiedSince,
         OffsetDateTime ifUnmodifiedSince, String requestId) {
-        this.serviceClient.releaseLease(containerName, leaseId, timeout, ifModifiedSince, ifUnmodifiedSince, requestId);
+        this.instrumentation.instrument("Container_ReleaseLease", null, updatedOptions -> this.serviceClient
+            .releaseLease(containerName, leaseId, timeout, ifModifiedSince, ifUnmodifiedSince, requestId));
     }
 
     /**
@@ -726,8 +754,9 @@ public final class ContainerClient {
     public Response<Void> renewLeaseWithResponse(String containerName, String leaseId, Integer timeout,
         OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String requestId,
         RequestOptions requestOptions) {
-        return this.serviceClient.renewLeaseWithResponse(containerName, leaseId, timeout, ifModifiedSince,
-            ifUnmodifiedSince, requestId, requestOptions);
+        return this.instrumentation.instrument("Container_RenewLease", requestOptions,
+            updatedOptions -> this.serviceClient.renewLeaseWithResponse(containerName, leaseId, timeout,
+                ifModifiedSince, ifUnmodifiedSince, requestId, updatedOptions));
     }
 
     /**
@@ -752,7 +781,8 @@ public final class ContainerClient {
     @Metadata(generated = true)
     public void renewLease(String containerName, String leaseId, Integer timeout, OffsetDateTime ifModifiedSince,
         OffsetDateTime ifUnmodifiedSince, String requestId) {
-        this.serviceClient.renewLease(containerName, leaseId, timeout, ifModifiedSince, ifUnmodifiedSince, requestId);
+        this.instrumentation.instrument("Container_RenewLease", null, updatedOptions -> this.serviceClient
+            .renewLease(containerName, leaseId, timeout, ifModifiedSince, ifUnmodifiedSince, requestId));
     }
 
     /**
@@ -785,8 +815,9 @@ public final class ContainerClient {
     public Response<Void> breakLeaseWithResponse(String containerName, Integer timeout, Integer breakPeriod,
         OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String requestId,
         RequestOptions requestOptions) {
-        return this.serviceClient.breakLeaseWithResponse(containerName, timeout, breakPeriod, ifModifiedSince,
-            ifUnmodifiedSince, requestId, requestOptions);
+        return this.instrumentation.instrument("Container_BreakLease", requestOptions,
+            updatedOptions -> this.serviceClient.breakLeaseWithResponse(containerName, timeout, breakPeriod,
+                ifModifiedSince, ifUnmodifiedSince, requestId, updatedOptions));
     }
 
     /**
@@ -816,8 +847,8 @@ public final class ContainerClient {
     @Metadata(generated = true)
     public void breakLease(String containerName, Integer timeout, Integer breakPeriod, OffsetDateTime ifModifiedSince,
         OffsetDateTime ifUnmodifiedSince, String requestId) {
-        this.serviceClient.breakLease(containerName, timeout, breakPeriod, ifModifiedSince, ifUnmodifiedSince,
-            requestId);
+        this.instrumentation.instrument("Container_BreakLease", null, updatedOptions -> this.serviceClient
+            .breakLease(containerName, timeout, breakPeriod, ifModifiedSince, ifUnmodifiedSince, requestId));
     }
 
     /**
@@ -848,8 +879,9 @@ public final class ContainerClient {
     public Response<Void> changeLeaseWithResponse(String containerName, String leaseId, String proposedLeaseId,
         Integer timeout, OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String requestId,
         RequestOptions requestOptions) {
-        return this.serviceClient.changeLeaseWithResponse(containerName, leaseId, proposedLeaseId, timeout,
-            ifModifiedSince, ifUnmodifiedSince, requestId, requestOptions);
+        return this.instrumentation.instrument("Container_ChangeLease", requestOptions,
+            updatedOptions -> this.serviceClient.changeLeaseWithResponse(containerName, leaseId, proposedLeaseId,
+                timeout, ifModifiedSince, ifUnmodifiedSince, requestId, updatedOptions));
     }
 
     /**
@@ -877,8 +909,9 @@ public final class ContainerClient {
     @Metadata(generated = true)
     public void changeLease(String containerName, String leaseId, String proposedLeaseId, Integer timeout,
         OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String requestId) {
-        this.serviceClient.changeLease(containerName, leaseId, proposedLeaseId, timeout, ifModifiedSince,
-            ifUnmodifiedSince, requestId);
+        this.instrumentation.instrument("Container_ChangeLease", null,
+            updatedOptions -> this.serviceClient.changeLease(containerName, leaseId, proposedLeaseId, timeout,
+                ifModifiedSince, ifUnmodifiedSince, requestId));
     }
 
     /**
@@ -912,8 +945,9 @@ public final class ContainerClient {
     public Response<ListBlobsFlatSegmentResponse> listBlobFlatSegmentWithResponse(String containerName, String prefix,
         String marker, Integer maxresults, List<ListBlobsIncludeItem> include, Integer timeout, String requestId,
         RequestOptions requestOptions) {
-        return this.serviceClient.listBlobFlatSegmentWithResponse(containerName, prefix, marker, maxresults, include,
-            timeout, requestId, requestOptions);
+        return this.instrumentation.instrument("Container_ListBlobFlatSegment", requestOptions,
+            updatedOptions -> this.serviceClient.listBlobFlatSegmentWithResponse(containerName, prefix, marker,
+                maxresults, include, timeout, requestId, updatedOptions));
     }
 
     /**
@@ -945,8 +979,9 @@ public final class ContainerClient {
     @Metadata(generated = true)
     public ListBlobsFlatSegmentResponse listBlobFlatSegment(String containerName, String prefix, String marker,
         Integer maxresults, List<ListBlobsIncludeItem> include, Integer timeout, String requestId) {
-        return this.serviceClient.listBlobFlatSegment(containerName, prefix, marker, maxresults, include, timeout,
-            requestId);
+        return this.instrumentation.instrument("Container_ListBlobFlatSegment", null,
+            updatedOptions -> this.serviceClient.listBlobFlatSegment(containerName, prefix, marker, maxresults, include,
+                timeout, requestId));
     }
 
     /**
@@ -983,8 +1018,9 @@ public final class ContainerClient {
     public Response<ListBlobsHierarchySegmentResponse> listBlobHierarchySegmentWithResponse(String containerName,
         String delimiter, String prefix, String marker, Integer maxresults, List<ListBlobsIncludeItem> include,
         Integer timeout, String requestId, RequestOptions requestOptions) {
-        return this.serviceClient.listBlobHierarchySegmentWithResponse(containerName, delimiter, prefix, marker,
-            maxresults, include, timeout, requestId, requestOptions);
+        return this.instrumentation.instrument("Container_ListBlobHierarchySegment", requestOptions,
+            updatedOptions -> this.serviceClient.listBlobHierarchySegmentWithResponse(containerName, delimiter, prefix,
+                marker, maxresults, include, timeout, requestId, updatedOptions));
     }
 
     /**
@@ -1020,8 +1056,9 @@ public final class ContainerClient {
     public ListBlobsHierarchySegmentResponse listBlobHierarchySegment(String containerName, String delimiter,
         String prefix, String marker, Integer maxresults, List<ListBlobsIncludeItem> include, Integer timeout,
         String requestId) {
-        return this.serviceClient.listBlobHierarchySegment(containerName, delimiter, prefix, marker, maxresults,
-            include, timeout, requestId);
+        return this.instrumentation.instrument("Container_ListBlobHierarchySegment", null,
+            updatedOptions -> this.serviceClient.listBlobHierarchySegment(containerName, delimiter, prefix, marker,
+                maxresults, include, timeout, requestId));
     }
 
     /**
@@ -1042,7 +1079,9 @@ public final class ContainerClient {
     @Metadata(generated = true)
     public Response<Void> getAccountInfoWithResponse(String containerName, Integer timeout, String requestId,
         RequestOptions requestOptions) {
-        return this.serviceClient.getAccountInfoWithResponse(containerName, timeout, requestId, requestOptions);
+        return this.instrumentation.instrument("Container_GetAccountInfo", requestOptions,
+            updatedOptions -> this.serviceClient.getAccountInfoWithResponse(containerName, timeout, requestId,
+                updatedOptions));
     }
 
     /**
@@ -1060,6 +1099,7 @@ public final class ContainerClient {
      */
     @Metadata(generated = true)
     public void getAccountInfo(String containerName, Integer timeout, String requestId) {
-        this.serviceClient.getAccountInfo(containerName, timeout, requestId);
+        this.instrumentation.instrument("Container_GetAccountInfo", null,
+            updatedOptions -> this.serviceClient.getAccountInfo(containerName, timeout, requestId));
     }
 }

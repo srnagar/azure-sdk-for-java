@@ -14,6 +14,7 @@ import io.clientcore.core.annotations.Metadata;
 import io.clientcore.core.annotations.ServiceClient;
 import io.clientcore.core.http.models.RequestOptions;
 import io.clientcore.core.http.models.Response;
+import io.clientcore.core.instrumentation.Instrumentation;
 import io.clientcore.core.models.binarydata.BinaryData;
 import java.time.OffsetDateTime;
 import java.util.Map;
@@ -26,14 +27,18 @@ public final class AppendBlobClient {
     @Metadata(generated = true)
     private final AppendBlobsImpl serviceClient;
 
+    private final Instrumentation instrumentation;
+
     /**
      * Initializes an instance of AppendBlobClient class.
      * 
      * @param serviceClient the service client implementation.
+     * @param instrumentation the instrumentation instance.
      */
     @Metadata(generated = true)
-    AppendBlobClient(AppendBlobsImpl serviceClient) {
+    AppendBlobClient(AppendBlobsImpl serviceClient, Instrumentation instrumentation) {
         this.serviceClient = serviceClient;
+        this.instrumentation = instrumentation;
     }
 
     /**
@@ -81,10 +86,11 @@ public final class AppendBlobClient {
         OffsetDateTime immutabilityPolicyExpiry, BlobImmutabilityPolicyMode immutabilityPolicyMode, Boolean legalHold,
         BlobHttpHeaders blobHttpHeaders, CpkInfo cpkInfo, EncryptionScope encryptionScopeParam,
         RequestOptions requestOptions) {
-        return this.serviceClient.createWithResponse(containerName, blob, contentLength, timeout, metadata, leaseId,
-            ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, blobTagsString,
-            immutabilityPolicyExpiry, immutabilityPolicyMode, legalHold, blobHttpHeaders, cpkInfo, encryptionScopeParam,
-            requestOptions);
+        return this.instrumentation.instrument("AppendBlob_Create", requestOptions,
+            updatedOptions -> this.serviceClient.createWithResponse(containerName, blob, contentLength, timeout,
+                metadata, leaseId, ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId,
+                blobTagsString, immutabilityPolicyExpiry, immutabilityPolicyMode, legalHold, blobHttpHeaders, cpkInfo,
+                encryptionScopeParam, updatedOptions));
     }
 
     /**
@@ -129,9 +135,11 @@ public final class AppendBlobClient {
         String ifMatch, String ifNoneMatch, String ifTags, String requestId, String blobTagsString,
         OffsetDateTime immutabilityPolicyExpiry, BlobImmutabilityPolicyMode immutabilityPolicyMode, Boolean legalHold,
         BlobHttpHeaders blobHttpHeaders, CpkInfo cpkInfo, EncryptionScope encryptionScopeParam) {
-        this.serviceClient.create(containerName, blob, contentLength, timeout, metadata, leaseId, ifModifiedSince,
-            ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, blobTagsString, immutabilityPolicyExpiry,
-            immutabilityPolicyMode, legalHold, blobHttpHeaders, cpkInfo, encryptionScopeParam);
+        this.instrumentation.instrument("AppendBlob_Create", null,
+            updatedOptions -> this.serviceClient.create(containerName, blob, contentLength, timeout, metadata, leaseId,
+                ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, blobTagsString,
+                immutabilityPolicyExpiry, immutabilityPolicyMode, legalHold, blobHttpHeaders, cpkInfo,
+                encryptionScopeParam));
     }
 
     /**
@@ -185,10 +193,11 @@ public final class AppendBlobClient {
         OffsetDateTime ifUnmodifiedSince, String ifMatch, String ifNoneMatch, String ifTags, String requestId,
         String structuredBodyType, Long structuredContentLength, CpkInfo cpkInfo, EncryptionScope encryptionScopeParam,
         RequestOptions requestOptions) {
-        return this.serviceClient.appendBlockWithResponse(containerName, blob, contentLength, body, timeout,
-            transactionalContentMD5, transactionalContentCrc64, leaseId, maxSize, appendPosition, ifModifiedSince,
-            ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, structuredBodyType, structuredContentLength,
-            cpkInfo, encryptionScopeParam, requestOptions);
+        return this.instrumentation.instrument("AppendBlob_AppendBlock", requestOptions,
+            updatedOptions -> this.serviceClient.appendBlockWithResponse(containerName, blob, contentLength, body,
+                timeout, transactionalContentMD5, transactionalContentCrc64, leaseId, maxSize, appendPosition,
+                ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, structuredBodyType,
+                structuredContentLength, cpkInfo, encryptionScopeParam, updatedOptions));
     }
 
     /**
@@ -239,9 +248,11 @@ public final class AppendBlobClient {
         Long appendPosition, OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String ifMatch,
         String ifNoneMatch, String ifTags, String requestId, String structuredBodyType, Long structuredContentLength,
         CpkInfo cpkInfo, EncryptionScope encryptionScopeParam) {
-        this.serviceClient.appendBlock(containerName, blob, contentLength, body, timeout, transactionalContentMD5,
-            transactionalContentCrc64, leaseId, maxSize, appendPosition, ifModifiedSince, ifUnmodifiedSince, ifMatch,
-            ifNoneMatch, ifTags, requestId, structuredBodyType, structuredContentLength, cpkInfo, encryptionScopeParam);
+        this.instrumentation.instrument("AppendBlob_AppendBlock", null,
+            updatedOptions -> this.serviceClient.appendBlock(containerName, blob, contentLength, body, timeout,
+                transactionalContentMD5, transactionalContentCrc64, leaseId, maxSize, appendPosition, ifModifiedSince,
+                ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, structuredBodyType, structuredContentLength,
+                cpkInfo, encryptionScopeParam));
     }
 
     /**
@@ -303,11 +314,12 @@ public final class AppendBlobClient {
         String ifTags, OffsetDateTime sourceIfModifiedSince, OffsetDateTime sourceIfUnmodifiedSince,
         String sourceIfMatch, String sourceIfNoneMatch, String requestId, String copySourceAuthorization,
         CpkInfo cpkInfo, EncryptionScope encryptionScopeParam, RequestOptions requestOptions) {
-        return this.serviceClient.appendBlockFromUrlWithResponse(containerName, blob, sourceUrl, contentLength,
-            sourceRange, sourceContentMD5, sourceContentcrc64, timeout, transactionalContentMD5, leaseId, maxSize,
-            appendPosition, ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, sourceIfModifiedSince,
-            sourceIfUnmodifiedSince, sourceIfMatch, sourceIfNoneMatch, requestId, copySourceAuthorization, cpkInfo,
-            encryptionScopeParam, requestOptions);
+        return this.instrumentation.instrument("AppendBlob_AppendBlockFromUrl", requestOptions,
+            updatedOptions -> this.serviceClient.appendBlockFromUrlWithResponse(containerName, blob, sourceUrl,
+                contentLength, sourceRange, sourceContentMD5, sourceContentcrc64, timeout, transactionalContentMD5,
+                leaseId, maxSize, appendPosition, ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags,
+                sourceIfModifiedSince, sourceIfUnmodifiedSince, sourceIfMatch, sourceIfNoneMatch, requestId,
+                copySourceAuthorization, cpkInfo, encryptionScopeParam, updatedOptions));
     }
 
     /**
@@ -367,11 +379,12 @@ public final class AppendBlobClient {
         String ifTags, OffsetDateTime sourceIfModifiedSince, OffsetDateTime sourceIfUnmodifiedSince,
         String sourceIfMatch, String sourceIfNoneMatch, String requestId, String copySourceAuthorization,
         CpkInfo cpkInfo, EncryptionScope encryptionScopeParam) {
-        this.serviceClient.appendBlockFromUrl(containerName, blob, sourceUrl, contentLength, sourceRange,
-            sourceContentMD5, sourceContentcrc64, timeout, transactionalContentMD5, leaseId, maxSize, appendPosition,
-            ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, sourceIfModifiedSince,
-            sourceIfUnmodifiedSince, sourceIfMatch, sourceIfNoneMatch, requestId, copySourceAuthorization, cpkInfo,
-            encryptionScopeParam);
+        this.instrumentation.instrument("AppendBlob_AppendBlockFromUrl", null,
+            updatedOptions -> this.serviceClient.appendBlockFromUrl(containerName, blob, sourceUrl, contentLength,
+                sourceRange, sourceContentMD5, sourceContentcrc64, timeout, transactionalContentMD5, leaseId, maxSize,
+                appendPosition, ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, sourceIfModifiedSince,
+                sourceIfUnmodifiedSince, sourceIfMatch, sourceIfNoneMatch, requestId, copySourceAuthorization, cpkInfo,
+                encryptionScopeParam));
     }
 
     /**
@@ -406,8 +419,9 @@ public final class AppendBlobClient {
     public Response<Void> sealWithResponse(String containerName, String blob, Integer timeout, String requestId,
         String leaseId, OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String ifMatch,
         String ifNoneMatch, Long appendPosition, RequestOptions requestOptions) {
-        return this.serviceClient.sealWithResponse(containerName, blob, timeout, requestId, leaseId, ifModifiedSince,
-            ifUnmodifiedSince, ifMatch, ifNoneMatch, appendPosition, requestOptions);
+        return this.instrumentation.instrument("AppendBlob_Seal", requestOptions,
+            updatedOptions -> this.serviceClient.sealWithResponse(containerName, blob, timeout, requestId, leaseId,
+                ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, appendPosition, updatedOptions));
     }
 
     /**
@@ -440,7 +454,8 @@ public final class AppendBlobClient {
     public void seal(String containerName, String blob, Integer timeout, String requestId, String leaseId,
         OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String ifMatch, String ifNoneMatch,
         Long appendPosition) {
-        this.serviceClient.seal(containerName, blob, timeout, requestId, leaseId, ifModifiedSince, ifUnmodifiedSince,
-            ifMatch, ifNoneMatch, appendPosition);
+        this.instrumentation.instrument("AppendBlob_Seal", null,
+            updatedOptions -> this.serviceClient.seal(containerName, blob, timeout, requestId, leaseId, ifModifiedSince,
+                ifUnmodifiedSince, ifMatch, ifNoneMatch, appendPosition));
     }
 }

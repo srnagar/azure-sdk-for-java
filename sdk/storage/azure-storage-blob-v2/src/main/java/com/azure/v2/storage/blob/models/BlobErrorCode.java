@@ -4,7 +4,12 @@
 
 package com.azure.v2.storage.blob.models;
 
+import io.clientcore.core.serialization.json.JsonReader;
+import io.clientcore.core.serialization.json.JsonSerializable;
+import io.clientcore.core.serialization.json.JsonToken;
+import io.clientcore.core.serialization.json.JsonWriter;
 import io.clientcore.core.utils.ExpandableEnum;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
@@ -15,7 +20,7 @@ import java.util.function.Function;
 /**
  * Error codes returned by the service.
  */
-public final class BlobErrorCode implements ExpandableEnum<String> {
+public final class BlobErrorCode implements ExpandableEnum<String>, JsonSerializable<BlobErrorCode> {
     private static final Map<String, BlobErrorCode> VALUES = new ConcurrentHashMap<>();
 
     private static final Function<String, BlobErrorCode> NEW_INSTANCE = BlobErrorCode::new;
@@ -659,6 +664,35 @@ public final class BlobErrorCode implements ExpandableEnum<String> {
     @Override
     public String getValue() {
         return this.value;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JsonWriter toJson(JsonWriter jsonWriter) throws IOException {
+        return jsonWriter.writeString(getValue());
+    }
+
+    /**
+     * Reads an instance of BlobErrorCode from the JsonReader.
+     * 
+     * @param jsonReader The JsonReader being read.
+     * @return An instance of BlobErrorCode if the JsonReader was pointing to an instance of it, or null if the
+     * JsonReader was pointing to JSON null.
+     * @throws IOException If an error occurs while reading the BlobErrorCode.
+     * @throws IllegalStateException If unexpected JSON token is found.
+     */
+    public static BlobErrorCode fromJson(JsonReader jsonReader) throws IOException {
+        JsonToken nextToken = jsonReader.nextToken();
+        if (nextToken == JsonToken.NULL) {
+            return null;
+        }
+        if (nextToken != JsonToken.STRING) {
+            throw new IllegalStateException(
+                String.format("Unexpected JSON token for %s deserialization: %s", JsonToken.STRING, nextToken));
+        }
+        return BlobErrorCode.fromValue(jsonReader.getString());
     }
 
     @Override

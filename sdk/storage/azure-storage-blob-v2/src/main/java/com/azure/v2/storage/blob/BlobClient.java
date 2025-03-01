@@ -22,6 +22,7 @@ import io.clientcore.core.annotations.Metadata;
 import io.clientcore.core.annotations.ServiceClient;
 import io.clientcore.core.http.models.RequestOptions;
 import io.clientcore.core.http.models.Response;
+import io.clientcore.core.instrumentation.Instrumentation;
 import java.io.InputStream;
 import java.time.OffsetDateTime;
 import java.util.Map;
@@ -34,14 +35,18 @@ public final class BlobClient {
     @Metadata(generated = true)
     private final BlobsImpl serviceClient;
 
+    private final Instrumentation instrumentation;
+
     /**
      * Initializes an instance of BlobClient class.
      * 
      * @param serviceClient the service client implementation.
+     * @param instrumentation the instrumentation instance.
      */
     @Metadata(generated = true)
-    BlobClient(BlobsImpl serviceClient) {
+    BlobClient(BlobsImpl serviceClient, Instrumentation instrumentation) {
         this.serviceClient = serviceClient;
+        this.instrumentation = instrumentation;
     }
 
     /**
@@ -89,9 +94,10 @@ public final class BlobClient {
         Boolean rangeGetContentCRC64, String structuredBodyType, OffsetDateTime ifModifiedSince,
         OffsetDateTime ifUnmodifiedSince, String ifMatch, String ifNoneMatch, String ifTags, String requestId,
         CpkInfo cpkInfo, RequestOptions requestOptions) {
-        return this.serviceClient.downloadWithResponse(containerName, blob, snapshot, versionId, timeout, range,
-            leaseId, rangeGetContentMD5, rangeGetContentCRC64, structuredBodyType, ifModifiedSince, ifUnmodifiedSince,
-            ifMatch, ifNoneMatch, ifTags, requestId, cpkInfo, requestOptions);
+        return this.instrumentation.instrument("Blob_Download", requestOptions,
+            updatedOptions -> this.serviceClient.downloadWithResponse(containerName, blob, snapshot, versionId, timeout,
+                range, leaseId, rangeGetContentMD5, rangeGetContentCRC64, structuredBodyType, ifModifiedSince,
+                ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, cpkInfo, updatedOptions));
     }
 
     /**
@@ -137,9 +143,10 @@ public final class BlobClient {
         String range, String leaseId, Boolean rangeGetContentMD5, Boolean rangeGetContentCRC64,
         String structuredBodyType, OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String ifMatch,
         String ifNoneMatch, String ifTags, String requestId, CpkInfo cpkInfo) {
-        return this.serviceClient.download(containerName, blob, snapshot, versionId, timeout, range, leaseId,
-            rangeGetContentMD5, rangeGetContentCRC64, structuredBodyType, ifModifiedSince, ifUnmodifiedSince, ifMatch,
-            ifNoneMatch, ifTags, requestId, cpkInfo);
+        return this.instrumentation.instrument("Blob_Download", null,
+            updatedOptions -> this.serviceClient.download(containerName, blob, snapshot, versionId, timeout, range,
+                leaseId, rangeGetContentMD5, rangeGetContentCRC64, structuredBodyType, ifModifiedSince,
+                ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, cpkInfo));
     }
 
     /**
@@ -179,8 +186,10 @@ public final class BlobClient {
         String versionId, Integer timeout, String leaseId, OffsetDateTime ifModifiedSince,
         OffsetDateTime ifUnmodifiedSince, String ifMatch, String ifNoneMatch, String ifTags, String requestId,
         CpkInfo cpkInfo, RequestOptions requestOptions) {
-        return this.serviceClient.getPropertiesWithResponse(containerName, blob, snapshot, versionId, timeout, leaseId,
-            ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, cpkInfo, requestOptions);
+        return this.instrumentation.instrument("Blob_GetProperties", requestOptions,
+            updatedOptions -> this.serviceClient.getPropertiesWithResponse(containerName, blob, snapshot, versionId,
+                timeout, leaseId, ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, cpkInfo,
+                updatedOptions));
     }
 
     /**
@@ -217,8 +226,9 @@ public final class BlobClient {
     public void getProperties(String containerName, String blob, String snapshot, String versionId, Integer timeout,
         String leaseId, OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String ifMatch,
         String ifNoneMatch, String ifTags, String requestId, CpkInfo cpkInfo) {
-        this.serviceClient.getProperties(containerName, blob, snapshot, versionId, timeout, leaseId, ifModifiedSince,
-            ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, cpkInfo);
+        this.instrumentation.instrument("Blob_GetProperties", null,
+            updatedOptions -> this.serviceClient.getProperties(containerName, blob, snapshot, versionId, timeout,
+                leaseId, ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, cpkInfo));
     }
 
     /**
@@ -275,9 +285,10 @@ public final class BlobClient {
         Integer timeout, String leaseId, DeleteSnapshotsOptionType deleteSnapshots, OffsetDateTime ifModifiedSince,
         OffsetDateTime ifUnmodifiedSince, String ifMatch, String ifNoneMatch, String ifTags, String requestId,
         BlobDeleteType blobDeleteType, RequestOptions requestOptions) {
-        return this.serviceClient.deleteWithResponse(containerName, blob, snapshot, versionId, timeout, leaseId,
-            deleteSnapshots, ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId,
-            blobDeleteType, requestOptions);
+        return this.instrumentation.instrument("Blob_Delete", requestOptions,
+            updatedOptions -> this.serviceClient.deleteWithResponse(containerName, blob, snapshot, versionId, timeout,
+                leaseId, deleteSnapshots, ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId,
+                blobDeleteType, updatedOptions));
     }
 
     /**
@@ -332,8 +343,10 @@ public final class BlobClient {
         String leaseId, DeleteSnapshotsOptionType deleteSnapshots, OffsetDateTime ifModifiedSince,
         OffsetDateTime ifUnmodifiedSince, String ifMatch, String ifNoneMatch, String ifTags, String requestId,
         BlobDeleteType blobDeleteType) {
-        this.serviceClient.delete(containerName, blob, snapshot, versionId, timeout, leaseId, deleteSnapshots,
-            ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, blobDeleteType);
+        this.instrumentation.instrument("Blob_Delete", null,
+            updatedOptions -> this.serviceClient.delete(containerName, blob, snapshot, versionId, timeout, leaseId,
+                deleteSnapshots, ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId,
+                blobDeleteType));
     }
 
     /**
@@ -355,7 +368,8 @@ public final class BlobClient {
     @Metadata(generated = true)
     public Response<Void> undeleteWithResponse(String containerName, String blob, Integer timeout, String requestId,
         RequestOptions requestOptions) {
-        return this.serviceClient.undeleteWithResponse(containerName, blob, timeout, requestId, requestOptions);
+        return this.instrumentation.instrument("Blob_Undelete", requestOptions, updatedOptions -> this.serviceClient
+            .undeleteWithResponse(containerName, blob, timeout, requestId, updatedOptions));
     }
 
     /**
@@ -374,7 +388,8 @@ public final class BlobClient {
      */
     @Metadata(generated = true)
     public void undelete(String containerName, String blob, Integer timeout, String requestId) {
-        this.serviceClient.undelete(containerName, blob, timeout, requestId);
+        this.instrumentation.instrument("Blob_Undelete", null,
+            updatedOptions -> this.serviceClient.undelete(containerName, blob, timeout, requestId));
     }
 
     /**
@@ -398,8 +413,8 @@ public final class BlobClient {
     @Metadata(generated = true)
     public Response<Void> setExpiryWithResponse(String containerName, String blob, BlobExpiryOptions expiryOptions,
         Integer timeout, String requestId, String expiresOn, RequestOptions requestOptions) {
-        return this.serviceClient.setExpiryWithResponse(containerName, blob, expiryOptions, timeout, requestId,
-            expiresOn, requestOptions);
+        return this.instrumentation.instrument("Blob_SetExpiry", requestOptions, updatedOptions -> this.serviceClient
+            .setExpiryWithResponse(containerName, blob, expiryOptions, timeout, requestId, expiresOn, updatedOptions));
     }
 
     /**
@@ -421,7 +436,8 @@ public final class BlobClient {
     @Metadata(generated = true)
     public void setExpiry(String containerName, String blob, BlobExpiryOptions expiryOptions, Integer timeout,
         String requestId, String expiresOn) {
-        this.serviceClient.setExpiry(containerName, blob, expiryOptions, timeout, requestId, expiresOn);
+        this.instrumentation.instrument("Blob_SetExpiry", null, updatedOptions -> this.serviceClient
+            .setExpiry(containerName, blob, expiryOptions, timeout, requestId, expiresOn));
     }
 
     /**
@@ -453,8 +469,10 @@ public final class BlobClient {
     public Response<Void> setHttpHeadersWithResponse(String containerName, String blob, Integer timeout, String leaseId,
         OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String ifMatch, String ifNoneMatch,
         String ifTags, String requestId, BlobHttpHeaders blobHttpHeaders, RequestOptions requestOptions) {
-        return this.serviceClient.setHttpHeadersWithResponse(containerName, blob, timeout, leaseId, ifModifiedSince,
-            ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, blobHttpHeaders, requestOptions);
+        return this.instrumentation.instrument("Blob_SetHTTPHeaders", requestOptions,
+            updatedOptions -> this.serviceClient.setHttpHeadersWithResponse(containerName, blob, timeout, leaseId,
+                ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, blobHttpHeaders,
+                updatedOptions));
     }
 
     /**
@@ -484,8 +502,9 @@ public final class BlobClient {
     public void setHttpHeaders(String containerName, String blob, Integer timeout, String leaseId,
         OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String ifMatch, String ifNoneMatch,
         String ifTags, String requestId, BlobHttpHeaders blobHttpHeaders) {
-        this.serviceClient.setHttpHeaders(containerName, blob, timeout, leaseId, ifModifiedSince, ifUnmodifiedSince,
-            ifMatch, ifNoneMatch, ifTags, requestId, blobHttpHeaders);
+        this.instrumentation.instrument("Blob_SetHTTPHeaders", null,
+            updatedOptions -> this.serviceClient.setHttpHeaders(containerName, blob, timeout, leaseId, ifModifiedSince,
+                ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, blobHttpHeaders));
     }
 
     /**
@@ -519,8 +538,10 @@ public final class BlobClient {
         String requestId, OffsetDateTime ifUnmodifiedSince, OffsetDateTime immutabilityPolicyExpiry,
         BlobImmutabilityPolicyMode immutabilityPolicyMode, String snapshot, String versionId,
         RequestOptions requestOptions) {
-        return this.serviceClient.setImmutabilityPolicyWithResponse(containerName, blob, timeout, requestId,
-            ifUnmodifiedSince, immutabilityPolicyExpiry, immutabilityPolicyMode, snapshot, versionId, requestOptions);
+        return this.instrumentation.instrument("Blob_SetImmutabilityPolicy", requestOptions,
+            updatedOptions -> this.serviceClient.setImmutabilityPolicyWithResponse(containerName, blob, timeout,
+                requestId, ifUnmodifiedSince, immutabilityPolicyExpiry, immutabilityPolicyMode, snapshot, versionId,
+                updatedOptions));
     }
 
     /**
@@ -551,8 +572,9 @@ public final class BlobClient {
     public void setImmutabilityPolicy(String containerName, String blob, Integer timeout, String requestId,
         OffsetDateTime ifUnmodifiedSince, OffsetDateTime immutabilityPolicyExpiry,
         BlobImmutabilityPolicyMode immutabilityPolicyMode, String snapshot, String versionId) {
-        this.serviceClient.setImmutabilityPolicy(containerName, blob, timeout, requestId, ifUnmodifiedSince,
-            immutabilityPolicyExpiry, immutabilityPolicyMode, snapshot, versionId);
+        this.instrumentation.instrument("Blob_SetImmutabilityPolicy", null,
+            updatedOptions -> this.serviceClient.setImmutabilityPolicy(containerName, blob, timeout, requestId,
+                ifUnmodifiedSince, immutabilityPolicyExpiry, immutabilityPolicyMode, snapshot, versionId));
     }
 
     /**
@@ -580,8 +602,9 @@ public final class BlobClient {
     @Metadata(generated = true)
     public Response<Void> deleteImmutabilityPolicyWithResponse(String containerName, String blob, Integer timeout,
         String requestId, String snapshot, String versionId, RequestOptions requestOptions) {
-        return this.serviceClient.deleteImmutabilityPolicyWithResponse(containerName, blob, timeout, requestId,
-            snapshot, versionId, requestOptions);
+        return this.instrumentation.instrument("Blob_DeleteImmutabilityPolicy", requestOptions,
+            updatedOptions -> this.serviceClient.deleteImmutabilityPolicyWithResponse(containerName, blob, timeout,
+                requestId, snapshot, versionId, updatedOptions));
     }
 
     /**
@@ -607,7 +630,8 @@ public final class BlobClient {
     @Metadata(generated = true)
     public void deleteImmutabilityPolicy(String containerName, String blob, Integer timeout, String requestId,
         String snapshot, String versionId) {
-        this.serviceClient.deleteImmutabilityPolicy(containerName, blob, timeout, requestId, snapshot, versionId);
+        this.instrumentation.instrument("Blob_DeleteImmutabilityPolicy", null, updatedOptions -> this.serviceClient
+            .deleteImmutabilityPolicy(containerName, blob, timeout, requestId, snapshot, versionId));
     }
 
     /**
@@ -636,8 +660,9 @@ public final class BlobClient {
     @Metadata(generated = true)
     public Response<Void> setLegalHoldWithResponse(String containerName, String blob, boolean legalHold,
         Integer timeout, String requestId, String snapshot, String versionId, RequestOptions requestOptions) {
-        return this.serviceClient.setLegalHoldWithResponse(containerName, blob, legalHold, timeout, requestId, snapshot,
-            versionId, requestOptions);
+        return this.instrumentation.instrument("Blob_SetLegalHold", requestOptions,
+            updatedOptions -> this.serviceClient.setLegalHoldWithResponse(containerName, blob, legalHold, timeout,
+                requestId, snapshot, versionId, updatedOptions));
     }
 
     /**
@@ -664,7 +689,8 @@ public final class BlobClient {
     @Metadata(generated = true)
     public void setLegalHold(String containerName, String blob, boolean legalHold, Integer timeout, String requestId,
         String snapshot, String versionId) {
-        this.serviceClient.setLegalHold(containerName, blob, legalHold, timeout, requestId, snapshot, versionId);
+        this.instrumentation.instrument("Blob_SetLegalHold", null, updatedOptions -> this.serviceClient
+            .setLegalHold(containerName, blob, legalHold, timeout, requestId, snapshot, versionId));
     }
 
     /**
@@ -705,9 +731,10 @@ public final class BlobClient {
         Map<String, String> metadata, String leaseId, OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince,
         String ifMatch, String ifNoneMatch, String ifTags, String requestId, CpkInfo cpkInfo,
         EncryptionScope encryptionScopeParam, RequestOptions requestOptions) {
-        return this.serviceClient.setMetadataWithResponse(containerName, blob, timeout, metadata, leaseId,
-            ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, cpkInfo, encryptionScopeParam,
-            requestOptions);
+        return this.instrumentation.instrument("Blob_SetMetadata", requestOptions,
+            updatedOptions -> this.serviceClient.setMetadataWithResponse(containerName, blob, timeout, metadata,
+                leaseId, ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, cpkInfo,
+                encryptionScopeParam, updatedOptions));
     }
 
     /**
@@ -745,8 +772,10 @@ public final class BlobClient {
     public void setMetadata(String containerName, String blob, Integer timeout, Map<String, String> metadata,
         String leaseId, OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String ifMatch,
         String ifNoneMatch, String ifTags, String requestId, CpkInfo cpkInfo, EncryptionScope encryptionScopeParam) {
-        this.serviceClient.setMetadata(containerName, blob, timeout, metadata, leaseId, ifModifiedSince,
-            ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, cpkInfo, encryptionScopeParam);
+        this.instrumentation.instrument("Blob_SetMetadata", null,
+            updatedOptions -> this.serviceClient.setMetadata(containerName, blob, timeout, metadata, leaseId,
+                ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, cpkInfo,
+                encryptionScopeParam));
     }
 
     /**
@@ -782,8 +811,10 @@ public final class BlobClient {
     public Response<Void> acquireLeaseWithResponse(String containerName, String blob, Integer timeout, Integer duration,
         String proposedLeaseId, OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String ifMatch,
         String ifNoneMatch, String ifTags, String requestId, RequestOptions requestOptions) {
-        return this.serviceClient.acquireLeaseWithResponse(containerName, blob, timeout, duration, proposedLeaseId,
-            ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, requestOptions);
+        return this.instrumentation.instrument("Blob_AcquireLease", requestOptions,
+            updatedOptions -> this.serviceClient.acquireLeaseWithResponse(containerName, blob, timeout, duration,
+                proposedLeaseId, ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId,
+                updatedOptions));
     }
 
     /**
@@ -817,8 +848,9 @@ public final class BlobClient {
     public void acquireLease(String containerName, String blob, Integer timeout, Integer duration,
         String proposedLeaseId, OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String ifMatch,
         String ifNoneMatch, String ifTags, String requestId) {
-        this.serviceClient.acquireLease(containerName, blob, timeout, duration, proposedLeaseId, ifModifiedSince,
-            ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId);
+        this.instrumentation.instrument("Blob_AcquireLease", null,
+            updatedOptions -> this.serviceClient.acquireLease(containerName, blob, timeout, duration, proposedLeaseId,
+                ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId));
     }
 
     /**
@@ -849,8 +881,9 @@ public final class BlobClient {
     public Response<Void> releaseLeaseWithResponse(String containerName, String blob, String leaseId, Integer timeout,
         OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String ifMatch, String ifNoneMatch,
         String ifTags, String requestId, RequestOptions requestOptions) {
-        return this.serviceClient.releaseLeaseWithResponse(containerName, blob, leaseId, timeout, ifModifiedSince,
-            ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, requestOptions);
+        return this.instrumentation.instrument("Blob_ReleaseLease", requestOptions,
+            updatedOptions -> this.serviceClient.releaseLeaseWithResponse(containerName, blob, leaseId, timeout,
+                ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, updatedOptions));
     }
 
     /**
@@ -879,8 +912,9 @@ public final class BlobClient {
     public void releaseLease(String containerName, String blob, String leaseId, Integer timeout,
         OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String ifMatch, String ifNoneMatch,
         String ifTags, String requestId) {
-        this.serviceClient.releaseLease(containerName, blob, leaseId, timeout, ifModifiedSince, ifUnmodifiedSince,
-            ifMatch, ifNoneMatch, ifTags, requestId);
+        this.instrumentation.instrument("Blob_ReleaseLease", null,
+            updatedOptions -> this.serviceClient.releaseLease(containerName, blob, leaseId, timeout, ifModifiedSince,
+                ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId));
     }
 
     /**
@@ -911,8 +945,9 @@ public final class BlobClient {
     public Response<Void> renewLeaseWithResponse(String containerName, String blob, String leaseId, Integer timeout,
         OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String ifMatch, String ifNoneMatch,
         String ifTags, String requestId, RequestOptions requestOptions) {
-        return this.serviceClient.renewLeaseWithResponse(containerName, blob, leaseId, timeout, ifModifiedSince,
-            ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, requestOptions);
+        return this.instrumentation.instrument("Blob_RenewLease", requestOptions,
+            updatedOptions -> this.serviceClient.renewLeaseWithResponse(containerName, blob, leaseId, timeout,
+                ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, updatedOptions));
     }
 
     /**
@@ -941,8 +976,9 @@ public final class BlobClient {
     public void renewLease(String containerName, String blob, String leaseId, Integer timeout,
         OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String ifMatch, String ifNoneMatch,
         String ifTags, String requestId) {
-        this.serviceClient.renewLease(containerName, blob, leaseId, timeout, ifModifiedSince, ifUnmodifiedSince,
-            ifMatch, ifNoneMatch, ifTags, requestId);
+        this.instrumentation.instrument("Blob_RenewLease", null,
+            updatedOptions -> this.serviceClient.renewLease(containerName, blob, leaseId, timeout, ifModifiedSince,
+                ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId));
     }
 
     /**
@@ -976,8 +1012,9 @@ public final class BlobClient {
     public Response<Void> changeLeaseWithResponse(String containerName, String blob, String leaseId,
         String proposedLeaseId, Integer timeout, OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince,
         String ifMatch, String ifNoneMatch, String ifTags, String requestId, RequestOptions requestOptions) {
-        return this.serviceClient.changeLeaseWithResponse(containerName, blob, leaseId, proposedLeaseId, timeout,
-            ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, requestOptions);
+        return this.instrumentation.instrument("Blob_ChangeLease", requestOptions,
+            updatedOptions -> this.serviceClient.changeLeaseWithResponse(containerName, blob, leaseId, proposedLeaseId,
+                timeout, ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, updatedOptions));
     }
 
     /**
@@ -1009,8 +1046,9 @@ public final class BlobClient {
     public void changeLease(String containerName, String blob, String leaseId, String proposedLeaseId, Integer timeout,
         OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String ifMatch, String ifNoneMatch,
         String ifTags, String requestId) {
-        this.serviceClient.changeLease(containerName, blob, leaseId, proposedLeaseId, timeout, ifModifiedSince,
-            ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId);
+        this.instrumentation.instrument("Blob_ChangeLease", null,
+            updatedOptions -> this.serviceClient.changeLease(containerName, blob, leaseId, proposedLeaseId, timeout,
+                ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId));
     }
 
     /**
@@ -1046,8 +1084,9 @@ public final class BlobClient {
     public Response<Void> breakLeaseWithResponse(String containerName, String blob, Integer timeout,
         Integer breakPeriod, OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String ifMatch,
         String ifNoneMatch, String ifTags, String requestId, RequestOptions requestOptions) {
-        return this.serviceClient.breakLeaseWithResponse(containerName, blob, timeout, breakPeriod, ifModifiedSince,
-            ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, requestOptions);
+        return this.instrumentation.instrument("Blob_BreakLease", requestOptions,
+            updatedOptions -> this.serviceClient.breakLeaseWithResponse(containerName, blob, timeout, breakPeriod,
+                ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, updatedOptions));
     }
 
     /**
@@ -1081,8 +1120,9 @@ public final class BlobClient {
     public void breakLease(String containerName, String blob, Integer timeout, Integer breakPeriod,
         OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String ifMatch, String ifNoneMatch,
         String ifTags, String requestId) {
-        this.serviceClient.breakLease(containerName, blob, timeout, breakPeriod, ifModifiedSince, ifUnmodifiedSince,
-            ifMatch, ifNoneMatch, ifTags, requestId);
+        this.instrumentation.instrument("Blob_BreakLease", null,
+            updatedOptions -> this.serviceClient.breakLease(containerName, blob, timeout, breakPeriod, ifModifiedSince,
+                ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId));
     }
 
     /**
@@ -1122,9 +1162,10 @@ public final class BlobClient {
         Map<String, String> metadata, OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String ifMatch,
         String ifNoneMatch, String ifTags, String leaseId, String requestId, CpkInfo cpkInfo,
         EncryptionScope encryptionScopeParam, RequestOptions requestOptions) {
-        return this.serviceClient.createSnapshotWithResponse(containerName, blob, timeout, metadata, ifModifiedSince,
-            ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, leaseId, requestId, cpkInfo, encryptionScopeParam,
-            requestOptions);
+        return this.instrumentation.instrument("Blob_CreateSnapshot", requestOptions,
+            updatedOptions -> this.serviceClient.createSnapshotWithResponse(containerName, blob, timeout, metadata,
+                ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, leaseId, requestId, cpkInfo,
+                encryptionScopeParam, updatedOptions));
     }
 
     /**
@@ -1161,8 +1202,9 @@ public final class BlobClient {
     public void createSnapshot(String containerName, String blob, Integer timeout, Map<String, String> metadata,
         OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String ifMatch, String ifNoneMatch,
         String ifTags, String leaseId, String requestId, CpkInfo cpkInfo, EncryptionScope encryptionScopeParam) {
-        this.serviceClient.createSnapshot(containerName, blob, timeout, metadata, ifModifiedSince, ifUnmodifiedSince,
-            ifMatch, ifNoneMatch, ifTags, leaseId, requestId, cpkInfo, encryptionScopeParam);
+        this.instrumentation.instrument("Blob_CreateSnapshot", null,
+            updatedOptions -> this.serviceClient.createSnapshot(containerName, blob, timeout, metadata, ifModifiedSince,
+                ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, leaseId, requestId, cpkInfo, encryptionScopeParam));
     }
 
     /**
@@ -1220,10 +1262,12 @@ public final class BlobClient {
         String ifMatch, String ifNoneMatch, String ifTags, String leaseId, String requestId, String blobTagsString,
         Boolean sealBlob, OffsetDateTime immutabilityPolicyExpiry, BlobImmutabilityPolicyMode immutabilityPolicyMode,
         Boolean legalHold, RequestOptions requestOptions) {
-        return this.serviceClient.startCopyFromURLWithResponse(containerName, blob, copySource, timeout, metadata, tier,
-            rehydratePriority, sourceIfModifiedSince, sourceIfUnmodifiedSince, sourceIfMatch, sourceIfNoneMatch,
-            sourceIfTags, ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, leaseId, requestId,
-            blobTagsString, sealBlob, immutabilityPolicyExpiry, immutabilityPolicyMode, legalHold, requestOptions);
+        return this.instrumentation.instrument("Blob_StartCopyFromURL", requestOptions,
+            updatedOptions -> this.serviceClient.startCopyFromURLWithResponse(containerName, blob, copySource, timeout,
+                metadata, tier, rehydratePriority, sourceIfModifiedSince, sourceIfUnmodifiedSince, sourceIfMatch,
+                sourceIfNoneMatch, sourceIfTags, ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags,
+                leaseId, requestId, blobTagsString, sealBlob, immutabilityPolicyExpiry, immutabilityPolicyMode,
+                legalHold, updatedOptions));
     }
 
     /**
@@ -1279,10 +1323,12 @@ public final class BlobClient {
         String ifMatch, String ifNoneMatch, String ifTags, String leaseId, String requestId, String blobTagsString,
         Boolean sealBlob, OffsetDateTime immutabilityPolicyExpiry, BlobImmutabilityPolicyMode immutabilityPolicyMode,
         Boolean legalHold) {
-        this.serviceClient.startCopyFromURL(containerName, blob, copySource, timeout, metadata, tier, rehydratePriority,
-            sourceIfModifiedSince, sourceIfUnmodifiedSince, sourceIfMatch, sourceIfNoneMatch, sourceIfTags,
-            ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, leaseId, requestId, blobTagsString,
-            sealBlob, immutabilityPolicyExpiry, immutabilityPolicyMode, legalHold);
+        this.instrumentation.instrument("Blob_StartCopyFromURL", null,
+            updatedOptions -> this.serviceClient.startCopyFromURL(containerName, blob, copySource, timeout, metadata,
+                tier, rehydratePriority, sourceIfModifiedSince, sourceIfUnmodifiedSince, sourceIfMatch,
+                sourceIfNoneMatch, sourceIfTags, ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags,
+                leaseId, requestId, blobTagsString, sealBlob, immutabilityPolicyExpiry, immutabilityPolicyMode,
+                legalHold));
     }
 
     /**
@@ -1345,11 +1391,12 @@ public final class BlobClient {
         OffsetDateTime immutabilityPolicyExpiry, BlobImmutabilityPolicyMode immutabilityPolicyMode, Boolean legalHold,
         String copySourceAuthorization, BlobCopySourceTagsMode copySourceTags, EncryptionScope encryptionScopeParam,
         RequestOptions requestOptions) {
-        return this.serviceClient.copyFromURLWithResponse(containerName, blob, copySource, timeout, metadata, tier,
-            sourceIfModifiedSince, sourceIfUnmodifiedSince, sourceIfMatch, sourceIfNoneMatch, ifModifiedSince,
-            ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, leaseId, requestId, sourceContentMD5, blobTagsString,
-            immutabilityPolicyExpiry, immutabilityPolicyMode, legalHold, copySourceAuthorization, copySourceTags,
-            encryptionScopeParam, requestOptions);
+        return this.instrumentation.instrument("Blob_CopyFromURL", requestOptions,
+            updatedOptions -> this.serviceClient.copyFromURLWithResponse(containerName, blob, copySource, timeout,
+                metadata, tier, sourceIfModifiedSince, sourceIfUnmodifiedSince, sourceIfMatch, sourceIfNoneMatch,
+                ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, leaseId, requestId, sourceContentMD5,
+                blobTagsString, immutabilityPolicyExpiry, immutabilityPolicyMode, legalHold, copySourceAuthorization,
+                copySourceTags, encryptionScopeParam, updatedOptions));
     }
 
     /**
@@ -1409,10 +1456,12 @@ public final class BlobClient {
         String ifTags, String leaseId, String requestId, byte[] sourceContentMD5, String blobTagsString,
         OffsetDateTime immutabilityPolicyExpiry, BlobImmutabilityPolicyMode immutabilityPolicyMode, Boolean legalHold,
         String copySourceAuthorization, BlobCopySourceTagsMode copySourceTags, EncryptionScope encryptionScopeParam) {
-        this.serviceClient.copyFromURL(containerName, blob, copySource, timeout, metadata, tier, sourceIfModifiedSince,
-            sourceIfUnmodifiedSince, sourceIfMatch, sourceIfNoneMatch, ifModifiedSince, ifUnmodifiedSince, ifMatch,
-            ifNoneMatch, ifTags, leaseId, requestId, sourceContentMD5, blobTagsString, immutabilityPolicyExpiry,
-            immutabilityPolicyMode, legalHold, copySourceAuthorization, copySourceTags, encryptionScopeParam);
+        this.instrumentation.instrument("Blob_CopyFromURL", null,
+            updatedOptions -> this.serviceClient.copyFromURL(containerName, blob, copySource, timeout, metadata, tier,
+                sourceIfModifiedSince, sourceIfUnmodifiedSince, sourceIfMatch, sourceIfNoneMatch, ifModifiedSince,
+                ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, leaseId, requestId, sourceContentMD5, blobTagsString,
+                immutabilityPolicyExpiry, immutabilityPolicyMode, legalHold, copySourceAuthorization, copySourceTags,
+                encryptionScopeParam));
     }
 
     /**
@@ -1437,8 +1486,9 @@ public final class BlobClient {
     @Metadata(generated = true)
     public Response<Void> abortCopyFromURLWithResponse(String containerName, String blob, String copyId,
         Integer timeout, String leaseId, String requestId, RequestOptions requestOptions) {
-        return this.serviceClient.abortCopyFromURLWithResponse(containerName, blob, copyId, timeout, leaseId, requestId,
-            requestOptions);
+        return this.instrumentation.instrument("Blob_AbortCopyFromURL", requestOptions,
+            updatedOptions -> this.serviceClient.abortCopyFromURLWithResponse(containerName, blob, copyId, timeout,
+                leaseId, requestId, updatedOptions));
     }
 
     /**
@@ -1461,7 +1511,8 @@ public final class BlobClient {
     @Metadata(generated = true)
     public void abortCopyFromURL(String containerName, String blob, String copyId, Integer timeout, String leaseId,
         String requestId) {
-        this.serviceClient.abortCopyFromURL(containerName, blob, copyId, timeout, leaseId, requestId);
+        this.instrumentation.instrument("Blob_AbortCopyFromURL", null, updatedOptions -> this.serviceClient
+            .abortCopyFromURL(containerName, blob, copyId, timeout, leaseId, requestId));
     }
 
     /**
@@ -1497,8 +1548,9 @@ public final class BlobClient {
     public Response<Void> setTierWithResponse(String containerName, String blob, AccessTier tier, String snapshot,
         String versionId, Integer timeout, RehydratePriority rehydratePriority, String requestId, String leaseId,
         String ifTags, RequestOptions requestOptions) {
-        return this.serviceClient.setTierWithResponse(containerName, blob, tier, snapshot, versionId, timeout,
-            rehydratePriority, requestId, leaseId, ifTags, requestOptions);
+        return this.instrumentation.instrument("Blob_SetTier", requestOptions,
+            updatedOptions -> this.serviceClient.setTierWithResponse(containerName, blob, tier, snapshot, versionId,
+                timeout, rehydratePriority, requestId, leaseId, ifTags, updatedOptions));
     }
 
     /**
@@ -1531,8 +1583,9 @@ public final class BlobClient {
     @Metadata(generated = true)
     public void setTier(String containerName, String blob, AccessTier tier, String snapshot, String versionId,
         Integer timeout, RehydratePriority rehydratePriority, String requestId, String leaseId, String ifTags) {
-        this.serviceClient.setTier(containerName, blob, tier, snapshot, versionId, timeout, rehydratePriority,
-            requestId, leaseId, ifTags);
+        this.instrumentation.instrument("Blob_SetTier", null,
+            updatedOptions -> this.serviceClient.setTier(containerName, blob, tier, snapshot, versionId, timeout,
+                rehydratePriority, requestId, leaseId, ifTags));
     }
 
     /**
@@ -1554,7 +1607,9 @@ public final class BlobClient {
     @Metadata(generated = true)
     public Response<Void> getAccountInfoWithResponse(String containerName, String blob, Integer timeout,
         String requestId, RequestOptions requestOptions) {
-        return this.serviceClient.getAccountInfoWithResponse(containerName, blob, timeout, requestId, requestOptions);
+        return this.instrumentation.instrument("Blob_GetAccountInfo", requestOptions,
+            updatedOptions -> this.serviceClient.getAccountInfoWithResponse(containerName, blob, timeout, requestId,
+                updatedOptions));
     }
 
     /**
@@ -1573,7 +1628,8 @@ public final class BlobClient {
      */
     @Metadata(generated = true)
     public void getAccountInfo(String containerName, String blob, Integer timeout, String requestId) {
-        this.serviceClient.getAccountInfo(containerName, blob, timeout, requestId);
+        this.instrumentation.instrument("Blob_GetAccountInfo", null,
+            updatedOptions -> this.serviceClient.getAccountInfo(containerName, blob, timeout, requestId));
     }
 
     /**
@@ -1611,8 +1667,10 @@ public final class BlobClient {
         String leaseId, OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String ifMatch,
         String ifNoneMatch, String ifTags, String requestId, QueryRequest queryRequest, CpkInfo cpkInfo,
         RequestOptions requestOptions) {
-        return this.serviceClient.queryWithResponse(containerName, blob, snapshot, timeout, leaseId, ifModifiedSince,
-            ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, queryRequest, cpkInfo, requestOptions);
+        return this.instrumentation.instrument("Blob_Query", requestOptions,
+            updatedOptions -> this.serviceClient.queryWithResponse(containerName, blob, snapshot, timeout, leaseId,
+                ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, queryRequest, cpkInfo,
+                updatedOptions));
     }
 
     /**
@@ -1648,8 +1706,9 @@ public final class BlobClient {
     public InputStream query(String containerName, String blob, String snapshot, Integer timeout, String leaseId,
         OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String ifMatch, String ifNoneMatch,
         String ifTags, String requestId, QueryRequest queryRequest, CpkInfo cpkInfo) {
-        return this.serviceClient.query(containerName, blob, snapshot, timeout, leaseId, ifModifiedSince,
-            ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, queryRequest, cpkInfo);
+        return this.instrumentation.instrument("Blob_Query", null,
+            updatedOptions -> this.serviceClient.query(containerName, blob, snapshot, timeout, leaseId, ifModifiedSince,
+                ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, queryRequest, cpkInfo));
     }
 
     /**
@@ -1679,8 +1738,9 @@ public final class BlobClient {
     @Metadata(generated = true)
     public Response<BlobTags> getTagsWithResponse(String containerName, String blob, Integer timeout, String requestId,
         String snapshot, String versionId, String ifTags, String leaseId, RequestOptions requestOptions) {
-        return this.serviceClient.getTagsWithResponse(containerName, blob, timeout, requestId, snapshot, versionId,
-            ifTags, leaseId, requestOptions);
+        return this.instrumentation.instrument("Blob_GetTags", requestOptions,
+            updatedOptions -> this.serviceClient.getTagsWithResponse(containerName, blob, timeout, requestId, snapshot,
+                versionId, ifTags, leaseId, updatedOptions));
     }
 
     /**
@@ -1709,8 +1769,8 @@ public final class BlobClient {
     @Metadata(generated = true)
     public BlobTags getTags(String containerName, String blob, Integer timeout, String requestId, String snapshot,
         String versionId, String ifTags, String leaseId) {
-        return this.serviceClient.getTags(containerName, blob, timeout, requestId, snapshot, versionId, ifTags,
-            leaseId);
+        return this.instrumentation.instrument("Blob_GetTags", null, updatedOptions -> this.serviceClient
+            .getTags(containerName, blob, timeout, requestId, snapshot, versionId, ifTags, leaseId));
     }
 
     /**
@@ -1740,8 +1800,9 @@ public final class BlobClient {
     public Response<Void> setTagsWithResponse(String containerName, String blob, Integer timeout, String versionId,
         byte[] transactionalContentMD5, byte[] transactionalContentCrc64, String requestId, String ifTags,
         String leaseId, BlobTags tags, RequestOptions requestOptions) {
-        return this.serviceClient.setTagsWithResponse(containerName, blob, timeout, versionId, transactionalContentMD5,
-            transactionalContentCrc64, requestId, ifTags, leaseId, tags, requestOptions);
+        return this.instrumentation.instrument("Blob_SetTags", requestOptions,
+            updatedOptions -> this.serviceClient.setTagsWithResponse(containerName, blob, timeout, versionId,
+                transactionalContentMD5, transactionalContentCrc64, requestId, ifTags, leaseId, tags, updatedOptions));
     }
 
     /**
@@ -1769,7 +1830,8 @@ public final class BlobClient {
     public void setTags(String containerName, String blob, Integer timeout, String versionId,
         byte[] transactionalContentMD5, byte[] transactionalContentCrc64, String requestId, String ifTags,
         String leaseId, BlobTags tags) {
-        this.serviceClient.setTags(containerName, blob, timeout, versionId, transactionalContentMD5,
-            transactionalContentCrc64, requestId, ifTags, leaseId, tags);
+        this.instrumentation.instrument("Blob_SetTags", null,
+            updatedOptions -> this.serviceClient.setTags(containerName, blob, timeout, versionId,
+                transactionalContentMD5, transactionalContentCrc64, requestId, ifTags, leaseId, tags));
     }
 }
