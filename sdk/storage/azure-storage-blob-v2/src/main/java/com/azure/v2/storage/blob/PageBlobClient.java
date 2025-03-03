@@ -95,7 +95,7 @@ public final class PageBlobClient {
         OffsetDateTime immutabilityPolicyExpiry, BlobImmutabilityPolicyMode immutabilityPolicyMode, Boolean legalHold,
         BlobHttpHeaders blobHttpHeaders, CpkInfo cpkInfo, EncryptionScope encryptionScopeParam,
         RequestOptions requestOptions) {
-        return this.instrumentation.instrument("PageBlob_Create", requestOptions,
+        return this.instrumentation.instrumentWithResponse("PageBlob_Create", requestOptions,
             updatedOptions -> this.serviceClient.createWithResponse(containerName, blob, contentLength,
                 blobContentLength, timeout, tier, metadata, leaseId, ifModifiedSince, ifUnmodifiedSince, ifMatch,
                 ifNoneMatch, ifTags, blobSequenceNumber, requestId, blobTagsString, immutabilityPolicyExpiry,
@@ -205,7 +205,7 @@ public final class PageBlobClient {
         Long ifSequenceNumberEqualTo, OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String ifMatch,
         String ifNoneMatch, String ifTags, String requestId, String structuredBodyType, Long structuredContentLength,
         CpkInfo cpkInfo, EncryptionScope encryptionScopeParam, RequestOptions requestOptions) {
-        return this.instrumentation.instrument("PageBlob_UploadPages", requestOptions,
+        return this.instrumentation.instrumentWithResponse("PageBlob_UploadPages", requestOptions,
             updatedOptions -> this.serviceClient.uploadPagesWithResponse(containerName, blob, contentLength, body,
                 transactionalContentMD5, transactionalContentCrc64, timeout, range, leaseId,
                 ifSequenceNumberLessThanOrEqualTo, ifSequenceNumberLessThan, ifSequenceNumberEqualTo, ifModifiedSince,
@@ -307,7 +307,7 @@ public final class PageBlobClient {
         Long ifSequenceNumberEqualTo, OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String ifMatch,
         String ifNoneMatch, String ifTags, String requestId, CpkInfo cpkInfo, EncryptionScope encryptionScopeParam,
         RequestOptions requestOptions) {
-        return this.instrumentation.instrument("PageBlob_ClearPages", requestOptions,
+        return this.instrumentation.instrumentWithResponse("PageBlob_ClearPages", requestOptions,
             updatedOptions -> this.serviceClient.clearPagesWithResponse(containerName, blob, contentLength, timeout,
                 range, leaseId, ifSequenceNumberLessThanOrEqualTo, ifSequenceNumberLessThan, ifSequenceNumberEqualTo,
                 ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, cpkInfo,
@@ -414,7 +414,7 @@ public final class PageBlobClient {
         String ifNoneMatch, String ifTags, OffsetDateTime sourceIfModifiedSince, OffsetDateTime sourceIfUnmodifiedSince,
         String sourceIfMatch, String sourceIfNoneMatch, String requestId, String copySourceAuthorization,
         CpkInfo cpkInfo, EncryptionScope encryptionScopeParam, RequestOptions requestOptions) {
-        return this.instrumentation.instrument("PageBlob_UploadPagesFromURL", requestOptions,
+        return this.instrumentation.instrumentWithResponse("PageBlob_UploadPagesFromURL", requestOptions,
             updatedOptions -> this.serviceClient.uploadPagesFromURLWithResponse(containerName, blob, sourceUrl,
                 sourceRange, contentLength, range, sourceContentMD5, sourceContentcrc64, timeout, leaseId,
                 ifSequenceNumberLessThanOrEqualTo, ifSequenceNumberLessThan, ifSequenceNumberEqualTo, ifModifiedSince,
@@ -531,7 +531,7 @@ public final class PageBlobClient {
         Integer timeout, String range, String leaseId, OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince,
         String ifMatch, String ifNoneMatch, String ifTags, String requestId, String marker, Integer maxresults,
         RequestOptions requestOptions) {
-        return this.instrumentation.instrument("PageBlob_GetPageRanges", requestOptions,
+        return this.instrumentation.instrumentWithResponse("PageBlob_GetPageRanges", requestOptions,
             updatedOptions -> this.serviceClient.getPageRangesWithResponse(containerName, blob, snapshot, timeout,
                 range, leaseId, ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, marker,
                 maxresults, updatedOptions));
@@ -580,7 +580,7 @@ public final class PageBlobClient {
     public PageList getPageRanges(String containerName, String blob, String snapshot, Integer timeout, String range,
         String leaseId, OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String ifMatch,
         String ifNoneMatch, String ifTags, String requestId, String marker, Integer maxresults) {
-        return this.instrumentation.instrument("PageBlob_GetPageRanges", null,
+        return this.instrumentation.instrumentWithResponse("PageBlob_GetPageRanges", null,
             updatedOptions -> this.serviceClient.getPageRanges(containerName, blob, snapshot, timeout, range, leaseId,
                 ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, marker, maxresults));
     }
@@ -638,7 +638,7 @@ public final class PageBlobClient {
         Integer timeout, String prevsnapshot, String prevSnapshotUrl, String range, String leaseId,
         OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String ifMatch, String ifNoneMatch,
         String ifTags, String requestId, String marker, Integer maxresults, RequestOptions requestOptions) {
-        return this.instrumentation.instrument("PageBlob_GetPageRangesDiff", requestOptions,
+        return this.instrumentation.instrumentWithResponse("PageBlob_GetPageRangesDiff", requestOptions,
             updatedOptions -> this.serviceClient.getPageRangesDiffWithResponse(containerName, blob, snapshot, timeout,
                 prevsnapshot, prevSnapshotUrl, range, leaseId, ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch,
                 ifTags, requestId, marker, maxresults, updatedOptions));
@@ -696,7 +696,7 @@ public final class PageBlobClient {
         String prevsnapshot, String prevSnapshotUrl, String range, String leaseId, OffsetDateTime ifModifiedSince,
         OffsetDateTime ifUnmodifiedSince, String ifMatch, String ifNoneMatch, String ifTags, String requestId,
         String marker, Integer maxresults) {
-        return this.instrumentation.instrument("PageBlob_GetPageRangesDiff", null,
+        return this.instrumentation.instrumentWithResponse("PageBlob_GetPageRangesDiff", null,
             updatedOptions -> this.serviceClient.getPageRangesDiff(containerName, blob, snapshot, timeout, prevsnapshot,
                 prevSnapshotUrl, range, leaseId, ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags,
                 requestId, marker, maxresults));
@@ -735,7 +735,7 @@ public final class PageBlobClient {
         String leaseId, OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String ifMatch,
         String ifNoneMatch, String ifTags, String requestId, CpkInfo cpkInfo, EncryptionScope encryptionScopeParam,
         RequestOptions requestOptions) {
-        return this.instrumentation.instrument("PageBlob_Resize", requestOptions,
+        return this.instrumentation.instrumentWithResponse("PageBlob_Resize", requestOptions,
             updatedOptions -> this.serviceClient.resizeWithResponse(containerName, blob, blobContentLength, timeout,
                 leaseId, ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, cpkInfo,
                 encryptionScopeParam, updatedOptions));
@@ -811,7 +811,7 @@ public final class PageBlobClient {
         SequenceNumberActionType sequenceNumberAction, Integer timeout, String leaseId, OffsetDateTime ifModifiedSince,
         OffsetDateTime ifUnmodifiedSince, String ifMatch, String ifNoneMatch, String ifTags, Long blobSequenceNumber,
         String requestId, RequestOptions requestOptions) {
-        return this.instrumentation.instrument("PageBlob_UpdateSequenceNumber", requestOptions,
+        return this.instrumentation.instrumentWithResponse("PageBlob_UpdateSequenceNumber", requestOptions,
             updatedOptions -> this.serviceClient.updateSequenceNumberWithResponse(containerName, blob,
                 sequenceNumberAction, timeout, leaseId, ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch,
                 ifTags, blobSequenceNumber, requestId, updatedOptions));
@@ -887,7 +887,7 @@ public final class PageBlobClient {
     public Response<Void> copyIncrementalWithResponse(String containerName, String blob, String copySource,
         Integer timeout, OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String ifMatch,
         String ifNoneMatch, String ifTags, String requestId, RequestOptions requestOptions) {
-        return this.instrumentation.instrument("PageBlob_CopyIncremental", requestOptions,
+        return this.instrumentation.instrumentWithResponse("PageBlob_CopyIncremental", requestOptions,
             updatedOptions -> this.serviceClient.copyIncrementalWithResponse(containerName, blob, copySource, timeout,
                 ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, updatedOptions));
     }

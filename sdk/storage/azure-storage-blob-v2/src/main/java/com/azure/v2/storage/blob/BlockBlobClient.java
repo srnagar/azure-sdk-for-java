@@ -103,7 +103,7 @@ public final class BlockBlobClient {
         BlobImmutabilityPolicyMode immutabilityPolicyMode, Boolean legalHold, byte[] transactionalContentCrc64,
         String structuredBodyType, Long structuredContentLength, BlobHttpHeaders blobHttpHeaders, CpkInfo cpkInfo,
         EncryptionScope encryptionScopeParam, RequestOptions requestOptions) {
-        return this.instrumentation.instrument("BlockBlob_Upload", requestOptions,
+        return this.instrumentation.instrumentWithResponse("BlockBlob_Upload", requestOptions,
             updatedOptions -> this.serviceClient.uploadWithResponse(containerName, blob, contentLength, body, timeout,
                 transactionalContentMD5, metadata, leaseId, tier, ifModifiedSince, ifUnmodifiedSince, ifMatch,
                 ifNoneMatch, ifTags, requestId, blobTagsString, immutabilityPolicyExpiry, immutabilityPolicyMode,
@@ -241,7 +241,7 @@ public final class BlockBlobClient {
         String requestId, byte[] sourceContentMD5, String blobTagsString, Boolean copySourceBlobProperties,
         String copySourceAuthorization, BlobCopySourceTagsMode copySourceTags, BlobHttpHeaders blobHttpHeaders,
         CpkInfo cpkInfo, EncryptionScope encryptionScopeParam, RequestOptions requestOptions) {
-        return this.instrumentation.instrument("BlockBlob_PutBlobFromUrl", requestOptions,
+        return this.instrumentation.instrumentWithResponse("BlockBlob_PutBlobFromUrl", requestOptions,
             updatedOptions -> this.serviceClient.putBlobFromUrlWithResponse(containerName, blob, contentLength,
                 copySource, timeout, transactionalContentMD5, metadata, leaseId, tier, ifModifiedSince,
                 ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, sourceIfModifiedSince, sourceIfUnmodifiedSince,
@@ -358,7 +358,7 @@ public final class BlockBlobClient {
         BinaryData body, byte[] transactionalContentMD5, byte[] transactionalContentCrc64, Integer timeout,
         String leaseId, String requestId, String structuredBodyType, Long structuredContentLength, CpkInfo cpkInfo,
         EncryptionScope encryptionScopeParam, RequestOptions requestOptions) {
-        return this.instrumentation.instrument("BlockBlob_StageBlock", requestOptions,
+        return this.instrumentation.instrumentWithResponse("BlockBlob_StageBlock", requestOptions,
             updatedOptions -> this.serviceClient.stageBlockWithResponse(containerName, blob, blockId, contentLength,
                 body, transactionalContentMD5, transactionalContentCrc64, timeout, leaseId, requestId,
                 structuredBodyType, structuredContentLength, cpkInfo, encryptionScopeParam, updatedOptions));
@@ -446,7 +446,7 @@ public final class BlockBlobClient {
         Integer timeout, String leaseId, OffsetDateTime sourceIfModifiedSince, OffsetDateTime sourceIfUnmodifiedSince,
         String sourceIfMatch, String sourceIfNoneMatch, String requestId, String copySourceAuthorization,
         CpkInfo cpkInfo, EncryptionScope encryptionScopeParam, RequestOptions requestOptions) {
-        return this.instrumentation.instrument("BlockBlob_StageBlockFromURL", requestOptions,
+        return this.instrumentation.instrumentWithResponse("BlockBlob_StageBlockFromURL", requestOptions,
             updatedOptions -> this.serviceClient.stageBlockFromURLWithResponse(containerName, blob, blockId,
                 contentLength, sourceUrl, sourceRange, sourceContentMD5, sourceContentcrc64, timeout, leaseId,
                 sourceIfModifiedSince, sourceIfUnmodifiedSince, sourceIfMatch, sourceIfNoneMatch, requestId,
@@ -555,7 +555,7 @@ public final class BlockBlobClient {
         OffsetDateTime immutabilityPolicyExpiry, BlobImmutabilityPolicyMode immutabilityPolicyMode, Boolean legalHold,
         BlobHttpHeaders blobHttpHeaders, CpkInfo cpkInfo, EncryptionScope encryptionScopeParam,
         RequestOptions requestOptions) {
-        return this.instrumentation.instrument("BlockBlob_CommitBlockList", requestOptions,
+        return this.instrumentation.instrumentWithResponse("BlockBlob_CommitBlockList", requestOptions,
             updatedOptions -> this.serviceClient.commitBlockListWithResponse(containerName, blob, blocks, timeout,
                 transactionalContentMD5, transactionalContentCrc64, metadata, leaseId, tier, ifModifiedSince,
                 ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, blobTagsString, immutabilityPolicyExpiry,
@@ -648,7 +648,7 @@ public final class BlockBlobClient {
     public Response<BlockList> getBlockListWithResponse(String containerName, String blob, BlockListType listType,
         String snapshot, Integer timeout, String leaseId, String ifTags, String requestId,
         RequestOptions requestOptions) {
-        return this.instrumentation.instrument("BlockBlob_GetBlockList", requestOptions,
+        return this.instrumentation.instrumentWithResponse("BlockBlob_GetBlockList", requestOptions,
             updatedOptions -> this.serviceClient.getBlockListWithResponse(containerName, blob, listType, snapshot,
                 timeout, leaseId, ifTags, requestId, updatedOptions));
     }
@@ -679,7 +679,8 @@ public final class BlockBlobClient {
     @Metadata(generated = true)
     public BlockList getBlockList(String containerName, String blob, BlockListType listType, String snapshot,
         Integer timeout, String leaseId, String ifTags, String requestId) {
-        return this.instrumentation.instrument("BlockBlob_GetBlockList", null, updatedOptions -> this.serviceClient
-            .getBlockList(containerName, blob, listType, snapshot, timeout, leaseId, ifTags, requestId));
+        return this.instrumentation.instrumentWithResponse("BlockBlob_GetBlockList", null,
+            updatedOptions -> this.serviceClient.getBlockList(containerName, blob, listType, snapshot, timeout, leaseId,
+                ifTags, requestId));
     }
 }
