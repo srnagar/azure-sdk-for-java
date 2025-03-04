@@ -30,6 +30,7 @@ import io.clientcore.core.http.paging.PagedResponse;
 import io.clientcore.core.http.models.RequestOptions;
 import io.clientcore.core.http.models.Response;
 import io.clientcore.core.http.pipeline.HttpPipeline;
+import io.clientcore.core.instrumentation.Instrumentation;
 import io.clientcore.core.models.binarydata.BinaryData;
 import io.clientcore.core.serialization.ObjectSerializer;
 import io.clientcore.core.utils.Context;
@@ -53,14 +54,17 @@ public final class ServicesImpl {
      */
     private final AzureBlobStorageImpl client;
 
+    private final Instrumentation instrumentation;
+
     /**
      * Initializes an instance of ServicesImpl.
      *
      * @param client the instance of the service client containing this operation class.
      */
-    ServicesImpl(AzureBlobStorageImpl client) {
+    ServicesImpl(AzureBlobStorageImpl client, Instrumentation instrumentation) {
         this.service = RestProxy.create(ServicesService.class, client.getHttpPipeline());
         this.client = client;
+        this.instrumentation = instrumentation;
     }
 
     /**
@@ -389,16 +393,19 @@ public final class ServicesImpl {
         String requestId) {
         final String comp = "list";
         final String accept = "application/xml";
-        String listBlobContainersIncludeTypeConverted = (listBlobContainersIncludeType == null)
-            ? null
-            : listBlobContainersIncludeType.stream()
-                .map(paramItemValue -> Objects.toString(paramItemValue, ""))
-                .collect(Collectors.joining(","));
-        Response<BlobContainersSegment> res = service.listBlobContainersSegment(this.client.getUrl(), comp, prefix,
-            marker, maxresults, listBlobContainersIncludeTypeConverted, timeout, this.client.getVersion(), requestId,
-            accept, RequestOptions.none());
-        return new PagedResponse<>(res.getRequest(), res.getStatusCode(), res.getHeaders(), res.getBody(),
-            res.getValue().getBlobContainerItems(), null, res.getValue().getNextMarker(), null, null, null);
+        return instrumentation.instrumentWithResponse("Service_ListBlobContainersSegment", RequestOptions.none(),
+            updatedOptions -> {
+                String listBlobContainersIncludeTypeConverted = (listBlobContainersIncludeType == null)
+                    ? null
+                    : listBlobContainersIncludeType.stream()
+                        .map(paramItemValue -> Objects.toString(paramItemValue, ""))
+                        .collect(Collectors.joining(","));
+                Response<BlobContainersSegment> res = service.listBlobContainersSegment(this.client.getUrl(), comp,
+                    prefix, marker, maxresults, listBlobContainersIncludeTypeConverted, timeout,
+                    this.client.getVersion(), requestId, accept, updatedOptions);
+                return new PagedResponse<>(res.getRequest(), res.getStatusCode(), res.getHeaders(), res.getBody(),
+                    res.getValue().getBlobContainerItems(), null, res.getValue().getNextMarker(), null, null, null);
+            });
     }
 
     /**
@@ -433,16 +440,20 @@ public final class ServicesImpl {
         String requestId, RequestOptions requestOptions) {
         final String comp = "list";
         final String accept = "application/xml";
-        String listBlobContainersIncludeTypeConverted = (listBlobContainersIncludeType == null)
-            ? null
-            : listBlobContainersIncludeType.stream()
-                .map(paramItemValue -> Objects.toString(paramItemValue, ""))
-                .collect(Collectors.joining(","));
-        Response<BlobContainersSegment> res = service.listBlobContainersSegment(this.client.getUrl(), comp, prefix,
-            marker, maxresults, listBlobContainersIncludeTypeConverted, timeout, this.client.getVersion(), requestId,
-            accept, requestOptions);
-        return new PagedResponse<>(res.getRequest(), res.getStatusCode(), res.getHeaders(), res.getBody(),
-            res.getValue().getBlobContainerItems(), null, res.getValue().getNextMarker(), null, null, null);
+
+        return instrumentation.instrumentWithResponse("Service_ListBlobContainersSegment", requestOptions,
+            updatedOptions -> {
+                String listBlobContainersIncludeTypeConverted = (listBlobContainersIncludeType == null)
+                    ? null
+                    : listBlobContainersIncludeType.stream()
+                        .map(paramItemValue -> Objects.toString(paramItemValue, ""))
+                        .collect(Collectors.joining(","));
+                Response<BlobContainersSegment> res = service.listBlobContainersSegment(this.client.getUrl(), comp,
+                    prefix, marker, maxresults, listBlobContainersIncludeTypeConverted, timeout,
+                    this.client.getVersion(), requestId, accept, updatedOptions);
+                return new PagedResponse<>(res.getRequest(), res.getStatusCode(), res.getHeaders(), res.getBody(),
+                    res.getValue().getBlobContainerItems(), null, res.getValue().getNextMarker(), null, null, null);
+            });
     }
 
     /**
@@ -738,10 +749,14 @@ public final class ServicesImpl {
      */
     public PagedResponse<BlobContainerItem> listBlobContainersSegmentNextSinglePage(String nextLink, String requestId) {
         final String accept = "application/xml";
-        Response<BlobContainersSegment> res = service.listBlobContainersSegmentNext(nextLink, this.client.getUrl(),
-            this.client.getVersion(), requestId, accept, RequestOptions.none());
-        return new PagedResponse<>(res.getRequest(), res.getStatusCode(), res.getHeaders(), res.getBody(),
-            res.getValue().getBlobContainerItems(), null, res.getValue().getNextMarker(), null, null, null);
+
+        return instrumentation.instrumentWithResponse("Service_ListBlobContainersSegment", RequestOptions.none(),
+            updatedOptions -> {
+                Response<BlobContainersSegment> res = service.listBlobContainersSegmentNext(nextLink, this.client.getUrl(),
+                        this.client.getVersion(), requestId, accept, RequestOptions.none());
+                return new PagedResponse<>(res.getRequest(), res.getStatusCode(), res.getHeaders(), res.getBody(),
+                        res.getValue().getBlobContainerItems(), null, res.getValue().getNextMarker(), null, null, null);
+            });
     }
 
     /**
@@ -759,9 +774,12 @@ public final class ServicesImpl {
     public PagedResponse<BlobContainerItem> listBlobContainersSegmentNextSinglePage(String nextLink, String requestId,
         RequestOptions requestOptions) {
         final String accept = "application/xml";
-        Response<BlobContainersSegment> res = service.listBlobContainersSegmentNext(nextLink, this.client.getUrl(),
-            this.client.getVersion(), requestId, accept, requestOptions);
-        return new PagedResponse<>(res.getRequest(), res.getStatusCode(), res.getHeaders(), res.getBody(),
-            res.getValue().getBlobContainerItems(), null, res.getValue().getNextMarker(), null, null, null);
+        return instrumentation.instrumentWithResponse("Service_ListBlobContainersSegment", RequestOptions.none(),
+                updatedOptions -> {
+                    Response<BlobContainersSegment> res = service.listBlobContainersSegmentNext(nextLink, this.client.getUrl(),
+                            this.client.getVersion(), requestId, accept, requestOptions);
+                    return new PagedResponse<>(res.getRequest(), res.getStatusCode(), res.getHeaders(), res.getBody(),
+                            res.getValue().getBlobContainerItems(), null, res.getValue().getNextMarker(), null, null, null);
+                });
     }
 }

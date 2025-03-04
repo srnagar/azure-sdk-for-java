@@ -225,9 +225,17 @@ public final class AzureBlobStorageBuilder implements HttpTrait<AzureBlobStorage
     @Metadata(generated = true)
     private AzureBlobStorageImpl buildInnerClient() {
         this.validateClient();
+
+        HttpInstrumentationOptions localHttpInstrumentationOptions = this.httpInstrumentationOptions == null
+            ? new HttpInstrumentationOptions()
+            : this.httpInstrumentationOptions;
+        LibraryInstrumentationOptions libraryInstrumentationOptions = new LibraryInstrumentationOptions("TODO");
+        Instrumentation instrumentation
+            = Instrumentation.create(localHttpInstrumentationOptions, libraryInstrumentationOptions);
+
         HttpPipeline localPipeline = (pipeline != null) ? pipeline : createHttpPipeline();
         String localVersion = (version != null) ? version : "2025-01-05";
-        AzureBlobStorageImpl client = new AzureBlobStorageImpl(localPipeline, this.url, localVersion);
+        AzureBlobStorageImpl client = new AzureBlobStorageImpl(localPipeline, this.url, localVersion, instrumentation);
         return client;
     }
 

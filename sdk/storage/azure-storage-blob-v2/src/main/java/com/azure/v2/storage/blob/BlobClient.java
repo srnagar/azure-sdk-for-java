@@ -39,7 +39,7 @@ public final class BlobClient {
 
     /**
      * Initializes an instance of BlobClient class.
-     * 
+     *
      * @param serviceClient the service client implementation.
      * @param instrumentation the instrumentation instance.
      */
@@ -52,7 +52,7 @@ public final class BlobClient {
     /**
      * The Download operation reads or downloads a blob from the system, including its metadata and properties. You can
      * also call Download to read a snapshot or version.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param snapshot The snapshot parameter is an opaque DateTime value that, when present, specifies the blob
@@ -103,7 +103,7 @@ public final class BlobClient {
     /**
      * The Download operation reads or downloads a blob from the system, including its metadata and properties. You can
      * also call Download to read a snapshot or version.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param snapshot The snapshot parameter is an opaque DateTime value that, when present, specifies the blob
@@ -152,7 +152,7 @@ public final class BlobClient {
     /**
      * The Get Properties operation returns all user-defined metadata, standard HTTP properties, and system properties
      * for the blob. It does not return the content of the blob.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param snapshot The snapshot parameter is an opaque DateTime value that, when present, specifies the blob
@@ -195,7 +195,7 @@ public final class BlobClient {
     /**
      * The Get Properties operation returns all user-defined metadata, standard HTTP properties, and system properties
      * for the blob. It does not return the content of the blob.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param snapshot The snapshot parameter is an opaque DateTime value that, when present, specifies the blob
@@ -247,7 +247,7 @@ public final class BlobClient {
      * automatic snapshot using snapshot timestamp or version id. You can restore the blob by calling Put or Copy Blob
      * API with automatic snapshot as source. Deleting automatic snapshot requires shared key or special SAS/RBAC
      * permissions.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param snapshot The snapshot parameter is an opaque DateTime value that, when present, specifies the blob
@@ -307,7 +307,7 @@ public final class BlobClient {
      * automatic snapshot using snapshot timestamp or version id. You can restore the blob by calling Put or Copy Blob
      * API with automatic snapshot as source. Deleting automatic snapshot requires shared key or special SAS/RBAC
      * permissions.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param snapshot The snapshot parameter is an opaque DateTime value that, when present, specifies the blob
@@ -351,7 +351,7 @@ public final class BlobClient {
 
     /**
      * Undelete a blob that was previously soft deleted.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
@@ -375,7 +375,7 @@ public final class BlobClient {
 
     /**
      * Undelete a blob that was previously soft deleted.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
@@ -395,7 +395,7 @@ public final class BlobClient {
 
     /**
      * Sets the time a blob will expire and be deleted.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param expiryOptions Required. Indicates mode of the expiry time.
@@ -421,7 +421,7 @@ public final class BlobClient {
 
     /**
      * Sets the time a blob will expire and be deleted.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param expiryOptions Required. Indicates mode of the expiry time.
@@ -444,7 +444,7 @@ public final class BlobClient {
 
     /**
      * The Set HTTP Headers operation sets system properties on the blob.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
@@ -479,7 +479,7 @@ public final class BlobClient {
 
     /**
      * The Set HTTP Headers operation sets system properties on the blob.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
@@ -511,7 +511,7 @@ public final class BlobClient {
 
     /**
      * The Set Immutability Policy operation sets the immutability policy on the blob.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
@@ -548,7 +548,7 @@ public final class BlobClient {
 
     /**
      * The Set Immutability Policy operation sets the immutability policy on the blob.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
@@ -581,7 +581,7 @@ public final class BlobClient {
 
     /**
      * The Delete Immutability Policy operation deletes the immutability policy on the blob.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
@@ -611,7 +611,7 @@ public final class BlobClient {
 
     /**
      * The Delete Immutability Policy operation deletes the immutability policy on the blob.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
@@ -638,7 +638,7 @@ public final class BlobClient {
 
     /**
      * The Set Legal Hold operation sets a legal hold on the blob.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param legalHold Specified if a legal hold should be set on the blob.
@@ -669,7 +669,7 @@ public final class BlobClient {
 
     /**
      * The Set Legal Hold operation sets a legal hold on the blob.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param legalHold Specified if a legal hold should be set on the blob.
@@ -698,7 +698,7 @@ public final class BlobClient {
     /**
      * The Set Blob Metadata operation sets user-defined metadata for the specified blob as one or more name-value
      * pairs.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
@@ -742,7 +742,7 @@ public final class BlobClient {
     /**
      * The Set Blob Metadata operation sets user-defined metadata for the specified blob as one or more name-value
      * pairs.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
@@ -782,7 +782,7 @@ public final class BlobClient {
 
     /**
      * [Update] The Lease Blob operation establishes and manages a lock on a blob for write and delete operations.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
@@ -821,7 +821,7 @@ public final class BlobClient {
 
     /**
      * [Update] The Lease Blob operation establishes and manages a lock on a blob for write and delete operations.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
@@ -857,7 +857,7 @@ public final class BlobClient {
 
     /**
      * [Update] The Lease Blob operation establishes and manages a lock on a blob for write and delete operations.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param leaseId Specifies the current lease ID on the resource.
@@ -890,7 +890,7 @@ public final class BlobClient {
 
     /**
      * [Update] The Lease Blob operation establishes and manages a lock on a blob for write and delete operations.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param leaseId Specifies the current lease ID on the resource.
@@ -921,7 +921,7 @@ public final class BlobClient {
 
     /**
      * [Update] The Lease Blob operation establishes and manages a lock on a blob for write and delete operations.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param leaseId Specifies the current lease ID on the resource.
@@ -954,7 +954,7 @@ public final class BlobClient {
 
     /**
      * [Update] The Lease Blob operation establishes and manages a lock on a blob for write and delete operations.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param leaseId Specifies the current lease ID on the resource.
@@ -985,7 +985,7 @@ public final class BlobClient {
 
     /**
      * [Update] The Lease Blob operation establishes and manages a lock on a blob for write and delete operations.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param leaseId Specifies the current lease ID on the resource.
@@ -1021,7 +1021,7 @@ public final class BlobClient {
 
     /**
      * [Update] The Lease Blob operation establishes and manages a lock on a blob for write and delete operations.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param leaseId Specifies the current lease ID on the resource.
@@ -1055,7 +1055,7 @@ public final class BlobClient {
 
     /**
      * [Update] The Lease Blob operation establishes and manages a lock on a blob for write and delete operations.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
@@ -1093,7 +1093,7 @@ public final class BlobClient {
 
     /**
      * [Update] The Lease Blob operation establishes and manages a lock on a blob for write and delete operations.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
@@ -1129,7 +1129,7 @@ public final class BlobClient {
 
     /**
      * The Create Snapshot operation creates a read-only snapshot of a blob.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
@@ -1172,7 +1172,7 @@ public final class BlobClient {
 
     /**
      * The Create Snapshot operation creates a read-only snapshot of a blob.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
@@ -1211,7 +1211,7 @@ public final class BlobClient {
 
     /**
      * The Start Copy From URL operation copies a blob or an internet resource to a new blob.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param copySource Specifies the name of the source page blob snapshot. This value is a URL of up to 2 KB in
@@ -1274,7 +1274,7 @@ public final class BlobClient {
 
     /**
      * The Start Copy From URL operation copies a blob or an internet resource to a new blob.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param copySource Specifies the name of the source page blob snapshot. This value is a URL of up to 2 KB in
@@ -1336,7 +1336,7 @@ public final class BlobClient {
     /**
      * The Copy From URL operation copies a blob or an internet resource to a new blob. It will not return a response
      * until the copy is complete.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param copySource Specifies the name of the source page blob snapshot. This value is a URL of up to 2 KB in
@@ -1404,7 +1404,7 @@ public final class BlobClient {
     /**
      * The Copy From URL operation copies a blob or an internet resource to a new blob. It will not return a response
      * until the copy is complete.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param copySource Specifies the name of the source page blob snapshot. This value is a URL of up to 2 KB in
@@ -1469,7 +1469,7 @@ public final class BlobClient {
     /**
      * The Abort Copy From URL operation aborts a pending Copy From URL operation, and leaves a destination blob with
      * zero length and full metadata.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param copyId The copy identifier provided in the x-ms-copy-id header of the original Copy Blob operation.
@@ -1496,7 +1496,7 @@ public final class BlobClient {
     /**
      * The Abort Copy From URL operation aborts a pending Copy From URL operation, and leaves a destination blob with
      * zero length and full metadata.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param copyId The copy identifier provided in the x-ms-copy-id header of the original Copy Blob operation.
@@ -1513,8 +1513,10 @@ public final class BlobClient {
     @Metadata(generated = true)
     public void abortCopyFromURL(String containerName, String blob, String copyId, Integer timeout, String leaseId,
         String requestId) {
-        this.instrumentation.instrument("Blob_AbortCopyFromURL", null, updatedOptions -> this.serviceClient
-            .abortCopyFromURL(containerName, blob, copyId, timeout, leaseId, requestId));
+        this.instrumentation.instrumentWithResponse("Blob_AbortCopyFromURL", null, updatedOptions -> {
+            this.serviceClient.abortCopyFromURL(containerName, blob, copyId, timeout, leaseId, requestId);
+            return null;
+        });
     }
 
     /**
@@ -1522,7 +1524,7 @@ public final class BlobClient {
      * account and on a block blob in a blob storage account (locally redundant storage only). A premium page blob's
      * tier determines the allowed size, IOPS, and bandwidth of the blob. A block blob's tier determines
      * Hot/Cool/Archive storage type. This operation does not update the blob's ETag.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param tier Indicates the tier to be set on the blob.
@@ -1560,7 +1562,7 @@ public final class BlobClient {
      * account and on a block blob in a blob storage account (locally redundant storage only). A premium page blob's
      * tier determines the allowed size, IOPS, and bandwidth of the blob. A block blob's tier determines
      * Hot/Cool/Archive storage type. This operation does not update the blob's ETag.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param tier Indicates the tier to be set on the blob.
@@ -1592,7 +1594,7 @@ public final class BlobClient {
 
     /**
      * Returns the sku name and account kind.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
@@ -1616,7 +1618,7 @@ public final class BlobClient {
 
     /**
      * Returns the sku name and account kind.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
@@ -1636,7 +1638,7 @@ public final class BlobClient {
 
     /**
      * The Query operation enables users to select/project on blob data by providing simple query expressions.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param snapshot The snapshot parameter is an opaque DateTime value that, when present, specifies the blob
@@ -1677,7 +1679,7 @@ public final class BlobClient {
 
     /**
      * The Query operation enables users to select/project on blob data by providing simple query expressions.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param snapshot The snapshot parameter is an opaque DateTime value that, when present, specifies the blob
@@ -1715,7 +1717,7 @@ public final class BlobClient {
 
     /**
      * The Get Tags operation enables users to get the tags associated with a blob.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
@@ -1747,7 +1749,7 @@ public final class BlobClient {
 
     /**
      * The Get Tags operation enables users to get the tags associated with a blob.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
@@ -1777,7 +1779,7 @@ public final class BlobClient {
 
     /**
      * The Set Tags operation enables users to set tags on a blob.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
@@ -1809,7 +1811,7 @@ public final class BlobClient {
 
     /**
      * The Set Tags operation enables users to set tags on a blob.
-     * 
+     *
      * @param containerName The container name.
      * @param blob The blob name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a

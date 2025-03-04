@@ -208,9 +208,8 @@ public final class StorageServiceClient {
     @ServiceMethod(returns = ReturnType.COLLECTION)
     public PagedIterable<BlobContainerItem> listBlobContainersSegment(String prefix, String marker, Integer maxresults,
         List<ListBlobContainersIncludeType> listBlobContainersIncludeType, Integer timeout, String requestId) {
-        return this.instrumentation.instrumentWithResponse("Service_ListBlobContainersSegment", null,
-            updatedOptions -> this.serviceClient.listBlobContainersSegment(prefix, marker, maxresults,
-                listBlobContainersIncludeType, timeout, requestId));
+        return this.serviceClient.listBlobContainersSegment(prefix, marker, maxresults, listBlobContainersIncludeType,
+            timeout, requestId);
     }
 
     /**
@@ -245,9 +244,8 @@ public final class StorageServiceClient {
     public PagedIterable<BlobContainerItem> listBlobContainersSegment(String prefix, String marker, Integer maxresults,
         List<ListBlobContainersIncludeType> listBlobContainersIncludeType, Integer timeout, String requestId,
         RequestOptions requestOptions) {
-        return this.instrumentation.instrumentWithResponse("Service_ListBlobContainersSegment", requestOptions,
-            updatedOptions -> this.serviceClient.listBlobContainersSegment(prefix, marker, maxresults,
-                listBlobContainersIncludeType, timeout, requestId, updatedOptions));
+        return this.serviceClient.listBlobContainersSegment(prefix, marker, maxresults, listBlobContainersIncludeType,
+            timeout, requestId, requestOptions);
     }
 
     /**
