@@ -3,8 +3,8 @@
 
 package com.azure.v2.core.util.metrics;
 
-import io.clientcore.core.util.Context;
 import com.azure.v2.core.util.TelemetryAttributes;
+import io.clientcore.core.utils.Context;
 
 import java.util.Map;
 import java.util.Objects;

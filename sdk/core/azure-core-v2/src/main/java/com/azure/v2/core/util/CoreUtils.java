@@ -4,7 +4,7 @@
 package com.azure.v2.core.util;
 
 import io.clientcore.core.instrumentation.logging.ClientLogger;
-import io.clientcore.core.util.configuration.Configuration;
+import io.clientcore.core.utils.configuration.Configuration;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -207,7 +207,7 @@ public final class CoreUtils {
      * @return Either the environment configured default timeout, {@code defaultTimeoutMillis}, or 0.
      */
     public static Duration getDefaultTimeoutFromEnvironment(Configuration configuration, String timeoutPropertyName,
-        Duration defaultTimeout, ClientLogger logger) {
+                                                            Duration defaultTimeout, ClientLogger logger) {
         String environmentTimeout = configuration.get(timeoutPropertyName);
 
         // Environment wasn't configured with the timeout property.

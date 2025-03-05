@@ -5,16 +5,16 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class BlockBlobClientTest {
-
     @Test
     @Disabled
     public void testUpload() {
-        BlockBlobClient blockBlobClient = new AzureBlobStorageBuilder().url("<URL>").buildBlockBlobClient();
+        BlockBlobClient blockBlobClient = new AzureBlobStorageBuilder()
+            .url("sas-url")
+            .buildBlockBlobClient();
 
         String content = "Hello World!";
-        blockBlobClient.upload("testcontainer", "upload.txt", content.length(), BinaryData.fromString(content), null,
+        blockBlobClient.upload("test-container", "upload.txt", content.length(), BinaryData.fromString(content), null,
             null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
             null, null);
-
     }
 }

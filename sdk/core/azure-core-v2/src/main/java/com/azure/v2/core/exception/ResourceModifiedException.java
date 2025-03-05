@@ -3,8 +3,8 @@
 
 package com.azure.v2.core.exception;
 
-import io.clientcore.core.http.models.HttpResponse;
 import io.clientcore.core.http.models.Response;
+import io.clientcore.core.implementation.http.HttpResponse;
 
 /**
  * <p>The {@code ResourceModifiedException} represents an exception thrown when an HTTP request attempts to modify a

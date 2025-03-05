@@ -3,9 +3,9 @@
 
 package com.azure.v2.core.implementation.util;
 
-import io.clientcore.core.util.configuration.Configuration;
+import io.clientcore.core.utils.configuration.Configuration;
+import io.clientcore.core.utils.configuration.ConfigurationSource;
 
-import io.clientcore.core.util.configuration.ConfigurationSource;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,8 +24,8 @@ public class EnvironmentConfiguration {
     /*
      * Configurations that are loaded into the global configuration store when the application starts.
      */
-    private static final List<String> DEFAULT_CONFIGURATIONS = Arrays.asList(Configuration.PROPERTY_HTTP_PROXY,
-        Configuration.PROPERTY_HTTPS_PROXY, Configuration.PROPERTY_NO_PROXY);
+    private static final List<String> DEFAULT_CONFIGURATIONS = Arrays.asList(Configuration.HTTP_PROXY,
+        Configuration.HTTPS_PROXY, Configuration.NO_PROXY);
     //Configuration.PROPERTY_IDENTITY_HEADER, Configuration.PROPERTY_IDENTITY_ENDPOINT, Configuration.PROPERTY_MSI_ENDPOINT,
     //Configuration.PROPERTY_MSI_SECRET, Configuration.PROPERTY_AZURE_SUBSCRIPTION_ID,
     //Configuration.PROPERTY_AZURE_USERNAME, Configuration.PROPERTY_AZURE_PASSWORD,
@@ -71,7 +71,7 @@ public class EnvironmentConfiguration {
      * @param environmentConfigurationSource mocked environment configuration source.
      */
     public EnvironmentConfiguration(ConfigurationSource systemPropertiesConfigurationSource,
-        ConfigurationSource environmentConfigurationSource) {
+                                    ConfigurationSource environmentConfigurationSource) {
         this.explicitConfigurations = new ConcurrentHashMap<>();
 
         if (environmentConfigurationSource == null) {

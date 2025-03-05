@@ -5,9 +5,10 @@ package com.azure.v2.core.http.rest;
 import io.clientcore.core.http.models.HttpHeaders;
 import io.clientcore.core.http.models.HttpRequest;
 import io.clientcore.core.http.models.Response;
-import io.clientcore.core.util.binarydata.BinaryData;
-import io.clientcore.core.util.binarydata.ByteArrayBinaryData;
-import io.clientcore.core.util.binarydata.StringBinaryData;
+import io.clientcore.core.models.binarydata.BinaryData;
+import io.clientcore.core.models.binarydata.ByteArrayBinaryData;
+import io.clientcore.core.models.binarydata.InputStreamBinaryData;
+import io.clientcore.core.models.binarydata.StringBinaryData;
 
 import java.io.IOException;
 
@@ -112,13 +113,12 @@ public class ResponseBase<H, T> implements Response<T> {
      * @return The value type.
      */
     public Object bodyToValue(BinaryData data) {
-        if (data instanceof ByteArrayBinaryData) {
-            ByteArrayBinaryData byteArray = (ByteArrayBinaryData) data;
-            return byteArray.toStream();
+        if (data instanceof ByteArrayBinaryData || data instanceof InputStreamBinaryData) {
+            return data.toStream();
         }
+
         if (data instanceof StringBinaryData) {
-            StringBinaryData string = (StringBinaryData) data;
-            return string.toString();
+            return data.toString();
         }
 
         return data;

@@ -3,8 +3,8 @@
 
 package com.azure.v2.core.util.tracing;
 
-import io.clientcore.core.util.Context;
 import com.azure.v2.core.util.TracingOptions;
+import io.clientcore.core.utils.Context;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
